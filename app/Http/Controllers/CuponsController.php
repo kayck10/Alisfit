@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cupons;
+use App\Models\Pedidos;
 use Illuminate\Http\Request;
 
 class CuponsController extends Controller
 {
-    public function create () {
+    public function create()
+    {
         return view('cupons.create');
     }
 
@@ -16,6 +18,7 @@ class CuponsController extends Controller
         $cupons = Cupons::orderBy('id', 'desc')->paginate(10);
         return view('cupons.index', compact('cupons'));
     }
+
 
     public function store(Request $request)
     {
@@ -39,12 +42,12 @@ class CuponsController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $cupom = Cupons::findOrFail($id);
-    $cupom->update($request->all());
+    {
+        $cupom = Cupons::findOrFail($id);
+        $cupom->update($request->all());
 
-    return response()->json(['success' => true, 'message' => 'Cupom atualizado com sucesso!']);
-}
+        return response()->json(['success' => true, 'message' => 'Cupom atualizado com sucesso!']);
+    }
 
     public function destroy(Cupons $cupom)
     {
@@ -52,5 +55,6 @@ class CuponsController extends Controller
 
         return redirect()->route('cupons.index')->with('success', 'Cupom excluído com sucesso!');
     }
+
 
 }

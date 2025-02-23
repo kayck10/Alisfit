@@ -17,6 +17,8 @@ return new class extends Migration
             $table->text('descricao')->nullable();
             $table->decimal('preco', 10, 2);
             $table->foreignId('colecao_id')->nullable()->constrained('colecoes')->onDelete('set null');
+            $table->foreignId('genero_id')->nullable()->constrained('generos')->onDelete('set null');
+            $table->foreignId('tipo_produto_id')->nullable()->constrained('tipos_produtos')->onDelete('set null');
             $table->timestamps();
         });
     }

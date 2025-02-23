@@ -92,6 +92,106 @@
     .size-box.selected {
         background-color: #000;
     }
+
+    /* Animação de entrada na página */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .container {
+        animation: fadeInUp 0.8s ease-in-out;
+    }
+
+    /* Efeito de zoom ao passar o mouse na imagem principal */
+    .img-produto {
+        overflow: hidden;
+        display: block;
+        transition: transform 0.3s ease-in-out;
+    }
+
+
+    .img-produto:hover {
+        transform: scale(1.1);
+        /* Aumenta o tamanho da imagem dentro do espaço */
+    }
+
+    .upsell-item img {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .upsell-item img:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Animação do botão */
+    .btn-dark {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .btn-dark:hover {
+        transform: scale(1.05);
+        background-color: #333;
+    }
+
+    .btn-dark::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300%;
+        height: 300%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: all 0.5s ease-in-out;
+        transform: translate(-50%, -50%) scale(0);
+        border-radius: 50%;
+    }
+
+    .btn-dark:hover::before {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Suavização na seleção de tamanhos */
+    .size-box {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .size-box:hover {
+        transform: scale(1.1);
+    }
+
+    /* Efeito na entrada dos produtos relacionados */
+    .upsell-item {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.8s ease-in-out forwards;
+    }
+
+    .upsell-item:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .upsell-item:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .upsell-item:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .upsell-item:nth-child(4) {
+        animation-delay: 0.4s;
+    }
 </style>
 
 @section('content')
@@ -133,12 +233,12 @@
                 <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST">
                     @csrf
                     <div class="d-grid gap-2 col-6">
-                        <button type="submit" class="btn btn-dark btn-lg mt-2">Adicionar à sacola</button>
+                        <input type="hidden" name="quantidade" value="1">
+                        <button type="submit" class="btn btn-dark btn-lg mt-2">Adicionar à sacola </button>
                     </div>
                 </form>
                 <h6 class="mt-5 mb-5">DESCRIÇÃO DO PRODUTO</h6>
                 <p>{{ $produto->descricao }}</p>
-
             </div>
         </div>
         <hr class="mt-5">

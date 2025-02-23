@@ -9,7 +9,7 @@ class Produtos extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nome', 'descricao', 'preco', 'colecao_id', 'imagem_id'];
+    protected $fillable = ['nome', 'descricao', 'preco', 'colecao_id', 'imagem_id', 'genero_id', 'tipo_produto_id',];
 
     public function colecao()
     {
@@ -33,6 +33,16 @@ class Produtos extends Model
     public function imagens()
     {
         return $this->hasMany(ImagensProduto::class, 'produto_id', 'id');
+    }
+
+    public function genero()
+    {
+        return $this->belongsTo(Generos::class, 'genero_id');
+    }
+
+    public function tipoProduto()
+    {
+        return $this->belongsTo(TiposProdutos::class, 'tipo_produto_id');
     }
 
 

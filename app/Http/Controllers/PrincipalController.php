@@ -17,8 +17,13 @@ class PrincipalController extends Controller
         $colecoes = Colecoes::all();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
-        return view('principal.index', compact('produtos', 'colecoes', 'carrinho'));
+        $pedido = optional($carrinho)->pedido_id;
+
+        return view('principal.index', compact('produtos', 'colecoes', 'carrinho', 'pedido'));
     }
+
+
+
 
     public function produtos()
     {
@@ -37,31 +42,30 @@ class PrincipalController extends Controller
     }
 
     public function produtoDetalhes($id)
-    {
-        // Buscar o produto com tamanhos e imagens
-        $produto = Produtos::with('tamanhos', 'imagens')->findOrFail($id);
+{
+    $produto = Produtos::with('tamanhos', 'imagens')->findOrFail($id);
 
-        // Definir o mapeamento de cores
-        $cor_map = [
-            'preto' => '#000000',
-            'branco' => '#FFFFFF',
-            'azul' => '#0000FF',
-            'vermelho' => '#FF0000',
-            'verde' => '#00FF00',
-            'amarelo' => '#FFFF00',
-            'roxo' => '#800080',
-            // Adicione mais cores conforme necessário
-        ];
+    $cor_map = [
+        'preto' => '#000000',
+        'branco' => '#FFFFFF',
+        'azul' => '#0000FF',
+        'vermelho' => '#FF0000',
+        'verde' => '#00FF00',
+        'amarelo' => '#FFFF00',
+        'roxo' => '#800080',
+    ];
 
-        // Relacionados
-        $produtosRelacionados = Produtos::where('colecao_id', $produto->colecao_id)
-            ->where('id', '!=', $id)
-            ->take(4)
-            ->get();
 
-        // Retornar a view, passando o produto, produtos relacionados e o mapeamento de cores
-        return view('principal.produto_detalhes', compact('produto', 'produtosRelacionados', 'cor_map'));
-    }
+    $produtosRelacionados = Produtos::where('colecao_id', $produto->colecao_id)
+        ->where('id', '!=', $id)
+        ->take(4)
+        ->get();
+
+    $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+    return view('principal.produto_detalhes', compact('produto', 'produtosRelacionados', 'cor_map', 'carrinho'));
+}
+
 
 
 }

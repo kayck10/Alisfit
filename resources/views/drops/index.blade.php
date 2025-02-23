@@ -161,7 +161,7 @@
                     @foreach ($produtos as $produto)
                         <div class="col-md-3 col-sm-6 mb-4">
                             <div class="product-card">
-                            <a href="{{route('produto.detalhes')}}">   @if ($produto->imagens->isNotEmpty())
+                                <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">   @if ($produto->imagens->isNotEmpty())
                                     <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
                                         alt="{{ $produto->nome }}">
                                 @else
@@ -173,7 +173,6 @@
 
                                 <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST">
                                     @csrf
-                                    <input type="number" name="quantidade" value="1" min="1" class="form-control" style="width: 60px;">
                                     <button type="submit" class="btn btn-primary mt-2">Adicionar a sacola</button>
                                 </form>
                             </div>

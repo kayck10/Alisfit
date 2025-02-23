@@ -24,7 +24,7 @@
     }
 
     /* Sobreposição ao passar o mouse */
-    .hover-overlay {
+    .hover-overlay {    
         position: absolute;
         bottom: 0;
         left: 0;

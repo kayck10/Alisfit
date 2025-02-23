@@ -2,13 +2,13 @@
 
 @section('content')
     <div class="container">
-        <h2 class="mb-4">Criar Novo Produto</h2>
+        <h2 class="mb-5">Criar Novo Produto</h2>
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <div class="card">
+        <div style="margin-bottom: 200px" class="card">
             <div class="card-body">
                 <form style="margin-bottom: 100px;" action="{{ route('produtos.store') }}" method="POST"
                     enctype="multipart/form-data">
@@ -46,12 +46,41 @@
                         </div>
                     </div>
 
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Gênero:</label>
+                                <select name="genero_id" class="form-control" required>
+                                    <option value="" selected disabled>Selecione o gênero</option>
+                                    @foreach ($generos as $genero)
+                                        <option value="{{ $genero->id }}">{{ $genero->desc }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de peça:</label>
+                                <select name="tipo_produto_id" class="form-control" required>
+                                    <option value="" selected disabled>Selecione o tipo de peça</option>
+                                    @foreach ($pecas as $peca)
+                                        <option value="{{ $peca->id }}">{{ $peca->desc }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Imagens:</label>
                         <input type="file" id="input-imagens" name="imagens[]" class="form-control" multiple required>
                         <small class="text-muted">Você pode selecionar várias imagens</small>
                         <div id="preview-imagens" class="mt-3"></div>
                     </div>
+
+
 
                     <div class="mb-3">
                         <label class="form-label">Tamanhos e Cores:</label>
@@ -98,7 +127,6 @@
             btn.parentElement.remove();
         }
 
-        // Validação do formulário
         document.querySelector("form").addEventListener("submit", function(event) {
             let mensagensErro = [];
 

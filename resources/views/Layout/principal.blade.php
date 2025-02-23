@@ -20,7 +20,7 @@
     {{-- Cabeçalho --}}
     <section id="header">
         <div class="logo-container">
-            <a href="{{ route('produtos.index') }}">
+            <a href="{{ route('loja.create') }}">
                 <img src="{{ asset('images/ALis - nova logo-03.png') }}" class="logo" alt="Logo">
             </a>
         </div>
@@ -129,13 +129,13 @@
                                         {{ number_format($subtotal, 2, ',', '.') }}</small>
                                 </div>
                                 <!-- Input de quantidade -->
-                                <form action="{{ route('carrinho.atualizar', $produto->pivot->produto_id) }}"
-                                    method="POST" class="update-quantity-form">
+                                <form class="update-quantity-form" data-produto-id="{{ $produto->pivot->produto_id }}">
                                     @csrf
                                     <input type="number" name="quantidade"
                                         class="form-control form-control-sm text-center mx-2 update-quantity"
                                         value="{{ $produto->pivot->quantidade }}" min="1" style="width: 60px;">
                                 </form>
+
                                 <form action="{{ route('carrinho.remover', $produto->pivot->produto_id) }}"
                                     method="POST">
                                     @csrf
@@ -154,16 +154,20 @@
                         <button id="btnCupom" class="btn btn-outline-secondary btn-sm">Adicionar Cupom</button>
                         <input type="text" id="inputCupom" class="form-control d-none mt-2"
                             placeholder="Digite seu cupom">
+                        <button id="applyCupom" class="btn btn-primary d-none mt-2">Aplicar</button>
                     </div>
+                    <!-- Input hidden para armazenar o ID do pedido -->
+                    <input type="hidden" id="pedidoId" name="pedido_id" value="{{ $pedido ?? '' }}">
 
                     <h5 class="text-end"><strong>Total: R$ {{ number_format($totalCarrinho, 2, ',', '.') }}</strong>
                     </h5>
+
                 @endif
             </div>
             <!-- Botão Finalizar Compra fixo no fundo -->
             @if (isset($carrinho) && !$carrinho->produtos->isEmpty())
                 <div class="p-3 border-top bg-light">
-                    <a href="" class="btn btn-dark w-100">Finalizar Compra</a>
+                    <a href="{{ route('carrinho.finalizar') }}" class="btn btn-dark w-100">Finalizar Compra</a>
                 </div>
             @endif
         </div>
@@ -329,7 +333,7 @@
                     id="showLoginModal">{{ __('Faça login') }}</a></p>
         </div>
 
-        <script src="{{ asset('js/script.js') }}"></script>
+        {{-- <script src="{{ asset('js/script.js') }}"></script> --}}
 </body>
 <script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="http://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
@@ -339,6 +343,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 
 <script>
+    //nav
     document.addEventListener("DOMContentLoaded", function() {
         const header = document.getElementById("header");
 
@@ -354,14 +359,106 @@
         toggleNavbarBackground();
     });
 
-    document.getElementById('btnCupom').addEventListener('click', function() {
-        this.classList.add('d-none');
-        document.getElementById('inputCupom').classList.remove('d-none');
+    //cupom
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('btnCupom').addEventListener('click', function() {
+            this.classList.add('d-none');
+            document.getElementById('inputCupom').classList.remove('d-none');
+            document.getElementById('applyCupom').classList.remove('d-none');
+        });
+
+        document.getElementById('applyCupom').addEventListener('click', function() {
+            const codigo = document.getElementById('inputCupom').value;
+            const pedidoInput = document.getElementById('pedidoId');
+            if (pedidoInput) {
+                const pedidoId = pedidoInput.value;
+                console.log("Pedido ID:", pedidoId); // Verifique se o pedidoId está correto
+            } else {
+                console.warn("O input pedidoId não foi encontrado na página.");
+            }
+
+            fetch(`/pedido/${pedidoId}/aplicar-cupom`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        codigo: codigo
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Cupom aplicado com sucesso!');
+                        document.querySelector('.text-end strong').textContent =
+                            `Total: R$ ${data.novoTotal}`;
+                    } else {
+                        alert('Erro ao aplicar o cupom: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao aplicar o cupom:', error);
+                    alert('Ocorreu um erro ao aplicar o cupom');
+                });
+        });
     });
+
+
+
+    //carrinho
+
     document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll(".update-quantity").forEach(input => {
             input.addEventListener("change", function() {
-                this.closest(".update-quantity-form").submit();
+                let form = this.closest(".update-quantity-form");
+                let produtoId = form.dataset.produtoId;
+                let quantidade = this.value;
+
+                // Envia os dados via AJAX
+                fetch(`/carrinho/atualizar/${produtoId}`, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')
+                                .value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let produtoElement = form.closest('li');
+                            let subtotal = data.produtos.find(produto => produto.pivot
+                                    .produto_id == produtoId).pivot.quantidade * data
+                                .produtos.find(produto => produto.pivot.produto_id ==
+                                    produtoId).preco;
+
+                            // Atualiza o subtotal do produto
+                            produtoElement.querySelector('.me-auto small:last-child')
+                                .textContent =
+                                `Total: R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+
+                            // Atualiza o total do carrinho
+                            document.querySelector(".offcanvas-body h5 strong")
+                                .textContent = `Total: R$ ${data.total.replace('.', ',')}`;
+                        } else {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao atualizar o carrinho:', error);
+                    });
+            });
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".remover-produto").forEach(btn => {
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                const form = btn.closest("form");
+                form.submit(); // Envia o formulário normalmente
             });
         });
     });
