@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 class PedidosController extends Controller
 {
 
+    public function index() {
+        $pedidos = Pedidos::with(['user', 'cupons', 'status', 'carrinho'])->paginate(10);
+
+        return view('pedidos.index', compact('pedidos'));
+    }
+
+
 
 
     public function retornarDescontoCupom(Request $request)

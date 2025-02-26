@@ -158,7 +158,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link py-3 text-dark" href="">Financeiro</a>
+                            <a class="nav-link py-3 text-dark" href="{{route('financeiro.index')}}">Financeiro</a>
                         </li>
 
                         <li class="nav-item dropdown">

@@ -236,13 +236,13 @@
     <div id="carouselExample" class="carousel slide mb-5" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="{{ asset('images/banner/12.png') }}" class="d-block w-100" alt="Banner 1">
+                <img src="{{ asset('images/banner/banner00.JPG') }}" class="d-block w-100" alt="Banner 1">
             </div>
             <div class="carousel-item">
-                <img src="{{ asset('images/banner/15.png') }}" class="d-block w-100" alt="Banner 2">
+                <img src="{{ asset('images/banner/banner002.JPG') }}" class="d-block w-100" alt="Banner 2">
             </div>
             <div class="carousel-item">
-                <img src="{{ asset('images/banner/9.png') }}" class="d-block w-100" alt="Banner 3">
+                <img src="{{ asset('images/banner/banner003.JPG') }}" class="d-block w-100" alt="Banner 3">
             </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
@@ -298,11 +298,11 @@
         <h4 class="section-title mb-5"><strong>MAIS VENDIDOS</strong></h4>
         <div class="mais-vendidos-container">
             <div class="mais-vendidos-item">
-                <img src="{{ asset('images/banner/IMG_0174.JPG') }}" alt="Ofertas Masculinas">
+                <img src="{{ asset('images/banner/ofMas.jpeg') }}" alt="Ofertas Masculinas">
                 <div class="overlay">Ofertas Masculinas</div>
             </div>
             <div class="mais-vendidos-item">
-                <img src="{{ asset('images/banner/IMG_0169.JPG') }}" alt="Ofertas Femininas">
+                <img src="{{ asset('images/banner/ofFem.JPG') }}" alt="Ofertas Femininas">
                 <div class="overlay">Ofertas Femininas</div>
             </div>
         </div>
@@ -311,7 +311,7 @@
 
 
     <!-- Seção de Parallax -->
-    <section class="parallax" style="background-image: url('{{ asset('images/banner/AND_0140.JPG') }}');">
+    <section class="parallax" style="background-image: url('{{ asset('images/banner/IMG_4680.JPG') }}');">
         <div class="parallax-overlay">
             <h2 class="text-white fw-bold">One day or Day one</h2>
 
@@ -331,30 +331,11 @@
                 logotipo da marca, com seus traços retos e curvas sutis, simboliza a
                 <strong>modernidade e leveza</strong> de um estilo de vida único.
             </p>
-
-            <div id="texto-completo" class="hidden">
-                <h3 class="text-white fw-bold">100% POLIAMIDA</h3>
-
-                <p class="text-white mt-3">
-                    <strong>Por que se utiliza poliamida em roupas de academia?</strong> O material é o mais
-                    indicado para a prática de atividades físicas, pois é resistente, durável, macio
-                    e leve. Além de permitir os movimentos, o tecido também ajuda no processo de
-                    transpiração, que é muito importante durante o treino.
-                </p>
-            </div>
-
-            <button id="btn-leia-mais" class="btn btn-outline-light mt-3">Leia Mais</button>
         </div>
     </section>
 
 
 
-
-    <!-- Banner Secundário -->
-    <section class="text-center section-spacing" style="background-color: #bfbec4">
-        <img src="{{ asset('images/banner/alis - frase vectorizada_Prancheta 1 cópia (1).png') }}" alt="Banner"
-            class="img-fluid mx-auto d-block" style="max-width: 40%; height: auto;">
-    </section>
 
     <script>
         document.getElementById('btn-leia-mais').addEventListener('click', function() {

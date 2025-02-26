@@ -15,7 +15,6 @@ class Pedidos extends Model
         'user_id',
         'carrinho_id',
         'total',
-        'status',
         'status_pedido_id'
     ];
 
@@ -57,8 +56,11 @@ class Pedidos extends Model
 
     public function status()
     {
-        return $this->belongsTo(StatusPedidos::class, 'status_pedido_id');
+        return $this->belongsTo(StatusPedidos::class, 'status_pedido_id', 'id');
     }
+
+
+
 
     public function carrinho()
     {

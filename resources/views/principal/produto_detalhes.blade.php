@@ -1,10 +1,19 @@
 @extends('Layout.principal')
 
 <style>
-    .produto-container {
+      .produto-container {
         display: flex;
         gap: 40px;
-        margin-top: 150px;
+        margin-top: 80px;
+        flex-wrap: wrap;
+    }
+
+    .produto-container .col-md-5 {
+        flex: 1;
+    }
+
+    .produto-container .col-md-7 {
+        flex: 2;
     }
 
     .img-produto {
@@ -14,37 +23,32 @@
         border-radius: 10px;
     }
 
-    .produto-info {
-        flex: 1;
-    }
 
-    .upsell-container {
-        margin-top: 100px;
-        margin-bottom: 100px;
-        text-align: center;
-    }
+    @media (max-width: 768px) {
+        .produto-container {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
 
-    .upsell-container h3 {
-        font-size: 24px;
-        margin-bottom: 20px;
-    }
+        .produto-info {
+            width: 100%;
+        }
 
-    .upsell-list {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
-    }
+        .img-produto {
+            max-width: 90%;
+            height: auto;
+        }
 
-    .upsell-item {
-        width: 300px;
-        /* Definindo o tamanho fixo da imagem e do conteúdo */
-        text-align: center;
-        /* Centralizando o texto */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        .upsell-list {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upsell-item {
+            width: 100%;
+            max-width: 300px;
+        }
     }
 
     .upsell-item img {
@@ -234,7 +238,9 @@
                     @csrf
                     <div class="d-grid gap-2 col-6">
                         <input type="hidden" name="quantidade" value="1">
-                        <button type="submit" class="btn btn-dark btn-lg mt-2">Adicionar à sacola </button>
+                        <div class="d-grid gap-2 col-6 text-center">
+                            <button type="submit" class="btn btn-dark btn-lg mt-2">Adicionar à sacola</button>
+                        </div>
                     </div>
                 </form>
                 <h6 class="mt-5 mb-5">DESCRIÇÃO DO PRODUTO</h6>

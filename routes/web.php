@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\CarrinhosController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\ColecoesController;
 use App\Http\Controllers\CuponsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinanceiroController;
 use App\Http\Controllers\FreteController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PedidosController;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [LoginController::class, 'login'])->name('login');
 
 Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+Route::post('/login/cliente', [LoginController::class, 'Clistore'])->name('cliente.store');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('loja')->group(function () {
@@ -25,6 +28,7 @@ Route::prefix('loja')->group(function () {
     Route::get('produtos', [PrincipalController::class, 'produtos'])->name('produtos');
     Route::get('drops', [PrincipalController::class, 'drops'])->name('drops');
     Route::get('produto/{id}', [PrincipalController::class, 'produtoDetalhes'])->name('produto.detalhes');
+    Route::get('/colecoes/{colecao}', [PrincipalController::class, 'showCol'])->name('colecoes.show.loja');
 });
 
 // Route::middleware(['auth'])->group(function () {
@@ -33,7 +37,9 @@ Route::prefix('dashboard')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 });
 
-
+Route::prefix('financeiro')->group(function () {
+    Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
+});
 
 
 // Coleções
@@ -68,6 +74,7 @@ Route::prefix('users')->group(function () {
     Route::put('/{id}', [UsersController::class, 'update'])->name('users.update');
     Route::delete('/destroy/{id}', [UsersController::class, 'destroy'])->name('users.destroy');
 });
+
 
 Route::prefix('cupons')->group(function () {
     Route::get('/', [CuponsController::class, 'create'])->name('cupons.create');

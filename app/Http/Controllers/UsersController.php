@@ -77,4 +77,23 @@ class UsersController extends Controller
 
         return redirect()->route('users.index')->with('success', 'Usuário excluído com sucesso!');
     }
+
+    public function Clistore(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'senha' => 'required|min:6|confirmed',
+            'id_tipos_usuarios' => 'required|exists:tipos_usuarios,id',
+        ]);
+
+        User::create([
+            'name' => $request->nome,
+            'email' => $request->email,
+            'password' => Hash::make($request->senha),
+            'id_tipos_usuarios' => $request->id_tipos_usuarios,
+        ]);
+
+        return redirect()->route('users.create')->with('success', 'Usuário criado com sucesso!');
+    }
 }

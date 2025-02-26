@@ -72,25 +72,26 @@
                                 '.',
                             ) }}
                         </li>
-                        <li class="list-group-item">
-                            <form action="{{ route('frete.calcular') }}" method="POST" class="form-inline">
-                                @csrf
-                                <label for="cep" class="mr-2">CEP:</label>
-                                <input type="text" id="cep" name="cep" class="form-control mr-2"
-                                    placeholder="Digite o CEP" required>
-                                <button type="submit" class="btn btn-primary">Calcular Frete</button>
-                            </form>
 
-                            @if (session()->has('error'))
-                                <p style="color: red; margin-top: 10px;">{{ session('error') }}</p>
-                            @endif
+                        <form action="{{ route('frete.calcular') }}" method="POST" class="form-inline">
+                            @csrf
+                            <label for="cep" class="mr-2">CEP:</label>
+                            <input type="text" id="cep" name="cep" class="form-control mr-2"
+                                   placeholder="Digite o CEP" required>
+                            <button type="submit" class="btn btn-primary">Calcular Frete</button>
+                        </form>
 
-                            @if (session()->has('valorFrete') && session()->has('prazoFrete'))
-                                <div id="resultado-frete" class="mt-3">
-                                    <p><strong>Frete:</strong> R$ {{ session('valorFrete') }}</p>
-                                    <p><strong>Prazo de Entrega:</strong> {{ session('prazoFrete') }} dias úteis</p>
-                                </div>
-                            @endif
+                        @if (session()->has('error'))
+                            <p style="color: red; margin-top: 10px;">{{ session('error') }}</p>
+                        @endif
+
+                        @if (session()->has('valorFrete') && session()->has('prazoFrete'))
+                            <div id="resultado-frete" class="mt-3">
+                                <p><strong>Frete:</strong> R$ {{ session('valorFrete') }}</p>
+                                <p><strong>Prazo de Entrega:</strong> {{ session('prazoFrete') }} dias úteis</p>
+                            </div>
+                        @endif
+
 
 
                         <li class="list-group-item">

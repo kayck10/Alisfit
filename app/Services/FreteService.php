@@ -8,45 +8,49 @@ class FreteService
 {
     public function calcularFrete($cepDestino)
     {
+        $token = env('MELHOR_ENVIO_TOKEN');
+        $cepOrigem = "61913080"; // Seu CEP de origem
 
-        $cepOrigem = "61913080"; // CEP da sua loja ou origem do envio
+        $url = "https://www.melhorenvio.com.br/api/v2/me/shipment/calculate";
 
-        $url = "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx";
-
-        $params = [
-            "nCdEmpresa" => "",
-            "sDsSenha" => "",
-            "nCdServico" => "04014", // SEDEX, pode mudar conforme necessário
-            "sCepOrigem" => $cepOrigem,
-            "sCepDestino" => $cepDestino,
-            "nVlPeso" => 0.5,
-            "nCdFormato" => 1,
-            "nVlComprimento" => 20,
-            "nVlAltura" => 5,
-            "nVlLargura" => 20,
-            "nVlDiametro" => 0,
-            "sCdMaoPropria" => "n",
-            "nVlValorDeclarado" => 0,
-            "sCdAvisoRecebimento" => "n",
-            "StrRetorno" => "xml",
+        $payload = [
+            "from" => ["postal_code" => $cepOrigem],
+            "to" => ["postal_code" => $cepDestino],
+            "products" => [
+                [
+                    "height" => 5, // altura em cm
+                    "width" => 20, // largura em cm
+                    "length" => 20, // comprimento em cm
+                    "weight" => 0.5 // peso em kg
+                ]
+            ]
         ];
 
-        $response = Http::timeout(30)->get($url, $params);
+        $response = Http::withToken($token)
+            ->timeout(30)
+            ->withHeaders(['Accept' => 'application/json'])
+            ->post($url, $payload);
 
         if (!$response->successful()) {
-            return ["error" => "Erro ao conectar com os Correios."];
+            return ["error" => "Erro ao calcular o frete: " . $response->body()];
         }
 
-        $xml = simplexml_load_string($response->body());
+        $data = $response->json();
 
-        // Depuração: Verifique o XML retornado
-        if (!isset($xml->cServico->Valor)) {
-            return ["error" => "Não foi possível calcular o frete."];
+
+        if (empty($data)) {
+            return ["error" => "Nenhuma opção de frete encontrada."];
+        }
+
+        $opcaoFrete = collect($data)->first(fn($opcao) => isset($opcao["price"]));
+
+        if (!$opcaoFrete) {
+            return ["error" => "Nenhum serviço de frete disponível com preço válido."];
         }
 
         return [
-            "valor" => (string) $xml->cServico->Valor,
-            "prazo" => (string) $xml->cServico->PrazoEntrega
+            "valor" => number_format($opcaoFrete["price"], 2, ',', '.'),
+            "prazo" => $opcaoFrete["delivery_time"] ?? 'Indisponível'
         ];
     }
 }

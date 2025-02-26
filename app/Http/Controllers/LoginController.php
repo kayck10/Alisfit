@@ -29,6 +29,23 @@ class LoginController extends Controller
         ]);
     }
 
+    public function Clistore(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->back();
+        }
+
+        return back()->withErrors([
+            'email' => 'As credenciais fornecidas não correspondem aos nossos registros.',
+        ]);
+    }
+
     public function logout()
     {
         Auth::logout();

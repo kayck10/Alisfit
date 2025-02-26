@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 
 class FreteController extends Controller
 {
-    protected $correiosService;
+    protected $freteService;
 
-    public function __construct(FreteService $correiosService)
+    public function __construct(FreteService $freteService)
     {
-        $this->correiosService = $correiosService;
+        $this->freteService = $freteService;
     }
 
     public function calcular(Request $request)
@@ -21,7 +21,7 @@ class FreteController extends Controller
         ]);
 
         $cepDestino = $request->cep;
-        $frete = $this->correiosService->calcularFrete($cepDestino);
+        $frete = $this->freteService->calcularFrete($cepDestino);
 
         if (isset($frete['error'])) {
             return redirect()->back()->with('error', $frete['error']);
@@ -32,4 +32,5 @@ class FreteController extends Controller
             'prazoFrete' => $frete['prazo']
         ]);
     }
+
 }

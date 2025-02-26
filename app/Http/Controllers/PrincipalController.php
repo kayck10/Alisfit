@@ -42,30 +42,36 @@ class PrincipalController extends Controller
     }
 
     public function produtoDetalhes($id)
-{
-    $produto = Produtos::with('tamanhos', 'imagens')->findOrFail($id);
+    {
+        $produto = Produtos::with('tamanhos', 'imagens')->findOrFail($id);
 
-    $cor_map = [
-        'preto' => '#000000',
-        'branco' => '#FFFFFF',
-        'azul' => '#0000FF',
-        'vermelho' => '#FF0000',
-        'verde' => '#00FF00',
-        'amarelo' => '#FFFF00',
-        'roxo' => '#800080',
-    ];
+        $cor_map = [
+            'preto' => '#000000',
+            'branco' => '#FFFFFF',
+            'azul' => '#0000FF',
+            'vermelho' => '#FF0000',
+            'verde' => '#00FF00',
+            'amarelo' => '#FFFF00',
+            'roxo' => '#800080',
+        ];
 
 
-    $produtosRelacionados = Produtos::where('colecao_id', $produto->colecao_id)
-        ->where('id', '!=', $id)
-        ->take(4)
-        ->get();
+        $produtosRelacionados = Produtos::where('colecao_id', $produto->colecao_id)
+            ->where('id', '!=', $id)
+            ->take(4)
+            ->get();
 
-    $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
-    return view('principal.produto_detalhes', compact('produto', 'produtosRelacionados', 'cor_map', 'carrinho'));
-}
+        return view('principal.produto_detalhes', compact('produto', 'produtosRelacionados', 'cor_map', 'carrinho'));
+    }
 
+    public function showCol(Colecoes $colecao)
+    {
+        
+        $produtos = $colecao->produtos;
+        return view('principal.colecoes', compact('colecao', 'produtos'));
+    }
 
 
 }
