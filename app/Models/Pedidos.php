@@ -15,7 +15,8 @@ class Pedidos extends Model
         'user_id',
         'carrinho_id',
         'total',
-        'status_pedido_id'
+        'status_pedido_id',
+        'payment_id'
     ];
 
     public function user()

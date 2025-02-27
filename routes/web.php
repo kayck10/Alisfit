@@ -96,7 +96,6 @@ Route::prefix('carrinho')->group(function () {
     Route::post('/atualizar/{produtoId}', [CarrinhosController::class, 'atualizarQuantidade'])->name('carrinho.atualizar');
     Route::post('/remover/{produtoId}', [CarrinhosController::class, 'removerProduto'])->name('carrinho.remover');
     Route::get('/finalizar', [CarrinhosController::class, 'finalizar'])->name('carrinho.finalizar');
-    Route::post('/calcular-frete', [CarrinhosController::class, 'calcularFrete'])->name('frete.calcular');
 });
 
 
@@ -107,6 +106,8 @@ Route::prefix('checkout')->group(function () {
     Route::get('/success', [CheckoutController::class, 'success'])->name('checkout.success');
     Route::get('/failure', [CheckoutController::class, 'failure'])->name('checkout.failure');
     Route::get('/pending', [CheckoutController::class, 'pending'])->name('checkout.pending');
+    Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook']);
+
 });
 
 Route::post('/calcular-frete', [FreteController::class, 'calcular'])->name('frete.calcular');

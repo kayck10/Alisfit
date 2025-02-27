@@ -89,7 +89,7 @@ class CarrinhosController extends Controller
     }
 
 
-    public function finalizar()
+    public function finalizar(Request $request)
     {
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
@@ -105,6 +105,12 @@ class CarrinhosController extends Controller
             }),
             'status' => 'pendente',
             'status_pedido_id' => 1,
+            'rua' => $request->rua,
+            'numero' => $request->numero,
+            'cidade' => $request->cidade,
+            'estado' => $request->estado,
+            'cep' => $request->cep,
+
         ]);
 
 

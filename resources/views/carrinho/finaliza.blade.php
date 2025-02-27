@@ -1,7 +1,7 @@
     @extends('Layout.principal')
 
     @section('content')
-    <link rel="stylesheet" href="iziToast.min.css">
+        <link rel="stylesheet" href="iziToast.min.css">
         <div class="container py-5">
             <h2 class="text-center mb-5 mt-5">Finalização de Compra</h2>
 
@@ -77,7 +77,7 @@
                             @csrf
                             <label for="cep" class="mr-2">CEP:</label>
                             <input type="text" id="cep" name="cep" class="form-control mr-2"
-                                   placeholder="Digite o CEP" required>
+                                placeholder="Digite o CEP" required>
                             <button type="submit" class="btn btn-primary">Calcular Frete</button>
                         </form>
 
@@ -97,11 +97,11 @@
                         <li class="list-group-item">
                             {{-- <form action="{{ route('pedidos.aplicar-cupom', ['pedidoId' => $pedido->id]) }}" method="POST">
                                 @csrf --}}
-                                <div class="input-group">
-                                    <input type="text" name="codigo" id="codigo-cupom" placeholder="Digite o código do cupom" required
-                                        class="form-control">
-                                    <button type="button" class="btn btn-success" id="aplicar-cupom">Aplicar</button>
-                                </div>
+                            <div class="input-group">
+                                <input type="text" name="codigo" id="codigo-cupom"
+                                    placeholder="Digite o código do cupom" required class="form-control">
+                                <button type="button" class="btn btn-success" id="aplicar-cupom">Aplicar</button>
+                            </div>
                             {{-- </form> --}}
                         </li>
 
@@ -133,7 +133,7 @@
                 <!-- Checkout -->
                 <form action="{{ route('checkout') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="pedidoId" value="{{$pedido->id}}">
+                    <input type="hidden" name="pedidoId" value="{{ $pedido->id }}">
                     <input type="hidden" name="valor_total" id="valor-total-input">
                     <input type="hidden" name="codigoCupom" id="codigo-cupom-input">
                     <button type="submit" class="btn btn-success btn-lg btn-block">Ir para o Checkout</button>
@@ -141,66 +141,64 @@
             </div>
         </div>
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<!-- iziToast CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css">
+        <!-- iziToast CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css">
 
-<!-- iziToast JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
-    <script>
-        $('#aplicar-cupom').click(function () {
-            console.log('apliquei');
+        <!-- iziToast JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
+        <script>
+            $('#aplicar-cupom').click(function() {
+                console.log('apliquei');
 
-            aplicarCupom();
+                aplicarCupom();
 
-        });
-        function aplicarCupom() {
-            let id = {{$pedido->id}};
-            let codigoCupom = $('#codigo-cupom').val();
-            if(codigoCupom !== "") {
-                $.ajax({
-                    type: "POST",
-                    url: "{{route('pedidos.aplicar-cupom')}}",
-                    data: {
-                        _token: "{{csrf_token()}}",
-                        pedidoId: id,
-                        codigoCupom: codigoCupom
-                    },
-                    success: function (response) {
-                        if(!response.error) {
-                            $('.valor-total').text(formatarDinheiro(response));
-                            $('#valor-total-input').val(response);
-                            $('#codigo-cupom-input').val(codigoCupom);
-                            iziToast.success({
-                                title: 'Sucesso!',
-                                message: "Cupom aplicado",
+            });
+
+            function aplicarCupom() {
+                let id = {{ $pedido->id }};
+                let codigoCupom = $('#codigo-cupom').val();
+                if (codigoCupom !== "") {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ route('pedidos.aplicar-cupom') }}",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            pedidoId: id,
+                            codigoCupom: codigoCupom
+                        },
+                        success: function(response) {
+                            if (!response.error) {
+                                $('.valor-total').text(formatarDinheiro(response));
+                                $('#valor-total-input').val(response);
+                                $('#codigo-cupom-input').val(codigoCupom);
+                                iziToast.success({
+                                    title: 'Sucesso!',
+                                    message: "Cupom aplicado",
+                                    position: 'topRight'
+                                });
+                                return;
+                            }
+                            $('#valor-total-input').val(response.results);
+                            $('#codigo-cupom-input').val(null);
+
+                            iziToast.error({
+                                title: 'Atenção!',
+                                message: response.msg,
                                 position: 'topRight'
                             });
-                            return;
+                            $('.valor-total').text(formatarDinheiro(response.results));
+
                         }
-                        $('#valor-total-input').val(response.results);
-                        $('#codigo-cupom-input').val(null);
+                    });
+                }
 
-                        iziToast.error({
-                            title: 'Atenção!',
-                            message: response.msg,
-                            position: 'topRight'
-                        });
-                        $('.valor-total').text(formatarDinheiro(response.results));
-
-                    }
-                });
             }
 
-        }
-
-        function formatarDinheiro(valor) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(valor);
-        }
-
-
-    </script>
+            function formatarDinheiro(valor) {
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                }).format(valor);
+            }
+        </script>
     @endsection
-
