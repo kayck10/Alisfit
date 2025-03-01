@@ -62,6 +62,9 @@ Route::prefix('produtos')->group(function () {
     Route::get('/edit/{id}', [ProdutosController::class, 'edit'])->name('produtos.edit');
     Route::put('/update/{id}', [ProdutosController::class, 'update'])->name('produtos.update');
     Route::delete('/destroy/{id}', [ProdutosController::class, 'destroy'])->name('produtos.destroy');
+    Route::get('/masculinos', [ProdutosController::class, 'masculinos'])->name('produtos.masculinos');
+    Route::get('/femininos', [ProdutosController::class, 'femininos'])->name('produtos.femininos');
+
 });
 
 

@@ -38,7 +38,7 @@
                 <li><a href="{{ route('drops') }}">LANÇAMENTOS</a></li>
 
                 <li>
-                    <a href="#">MASCULINO</a>
+                    <a href="{{route('produtos.masculinos')}}">MASCULINO</a>
                     <div class="dropdown">
                         <h4>ROUPAS MASCULINAS</h4>
                         <ul>
@@ -48,7 +48,7 @@
                     </div>
                 </li>
                 <li>
-                    <a href="#">FEMININO</a>
+                    <a href="{{route('produtos.femininos')}}">FEMININO</a>
                     <div class="dropdown">
                         <h4>ROUPAS FEMININAS</h4>
                         <ul>
@@ -301,8 +301,8 @@
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
                             <div class="mb-3">
-                                <label for="senha" class="form-label">Senha</label>
-                                <input type="password" class="form-control" id="senha" name="senha" required>
+                                <label for="password" class="form-label">Senha</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Entrar</button>
                         </form>
@@ -336,7 +336,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
             </div>
         </div>

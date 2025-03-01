@@ -24,52 +24,52 @@ class ProdutosController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'nome' => 'required|string|max:255',
-        'descricao' => 'nullable|string',
-        'preco' => 'required|numeric|min:0',
-        'colecao_id' => 'required|exists:colecoes,id',
-        'genero_id' => 'required|exists:generos,id',
-        'tipo_produto_id' => 'required|exists:tipos_produtos,id',
-        'imagens' => 'required|array',
-        'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        'informacoes' => 'required|array',
-        'informacoes.*.cor' => 'required|string',
-        'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
-        'informacoes.*.quantidades' => 'required|integer|min:1',
-    ]);
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'preco' => 'required|numeric|min:0',
+            'colecao_id' => 'required|exists:colecoes,id',
+            'genero_id' => 'required|exists:generos,id',
+            'tipo_produto_id' => 'required|exists:tipos_produtos,id',
+            'imagens' => 'required|array',
+            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'informacoes' => 'required|array',
+            'informacoes.*.cor' => 'required|string',
+            'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
+            'informacoes.*.quantidades' => 'required|integer|min:1',
+        ]);
 
-    $produto = Produtos::create([
-        'nome' => $request->nome,
-        'descricao' => $request->descricao,
-        'preco' => $request->preco,
-        'colecao_id' => $request->colecao_id,
-        'genero_id' => $request->genero_id,
-        'tipo_produto_id' => $request->tipo_produto_id,
-    ]);
+        $produto = Produtos::create([
+            'nome' => $request->nome,
+            'descricao' => $request->descricao,
+            'preco' => $request->preco,
+            'colecao_id' => $request->colecao_id,
+            'genero_id' => $request->genero_id,
+            'tipo_produto_id' => $request->tipo_produto_id,
+        ]);
 
-    if ($request->hasFile('imagens')) {
-        foreach ($request->file('imagens') as $imagem) {
-            $imagePath = $imagem->store('produtos', 'public');
-            ImagensProduto::create([
+        if ($request->hasFile('imagens')) {
+            foreach ($request->file('imagens') as $imagem) {
+                $imagePath = $imagem->store('produtos', 'public');
+                ImagensProduto::create([
+                    'produto_id' => $produto->id,
+                    'imagem' => $imagePath,
+                ]);
+            }
+        }
+
+        foreach ($request->informacoes as $info) {
+            ProdutosTamanhos::create([
                 'produto_id' => $produto->id,
-                'imagem' => $imagePath,
+                'cor' => $info['cor'],
+                'tamanho_id' => $info['tamanhos'],
+                'quantidade' => $info['quantidades'],
             ]);
         }
-    }
 
-    foreach ($request->informacoes as $info) {
-        ProdutosTamanhos::create([
-            'produto_id' => $produto->id,
-            'cor' => $info['cor'],
-            'tamanho_id' => $info['tamanhos'],
-            'quantidade' => $info['quantidades'],
-        ]);
+        return redirect()->route('produtos.create')->with('success', 'Produto criado com sucesso!');
     }
-
-    return redirect()->route('produtos.create')->with('success', 'Produto criado com sucesso!');
-}
 
 
     public function index()
@@ -134,5 +134,23 @@ class ProdutosController extends Controller
 
         $produto->delete();
         return redirect()->route('produtos.index')->with('success', 'Produto excluído com sucesso!');
+    }
+
+    public function masculinos()
+    {
+        $produtos = Produtos::with(['imagens', 'colecao', 'tamanhos'])
+            ->where('genero_id', 1)
+            ->get();
+
+        return view('produtos.masculinos', compact('produtos'));
+    }
+
+    public function femininos()
+    {
+        $produtos = Produtos::with(['imagens', 'colecao', 'tamanhos'])
+        ->where('genero_id', 2)
+        ->get();
+
+        return view('produtos.femininos', compact('produtos'));
     }
 }
