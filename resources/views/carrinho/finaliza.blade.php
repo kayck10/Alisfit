@@ -149,11 +149,8 @@
         <script>
             $('#aplicar-cupom').click(function() {
                 console.log('apliquei');
-
                 aplicarCupom();
-
             });
-
             function aplicarCupom() {
                 let id = {{ $pedido->id }};
                 let codigoCupom = $('#codigo-cupom').val();

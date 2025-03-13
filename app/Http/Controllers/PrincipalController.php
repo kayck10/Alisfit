@@ -23,6 +23,10 @@ class PrincipalController extends Controller
     }
 
 
+    public function sobre() {
+        return view('principal.sobre');
+    }
+
 
 
     public function produtos()
@@ -68,7 +72,7 @@ class PrincipalController extends Controller
 
     public function showCol(Colecoes $colecao)
     {
-        
+
         $produtos = $colecao->produtos;
         return view('principal.colecoes', compact('colecao', 'produtos'));
     }

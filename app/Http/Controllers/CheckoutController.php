@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\StatusUpdatedMail;
 use App\Models\Carrinhos;
 use App\Models\Cupons;
 use App\Models\Pedidos;
@@ -9,6 +10,7 @@ use App\Models\StatusPedidos;
 use Faker\Provider\pt_BR\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use MercadoPago\SDK;
 use MercadoPago\Preference;
 use MercadoPago\Item;
@@ -47,19 +49,15 @@ class CheckoutController extends Controller
             $items[] = $item;
         }
 
-
         $preference->items = $items;
         $preference->back_urls = [
-            "success" => route('checkout.success'),
-            "failure" => route('checkout.failure'),
-            "pending" => route('checkout.pending'),
+            "success" => route('checkout.success', ['pedido_id' => $request->pedidoId]),
+            "failure" => route('checkout.failure', ['pedido_id' => $request->pedidoId]),
+            "pending" => route('checkout.pending', ['pedido_id' => $request->pedidoId]),
         ];
         $preference->auto_return = "approved";
 
         $preference->save();
-
-
-
 
         return redirect($preference->init_point);
     }
@@ -95,65 +93,48 @@ class CheckoutController extends Controller
 
     public function success(Request $request)
     {
-        // Obtém o payment_id da requisição
+
+        $pedido_id = $request->pedido_id;
         $paymentId = $request->get('payment_id');
 
-        // Verifica se o payment_id foi passado e busca o pedido correspondente
         if (!$paymentId) {
             return redirect()->route('carrinho.finalizar')->with('error', 'Payment ID não encontrado!');
         }
 
-        // Busca o pedido relacionado ao payment_id
-        $pedido = Pedidos::where('payment_id', $paymentId)->first();
+        $pedido = Pedidos::find($pedido_id);
+
+        $pedido->update([
+            'payment_id' => $paymentId,
+        ]);
 
         if (!$pedido) {
             return redirect()->route('carrinho.finalizar')->with('error', 'Pedido não encontrado!');
         }
 
-        // Acessa o status do pedido através do relacionamento
-        $statusPedido = $pedido->status; // Aqui é o relacionamento que traz o StatusPedidos
+        $statusPedido = $pedido->status;
 
         if (!$statusPedido) {
             return redirect()->route('carrinho.finalizar')->with('error', 'Status do pagamento não encontrado!');
         }
 
-        // Define o statusId com base na descrição do status
-        $statusId = 0;
-        if ($statusPedido->desc == 'approved') {
-            $statusId = 2; // Aprovado
-        } elseif ($statusPedido->desc == 'pending') {
-            $statusId = 1; // Pendente
-        } elseif ($statusPedido->desc == 'rejected') {
-            $statusId = 3; // Recusado
-        }
-
-        // Atualiza o pedido com o novo status
         $pedido->update([
-            'status_pedido_id' => $statusId,
+            'status_pedido_id' => 2,
+
         ]);
-
-        // Retorna a view com base no status do pagamento
-        if ($statusPedido->desc == 'approved') {
-            return view('checkout.success', ['payment' => $statusPedido, 'pedido' => $pedido]);
-        } elseif ($statusPedido->desc == 'pending') {
-            return view('checkout.pending', ['payment' => $statusPedido, 'pedido' => $pedido]);
-        } else {
-            return view('checkout.failure', ['payment' => $statusPedido, 'pedido' => $pedido]);
+        if ($statusPedido->desc == 'Pagamento Aprovado' && $pedido->user) {
+            Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
         }
+
+        return view('checkout.success', ['payment' => $statusPedido, 'pedido' => $pedido]);
     }
-
-
-
 
 
     public function webhook(Request $request)
     {
         SDK::setAccessToken(config('services.mercadopago.access_token'));
 
-        // Obtém o payment_id da requisição
         $paymentId = $request->input('data.id');
 
-        // Verifica se o payment_id foi passado e busca o pedido correspondente
         $pedido = Pedidos::where('payment_id', $paymentId)->first();
 
         if (!$pedido) {
@@ -185,19 +166,89 @@ class CheckoutController extends Controller
             $pedido->update([
                 'status_pedido_id' => $statusPedido->id,
             ]);
+
+            if ($statusPedido->desc == 'Pagamento Aprovado' && $pedido->user) {
+                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+            } elseif ($statusPedido->desc == 'Pagamento Pendente' && $pedido->user) {
+                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+            } elseif ($statusPedido->desc == 'Pagamento Recusado' && $pedido->user) {
+                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+            }
         }
 
         return response()->json(['status' => 'success', 'message' => 'Status do pedido atualizado com sucesso!']);
     }
 
 
-    public function failure()
+    public function failure(Request $request)
     {
-        return view('checkout.failure');
+        $pedido_id = $request->pedido_id;
+        $paymentId = $request->get('payment_id');
+
+        if (!$paymentId) {
+            return redirect()->route('carrinho.finalizar')->with('error', 'Payment ID não encontrado!');
+        }
+
+        $pedido = Pedidos::find($pedido_id);
+
+        $pedido->update([
+            'payment_id' => $paymentId,
+        ]);
+
+        if (!$pedido) {
+            return redirect()->route('carrinho.finalizar')->with('error', 'Pedido não encontrado!');
+        }
+
+        $statusPedido = $pedido->status;
+
+        if (!$statusPedido) {
+            return redirect()->route('carrinho.finalizar')->with('error', 'Status do pagamento não encontrado!');
+        }
+
+        $pedido->update([
+            'status_pedido_id' => 3,
+        ]);
+
+        if ($statusPedido->desc == 'Pagamento Recusado' && $pedido->user) {
+            Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+        }
+
+        return view('checkout.failure', ['payment' => $statusPedido, 'pedido' => $pedido]);
     }
 
-    public function pending()
+    public function pending(Request $request)
     {
-        return view('checkout.pending');
+        $pedido_id = $request->pedido_id;
+        $paymentId = $request->get('payment_id');
+
+        if (!$paymentId) {
+            return redirect()->route('carrinho.finalizar')->with('error', 'Payment ID não encontrado!');
+        }
+
+        $pedido = Pedidos::find($pedido_id);
+
+        $pedido->update([
+            'payment_id' => $paymentId,
+        ]);
+
+        if (!$pedido) {
+            return redirect()->route('carrinho.finalizar')->with('error', 'Pedido não encontrado!');
+        }
+
+        $statusPedido = $pedido->status;
+
+        if (!$statusPedido) {
+            return redirect()->route('carrinho.finalizar')->with('error', 'Status do pagamento não encontrado!');
+        }
+
+        $pedido->update([
+            'status_pedido_id' => 1,
+        ]);
+
+        if ($statusPedido->desc == 'Pagamento Pendente' && $pedido->user) {
+            Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+        }
+
+        return view('checkout.pending', ['payment' => $statusPedido, 'pedido' => $pedido]);
     }
 }

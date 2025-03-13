@@ -156,9 +156,13 @@
 
         .mais-vendidos-item img {
             width: 100%;
-            height: auto;
-            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+            height: 600px;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+
         }
+
 
         .mais-vendidos-item:hover img {
             transform: scale(1.1);
@@ -183,15 +187,22 @@
         @media (max-width: 1024px) {
             .mais-vendidos-item {
                 flex: 1 1 calc(50% - 10px);
-                /* 2 itens por linha */
                 max-width: calc(50% - 10px);
             }
         }
 
         @media (max-width: 768px) {
+            .mais-vendidos-item img {
+                height: 200px;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+
+            }
+        }
+
+
+        @media (max-width: 768px) {
             .mais-vendidos-item {
                 flex: 1 1 100%;
-                /* 1 item por linha */
                 max-width: 100%;
             }
         }
@@ -273,13 +284,14 @@
             @foreach ($produtos as $produto)
                 <div class="product-card" id="product-{{ $produto->id }}">
                     <div class="product-image">
-                    <a href="{{ route('produto.detalhes', $produto->id) }}">   @if ($produto->imagens->isNotEmpty())
-                            <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
-                                alt="{{ $produto->nome }}">
-                        @else
-                            <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
-                        @endif
-                    </a>
+                        <a href="{{ route('produto.detalhes', $produto->id) }}">
+                            @if ($produto->imagens->isNotEmpty())
+                                <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
+                                    alt="{{ $produto->nome }}">
+                            @else
+                                <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
+                            @endif
+                        </a>
                     </div>
                     <div class="product-details">
                         <h5 class="text-secondary">{{ $produto->nome }}</h5>

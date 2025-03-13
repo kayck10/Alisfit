@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Carrinhos;
 use App\Models\Colecoes;
 use App\Models\Generos;
 use App\Models\imagensProduto;
@@ -10,6 +11,7 @@ use App\Models\ProdutosTamanhos;
 use App\Models\Tamanhos;
 use App\Models\TiposProdutos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ProdutosController extends Controller
@@ -148,9 +150,96 @@ class ProdutosController extends Controller
     public function femininos()
     {
         $produtos = Produtos::with(['imagens', 'colecao', 'tamanhos'])
-        ->where('genero_id', 2)
-        ->get();
+            ->where('genero_id', 2)
+            ->get();
 
         return view('produtos.femininos', compact('produtos'));
+    }
+
+    public function masculinasCamisetas()
+    {
+        $masculino = Generos::where('desc', 'Masculino')->first();
+        $camiseta = TiposProdutos::where('desc', 'Camiseta')->first();
+        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+
+        if (!$masculino || !$camiseta) {
+            return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
+        }
+
+        $produtos = Produtos::where('genero_id', $masculino->id)
+            ->where('tipo_produto_id', $camiseta->id)
+            ->get();
+
+        return view('produtos.masculinasCamisetas', compact('produtos', 'carrinho'));
+    }
+
+    public function masculinosShorts()
+    {
+        $masculino = Generos::where('desc', 'Masculino')->first();
+        $shorts = TiposProdutos::where('desc', 'Shorts')->first();
+        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+
+        if (!$masculino || !$shorts) {
+            return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
+        }
+
+        $produtos = Produtos::where('genero_id', $masculino->id)
+            ->where('tipo_produto_id', $shorts->id)
+            ->get();
+
+        return view('produtos.masculinosShorts', compact('produtos', 'carrinho'));
+    }
+
+    public function femininosTops()
+    {
+        $feminino = Generos::where('desc', 'Feminino')->first();
+        $tops = TiposProdutos::where('desc', 'Tops')->first();
+        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+        if (!$feminino || !$tops) {
+            return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
+        }
+
+        $produtos = Produtos::where('genero_id', $feminino->id)
+            ->where('tipo_produto_id', $tops->id)
+            ->get();
+
+        return view('produtos.femininosTops', compact('produtos', 'carrinho'));
+    }
+
+    public function femininosLegging()
+    {
+        $feminino = Generos::where('desc', 'Feminino')->first();
+        $legging = TiposProdutos::where('desc', 'Legging')->first();
+        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+        if (!$feminino || !$legging) {
+            return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
+        }
+
+        $produtos = Produtos::where('genero_id', $feminino->id)
+            ->where('tipo_produto_id', $legging->id)
+            ->get();
+
+        return view('produtos.femininosLegging', compact('produtos', 'carrinho'));
+    }
+
+    public function femininosShorts()
+    {
+        $feminino = Generos::where('desc', 'Feminino')->first();
+        $shorts = TiposProdutos::where('desc', 'Shorts')->first();
+        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+        if (!$feminino || !$shorts) {
+            return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
+        }
+
+        $produtos = Produtos::where('genero_id', $feminino->id)
+            ->where('tipo_produto_id', $shorts->id)
+            ->get();
+
+        return view('produtos.femininosShorts', compact('produtos', 'carrinho'));
     }
 }

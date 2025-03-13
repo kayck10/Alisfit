@@ -2,7 +2,7 @@
 
 @section('content')
 <div style="margin-top: 100px;" class="container">
-    <h1>Roupas Femininas</h1>
+    <h3 class="mb-5">Roupas Femininas</h3>
 
     @if($produtos->isEmpty())
         <div class="alert alert-warning text-center mt-4">
@@ -21,7 +21,7 @@
                             <h5 class="card-title">{{ $produto->nome }}</h5>
                             <p class="card-text">{{ $produto->descricao }}</p>
                             <p><strong>Preço:</strong> R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
-                            <a href="{{ route('produtos.detalhes', $produto->id) }}" class="btn btn-primary">Ver Detalhes</a>
+                            <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary">Ver Detalhes</a>
                         </div>
                     </div>
                 </div>

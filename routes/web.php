@@ -23,12 +23,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('loja')->group(function () {
     Route::get('/', [PrincipalController::class, 'index'])->name('loja.create');
+    Route::get('/sobre', [PrincipalController::class, 'sobre'])->name('loja.sobre');
     Route::get('/teste', [PrincipalController::class, 'teste'])->name('teste');
     Route::post('/ajax-request', [PrincipalController::class, 'handleRequest'])->name('ajax.request');
     Route::get('produtos', [PrincipalController::class, 'produtos'])->name('produtos');
     Route::get('drops', [PrincipalController::class, 'drops'])->name('drops');
     Route::get('produto/{id}', [PrincipalController::class, 'produtoDetalhes'])->name('produto.detalhes');
     Route::get('/colecoes/{colecao}', [PrincipalController::class, 'showCol'])->name('colecoes.show.loja');
+
 });
 
 // Route::middleware(['auth'])->group(function () {
@@ -64,7 +66,11 @@ Route::prefix('produtos')->group(function () {
     Route::delete('/destroy/{id}', [ProdutosController::class, 'destroy'])->name('produtos.destroy');
     Route::get('/masculinos', [ProdutosController::class, 'masculinos'])->name('produtos.masculinos');
     Route::get('/femininos', [ProdutosController::class, 'femininos'])->name('produtos.femininos');
-
+    Route::get('/masculinos/camisetas', [ProdutosController::class, 'masculinasCamisetas'])->name('produtos.masculinasCamisetas');
+    Route::get('/masculinos/shorts', [ProdutosController::class, 'masculinosShorts'])->name('produtos.masculinosShorts');
+    Route::get('/femininos/tops', [ProdutosController::class, 'femininosTops'])->name('produtos.femininosTops');
+    Route::get('/femininos/legging', [ProdutosController::class, 'femininosLegging'])->name('produtos.femininosLegging');
+    Route::get('/femininos/shorts', [ProdutosController::class, 'femininosShorts'])->name('produtos.femininosShorts');
 });
 
 
@@ -91,7 +97,10 @@ Route::prefix('cupons')->group(function () {
 Route::prefix('pedidos')->group(function () {
     Route::get('/', [PedidosController::class, 'index'])->name('pedidos.index');
     Route::post('/aplicar-cupom', [PedidosController::class, 'retornarDescontoCupom'])->name('pedidos.aplicar-cupom');
+    Route::put('/{id}/status', [PedidosController::class, 'atualizarStatus'])->name('pedidos.atualizar-status');
 });
+
+
 
 Route::prefix('carrinho')->group(function () {
     Route::get('/', [CarrinhosController::class, 'carrinho'])->name('carrinho');
@@ -110,7 +119,6 @@ Route::prefix('checkout')->group(function () {
     Route::get('/failure', [CheckoutController::class, 'failure'])->name('checkout.failure');
     Route::get('/pending', [CheckoutController::class, 'pending'])->name('checkout.pending');
     Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook']);
-
 });
 
 Route::post('/calcular-frete', [FreteController::class, 'calcular'])->name('frete.calcular');

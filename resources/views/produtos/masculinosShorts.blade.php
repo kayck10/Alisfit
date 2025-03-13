@@ -1,0 +1,125 @@
+@extends('Layout.principal')
+
+@section('content')
+    <main class="col-md-9 offset-md-3">
+        <div class="container">
+            <h3 class="mb-4">Shorts Masculinos</h3>
+
+            @if ($produtos->isEmpty())
+                <div class="alert alert-warning text-center">
+                    Nenhum short masculino disponível no momento.
+                </div>
+            @else
+                <div class="row">
+                    @foreach ($produtos as $produto)
+                        <div class="col-md-3 col-sm-6 mb-4">
+                            <div class="product-card">
+                                <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">
+                                    @if ($produto->imagens->isNotEmpty())
+                                        <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
+                                            alt="{{ $produto->nome }}">
+                                    @else
+                                    @endif
+                                </a>
+                                <p class="product-name">{{ $produto->nome }}</p>
+                                <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
+
+                                <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary mt-2">Adicionar a sacola</button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </main>
+
+    <style>
+        .container {
+            margin-top: 100px;
+        }
+
+        .btn-primary {
+            background: black !important;
+            border: none;
+            padding: 6px 12px;
+            font-size: 13px;
+            margin-top: 5px;
+            color: white;
+            width: 75%;
+            transition: background 0.3s ease, transform 0.2s ease;
+            border-radius: 4px;
+        }
+
+        .btn-primary:hover {
+            background: #333 !important;
+            transform: scale(1.05);
+        }
+
+        .col-md-3 {
+            padding: 8px;
+        }
+
+        .product-card {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            min-width: 260px;
+            margin: auto;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card img:hover {
+            transform: scale(1.05);
+        }
+
+        .product-card:hover {
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .product-name,
+        .product-price,
+        .btn-primary {
+            margin-top: 6px;
+        }
+
+        .btn-primary {
+            width: 90%;
+            padding: 10px 14px;
+            font-size: 15px;
+        }
+
+        @media (max-width: 992px) {
+            .col-md-4 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .col-md-3 {
+                flex: 0 0 25%;
+                max-width: 25%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .col-md-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+@endsection

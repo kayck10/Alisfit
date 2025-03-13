@@ -14,8 +14,9 @@ class StatusPedidosSeeder extends Seeder
     public function run(): void
     {
         DB::table('status_pedidos')->insert([
-            ['desc' => 'Pagamento pedente'],
+            ['desc' => 'Pagamento Pendente'],
             ['desc' => 'Pagamento Aprovado'],
+            ['desc' => 'Pagamento Recusado'],
             ['desc' => 'Pedido Separado'],
             ['desc' => 'Pedido Enviado'],
             ['desc' => 'Concluído'],

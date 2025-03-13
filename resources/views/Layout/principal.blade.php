@@ -42,8 +42,8 @@
                     <div class="dropdown">
                         <h4>ROUPAS MASCULINAS</h4>
                         <ul>
-                            <li><a href="">Camisas</a></li>
-                            <li><a href="">Shorts</a></li>
+                            <li><a href="{{route('produtos.masculinasCamisetas')}}">Camisas</a></li>
+                            <li><a href="{{route('produtos.masculinosShorts')}}">Shorts</a></li>
                         </ul>
                     </div>
                 </li>
@@ -52,9 +52,9 @@
                     <div class="dropdown">
                         <h4>ROUPAS FEMININAS</h4>
                         <ul>
-                            <li><a href="">Tops</a></li>
-                            <li><a href="">Leggings</a></li>
-                            <li><a href="">Shorts</a></li>
+                            <li><a href="{{route('produtos.femininosTops')}}">Tops</a></li>
+                            <li><a href="{{route('produtos.femininosLegging')}}">Leggings</a></li>
+                            <li><a href="{{route('produtos.femininosShorts')}}">Shorts</a></li>
                         </ul>
                     </div>
                 </li>
@@ -80,7 +80,7 @@
                     </div>
                 </li>
 
-                <li><a href="#">SOBRE NÓS</a></li>
+                <li><a href="{{route('loja.sobre')}}">SOBRE NÓS</a></li>
             </ul>
         </nav>
 
@@ -247,7 +247,7 @@
 
             <div class="col">
                 <h4>{{ __('Dúvidas') }}</h4>
-                <a href="#">{{ __('Sobre nós') }}</a>
+                <a href="{{route('loja.sobre')}}">{{ __('Sobre nós') }}</a>
                 <a href="#">{{ __('Informações de entrega') }}</a>
                 <a href="#">{{ __('Política de Privacidade') }}</a>
                 <a href="#">{{ __('Termos & Condições') }}</a>
