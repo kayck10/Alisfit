@@ -30,10 +30,11 @@ Route::prefix('loja')->group(function () {
     Route::get('drops', [PrincipalController::class, 'drops'])->name('drops');
     Route::get('produto/{id}', [PrincipalController::class, 'produtoDetalhes'])->name('produto.detalhes');
     Route::get('/colecoes/{colecao}', [PrincipalController::class, 'showCol'])->name('colecoes.show.loja');
+    Route::get('/informacoes', [PrincipalController::class, 'informacoes'])->name('informacoes');
 
 });
 
-// Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 // Dashboard
 Route::prefix('dashboard')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
@@ -124,4 +125,4 @@ Route::prefix('checkout')->group(function () {
 Route::post('/calcular-frete', [FreteController::class, 'calcular'])->name('frete.calcular');
 
 
-// });
+});

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CarrinhoIten;
 use App\Models\Carrinhos;
 use App\Models\Pedidos;
 use App\Models\Produtos;
@@ -28,28 +29,49 @@ class CarrinhosController extends Controller
 
     public function adicionarProduto(Request $request, $produtoId)
     {
+        if (!Auth::check()) {
+            return redirect()->back()->with('error', 'Faça login para adicionar produtos à sacola.');
+        }
+
+        $request->validate([
+            'tamanho_id' => 'required|exists:tamanhos,id',
+            'cor' => 'required|string',
+            'quantidade' => 'required|integer|min:1'
+        ]);
+
         $carrinho = Carrinhos::firstOrCreate(['user_id' => Auth::id()]);
         $produto = Produtos::find($produtoId);
 
-        if ($produto) {
-            $quantidade = max(1, (int) ($request->quantidade ?? 1));
-
-            $carrinhoItem = $carrinho->produtos()->where('produto_id', $produtoId)->first();
-
-            if ($carrinhoItem) {
-                $carrinho->produtos()->updateExistingPivot($produtoId, [
-                    'quantidade' => $carrinhoItem->pivot->quantidade + $quantidade
-                ]);
-            } else {
-                $carrinho->produtos()->attach($produtoId, [
-                    'quantidade' => $quantidade
-                ]);
-            }
-            return redirect()->back()->with('success', 'Produto adicionado ao carrinho!');
+        if (!$produto) {
+            return redirect()->back()->with('error', 'Produto não encontrado!');
         }
 
-        return redirect()->back()->with('error', 'Produto não encontrado!');
+        $quantidade = max(1, (int) $request->quantidade);
+
+        $carrinhoItem = CarrinhoIten::where('carrinho_id', $carrinho->id)
+            ->where('produto_id', $produtoId)
+            ->where('tamanho_id', $request->tamanho_id)
+            ->where('cor', $request->cor)
+            ->first();
+
+        if ($carrinhoItem) {
+            $carrinhoItem->increment('quantidade', $quantidade);
+        } else {
+            CarrinhoIten::create([
+                'carrinho_id' => $carrinho->id,
+                'produto_id' => $produtoId,
+                'quantidade' => $quantidade,
+                'tamanho_id' => $request->tamanho_id,
+                'cor' => $request->cor
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Produto adicionado ao carrinho!');
     }
+
+
+
+
 
 
     public function atualizarQuantidade(Request $request, $produtoId)

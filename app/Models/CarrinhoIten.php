@@ -9,10 +9,13 @@ class CarrinhoIten extends Model
 {
     use HasFactory;
 
+    protected $table = 'carrinho_iten';
     protected $fillable = [
         'carrinho_id',
         'produto_id',
-        'quantidade'
+        'quantidade',
+        'tamanho_id',
+        'cor'
     ];
 
     public function user()

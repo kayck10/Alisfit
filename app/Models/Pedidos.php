@@ -60,6 +60,17 @@ class Pedidos extends Model
         return $this->belongsTo(StatusPedidos::class, 'status_pedido_id', 'id');
     }
 
+    public function carrinhoItens()
+    {
+        return $this->hasManyThrough(
+            CarrinhoIten::class,
+            Carrinhos::class,
+            'id',
+            'carrinho_id',
+            'carrinho_id',
+            'id'
+        );
+    }
 
 
 

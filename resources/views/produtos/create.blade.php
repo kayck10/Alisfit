@@ -1,35 +1,34 @@
 @extends('layout.app')
 
 @section('content')
-    <div class="container">
+    <div style="margin-bottom: 100px;" class="container">
         <h2 class="mb-5">Criar Novo Produto</h2>
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <div style="margin-bottom: 200px" class="card">
+        <div class="card">
             <div class="card-body">
-                <form style="margin-bottom: 100px;" action="{{ route('produtos.store') }}" method="POST"
-                    enctype="multipart/form-data">
+                <form action="{{ route('produtos.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
+                    <!-- Campos do produto -->
                     <div class="mb-3">
                         <label class="form-label">Nome:</label>
-                        <input placeholder="Adicione um nome ao produto" type="text" name="nome" class="form-control" required>
+                        <input type="text" name="nome" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Descrição:</label>
-                        <textarea placeholder="Deixe a descrição do seu produto" name="descricao" class="form-control"></textarea>
+                        <textarea name="descricao" class="form-control"></textarea>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Preço:</label>
-                                <input placeholder="Valor do seu produto" type="number" name="preco" class="form-control"
-                                    required min="0" step="0.01">
+                                <input type="number" name="preco" class="form-control" required min="0" step="0.01">
                             </div>
                         </div>
 
@@ -45,7 +44,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     <div class="row">
                         <div class="col-md-6">
@@ -73,15 +71,16 @@
                         </div>
                     </div>
 
+                    <!-- Campo de imagens -->
                     <div class="mb-3">
                         <label class="form-label">Imagens:</label>
-                        <input type="file" id="input-imagens" name="imagens[]" class="form-control" multiple required>
-                        <small class="text-muted">Você pode selecionar várias imagens</small>
+                        <input type="file" id="input-imagens" name="imagens[]" class="form-control" multiple>
+                        <small class="text-muted">Selecione várias imagens de uma vez ou adicione uma por vez</small>
+                        <button type="button" id="adicionar-mais-imagens" class="btn btn-secondary mt-2">Adicionar mais imagens</button>
                         <div id="preview-imagens" class="mt-3"></div>
                     </div>
 
-
-
+                    <!-- Campo de tamanhos e cores -->
                     <div class="mb-3">
                         <label class="form-label">Tamanhos e Cores:</label>
                         <div id="tamanhos-container"></div>
@@ -95,6 +94,7 @@
     </div>
 
     <script>
+        // JavaScript para adicionar e remover tamanhos
         let contador = 0;
 
         function adicionarTamanho() {
@@ -111,11 +111,9 @@
                     </select>
 
                     <label class="me-2">Cor:</label>
-                    <input type="text" name="informacoes[${contador}][cor]" class="form-control me-2"
-                        placeholder="Digite a cor" required>
+                    <input type="text" name="informacoes[${contador}][cor]" class="form-control me-2" placeholder="Digite a cor" required>
 
-                    <input type="number" name="informacoes[${contador}][quantidades]" class="form-control me-2"
-                        placeholder="Quantidade" min="1" required>
+                    <input type="number" name="informacoes[${contador}][quantidades]" class="form-control me-2" placeholder="Quantidade" min="1" required>
 
                     <button type="button" class="btn btn-danger" onclick="removerTamanho(this)">Remover</button>
                 </div>
@@ -127,40 +125,62 @@
             btn.parentElement.remove();
         }
 
-        document.querySelector("form").addEventListener("submit", function(event) {
-            let mensagensErro = [];
+        document.addEventListener('DOMContentLoaded', function () {
+    const inputImagens = document.getElementById('input-imagens');
+    const previewContainer = document.getElementById('preview-imagens');
+    const btnAdicionarMais = document.getElementById('adicionar-mais-imagens');
+    let files = []; // Array para armazenar as imagens selecionadas
 
-            document.querySelectorAll(".tamanho-item").forEach((item) => {
-                let tamanho = item.querySelector("select[name^='informacoes'][name$='[tamanhos]']");
-                let cor = item.querySelector("input[name^='informacoes'][name$='[cor]']");
-                let quantidade = item.querySelector("input[name^='informacoes'][name$='[quantidades]']");
-
-                if (!tamanho.value) mensagensErro.push("Por favor, selecione um tamanho.");
-                if (!cor.value.trim()) mensagensErro.push("Por favor, insira uma cor.");
-                if (!quantidade.value || quantidade.value <= 0) mensagensErro.push("Por favor, informe uma quantidade válida.");
-            });
-
-            if (mensagensErro.length > 0) {
-                alert(mensagensErro.join("\n"));
-                event.preventDefault();
-            }
-        });
-
-        document.getElementById('input-imagens').addEventListener('change', function(event) {
-        let previewContainer = document.getElementById('preview-imagens');
-        previewContainer.innerHTML = "";
-
-        Array.from(event.target.files).forEach(file => {
+    // Função para exibir as imagens no preview
+    function exibirPreview() {
+        previewContainer.innerHTML = ""; // Limpa o preview
+        files.forEach((file, index) => {
             let reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 let img = document.createElement("img");
                 img.src = e.target.result;
                 img.classList.add("img-thumbnail", "me-2");
                 img.style.width = "100px";
-                previewContainer.appendChild(img);
+
+                // Adiciona um botão para remover a imagem
+                let removeBtn = document.createElement("button");
+                removeBtn.innerText = "Remover";
+                removeBtn.classList.add("btn", "btn-danger", "btn-sm", "ms-2");
+                removeBtn.onclick = function () {
+                    files.splice(index, 1); // Remove a imagem do array
+                    exibirPreview(); // Atualiza o preview
+                    atualizarInputImagens(); // Atualiza o input de arquivos
+                };
+
+                let container = document.createElement("div");
+                container.classList.add("d-inline-block", "mb-2");
+                container.appendChild(img);
+                container.appendChild(removeBtn);
+                previewContainer.appendChild(container);
             };
             reader.readAsDataURL(file);
         });
+    }
+
+    // Função para atualizar o input de arquivos
+    function atualizarInputImagens() {
+        const dataTransfer = new DataTransfer();
+        files.forEach(file => dataTransfer.items.add(file));
+        inputImagens.files = dataTransfer.files;
+    }
+
+    // Evento para adicionar imagens ao array
+    inputImagens.addEventListener('change', function (event) {
+        const newFiles = Array.from(event.target.files);
+        files = files.concat(newFiles); // Adiciona as novas imagens ao array
+        exibirPreview(); // Atualiza o preview
+        atualizarInputImagens(); // Atualiza o input de arquivos
     });
+
+    // Evento para adicionar mais imagens
+    btnAdicionarMais.addEventListener('click', function () {
+        inputImagens.click(); // Abre o seletor de arquivos
+    });
+});
     </script>
 @endsection

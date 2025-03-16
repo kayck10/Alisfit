@@ -241,19 +241,14 @@
                 </p>
             </div>
 
-            <div class="alis">
-                <img src="{{ asset('images/banner/alis - frase vectorizada_Prancheta 1 cópia (1).png') }}" alt="Banner">
-            </div>
-
             <div class="col">
                 <h4>{{ __('Dúvidas') }}</h4>
                 <a href="{{route('loja.sobre')}}">{{ __('Sobre nós') }}</a>
-                <a href="#">{{ __('Informações de entrega') }}</a>
-                <a href="#">{{ __('Política de Privacidade') }}</a>
-                <a href="#">{{ __('Termos & Condições') }}</a>
-                <a href="#">{{ __('Fale Conosco') }}</a>
+                <a href="{{route('informacoes')}}">{{ __('Informações de entrega') }}</a>
+                <a href="{{route('informacoes')}}">{{ __('Política de Privacidade') }}</a>
+                <a href="{{route('informacoes')}}">{{ __('Termos & Condições') }}</a>
+                <a href="{{route('informacoes')}}">{{ __('Fale Conosco') }}</a>
             </div>
-
 
             <div class="col">
                 <h4>{{ __('Formas de Pagamento') }}</h4>
@@ -265,19 +260,22 @@
                     <img class="paypal-img" src="{{ asset('images/pay/paypal-logo.png') }}" alt="Paypal">
                 </div>
             </div>
+            <div class="col">
+                <h4>{{ __() }}</h4>
+                <div class="pay-icons-alis">
+                    <img src="{{ asset('images/banner/alis - frase vectorizada_Prancheta 1 cópia (1).png') }}" alt="Banner">
+
+                </div>
+            </div>
         </div>
 
-        <div class="alis">
-            <img src="{{ asset('images/banner/alis - frase vectorizada_Prancheta 1 cópia (1).png') }}" alt="Banner">
-        </div>
+
 
         <div id="copyright">
             <p>{{ __('CNPJ "XXXXXXXX" - © 2024 Alis - Todos os direitos reservados.') }}</p>
             <p>{{ __('Desenvolvido por Tarcísio Kayck') }}</p>
         </div>
-        <div class="alis">
-            <img src="{{ asset('images/banner/alis - frase vectorizada_Prancheta 1 cópia (1).png') }}" alt="Banner">
-        </div>
+
     </footer>
 
     <!-- Modal -->

@@ -21,7 +21,8 @@ class Carrinhos extends Model
     public function produtos()
     {
         return $this->belongsToMany(Produtos::class, 'carrinho_iten', 'carrinho_id', 'produto_id')
-            ->withPivot('quantidade')
+            ->withPivot('quantidade', 'tamanho_id', 'cor')
             ->withTimestamps();
     }
+
 }

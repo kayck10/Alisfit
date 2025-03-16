@@ -23,7 +23,8 @@ class PrincipalController extends Controller
     }
 
 
-    public function sobre() {
+    public function sobre()
+    {
         return view('principal.sobre');
     }
 
@@ -77,5 +78,8 @@ class PrincipalController extends Controller
         return view('principal.colecoes', compact('colecao', 'produtos'));
     }
 
-
+    public function informacoes()
+    {
+        return view('principal.informacoes');
+    }
 }
