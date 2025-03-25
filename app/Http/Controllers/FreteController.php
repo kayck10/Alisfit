@@ -27,10 +27,12 @@ class FreteController extends Controller
             return redirect()->back()->with('error', $frete['error']);
         }
 
-        return redirect()->back()->with([
-            'valorFrete' => $frete['valor'],
-            'prazoFrete' => $frete['prazo']
-        ]);
+        // return redirect()->back()->with([
+        //     'valorFrete' => $frete['valor'],
+        //     'prazoFrete' => $frete['prazo']
+        // ]);
+
+        return response()->json($frete);
     }
 
 }

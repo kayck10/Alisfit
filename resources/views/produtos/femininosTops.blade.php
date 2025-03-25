@@ -24,10 +24,8 @@
                             <p class="product-name">{{ $produto->nome }}</p>
                             <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
 
-                            <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-primary mt-2">Adicionar a sacola</button>
-                            </form>
+                            <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-dark">Ver Detalhes</a>
+
                         </div>
                     </div>
                 @endforeach
@@ -78,6 +76,13 @@
         height: 320px;
         object-fit: cover;
         transition: transform 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+        .product-card img {
+            height: auto;
+            aspect-ratio: 3/4;
+        }
     }
 
     .product-card img:hover {

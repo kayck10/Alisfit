@@ -16,21 +16,21 @@ class Pedidos extends Model
         'carrinho_id',
         'total',
         'status_pedido_id',
-        'payment_id'
+        'payment_id',
+        'rua',
+        'numero',
+        'cidade',
+        'estado',
+        'bairro',
+        'cep',
+        'complemento',
+        'valor_frete',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-    public function cupons()
-    {
-        return $this->belongsToMany(Cupons::class, 'pedido_cupons', 'pedido_id', 'cupom_id')
-            ->withPivot('desconto_aplicado')
-            ->withTimestamps();
-    }
-
 
     public function aplicarCupom(Cupons $cupom)
     {
@@ -49,11 +49,11 @@ class Pedidos extends Model
         return true;
     }
 
-    public function getTotalComDescontoAttribute()
-    {
-        $descontoTotal = $this->cupons->sum('pivot.desconto_aplicado');
-        return max($this->total - $descontoTotal, 0);
-    }
+    // public function getTotalComDescontoAttribute()
+    // {
+    //     $descontoTotal = $this->cupons->sum('pivot.desconto_aplicado');
+    //     return max($this->total - $descontoTotal, 0);
+    // }
 
     public function status()
     {

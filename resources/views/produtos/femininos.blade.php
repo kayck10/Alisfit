@@ -21,7 +21,7 @@
                             <h5 class="card-title">{{ $produto->nome }}</h5>
                             <p class="card-text">{{ $produto->descricao }}</p>
                             <p><strong>Preço:</strong> R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
-                            <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary">Ver Detalhes</a>
+                            <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-dark">Ver Detalhes</a>
                         </div>
                     </div>
                 </div>

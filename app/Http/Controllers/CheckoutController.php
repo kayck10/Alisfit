@@ -7,6 +7,7 @@ use App\Models\Carrinhos;
 use App\Models\Cupons;
 use App\Models\Pedidos;
 use App\Models\StatusPedidos;
+use Exception;
 use Faker\Provider\pt_BR\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,82 +19,106 @@ use MercadoPago\Item;
 
 class CheckoutController extends Controller
 {
-    public function checkout(Request $request)
+
+    public function checkout($id)
     {
-        $desconto = 0;
+        $pedido = Pedidos::findOrFail($id);
 
-        if ($request->codigoCupom) {
-            $this->aplicarCupomAoPedido($request->pedidoId, $request->codigoCupom, $request->valor_total);
-            $desconto = Cupons::whereCodigo($request->codigoCupom)->first()->valor;
-        }
-        SDK::setAccessToken(config('services.mercadopago.access_token'));
-
-        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
-
-        if (!$carrinho || $carrinho->produtos->isEmpty()) {
-            return redirect()->back()->with('error', 'Seu carrinho está vazio!');
+        if ($pedido->user_id !== Auth::id()) {
+            return redirect()->route('carrinho')->with('error', 'Você não tem permissão para acessar este pedido.');
         }
 
-        $preference = new Preference();
-        $items = [];
-
-        $teste = 0;
-        foreach ($carrinho->produtos as $produto) {
-            $item = new Item();
-            $item->title = $produto->nome;
-            $item->quantity = $produto->pivot->quantidade;
-            $aplicarDesconto = ($produto->preco * $desconto) / 100;
-            $teste += ($produto->preco - $aplicarDesconto);
-            $item->unit_price = ((float) $produto->preco - $aplicarDesconto);
-            $item->currency_id = "BRL";
-            $items[] = $item;
-        }
-
-        $preference->items = $items;
-        $preference->back_urls = [
-            "success" => route('checkout.success', ['pedido_id' => $request->pedidoId]),
-            "failure" => route('checkout.failure', ['pedido_id' => $request->pedidoId]),
-            "pending" => route('checkout.pending', ['pedido_id' => $request->pedidoId]),
-        ];
-        $preference->auto_return = "approved";
-
-        $preference->save();
-
-        return redirect($preference->init_point);
+        return view('checkout.checkout', compact('pedido'));
     }
 
-    private function aplicarCupomAoPedido($pedidoId, $codigo, $valorTotal)
+    public function processarCheckout(Request $request)
     {
+        try {
 
-        $pedido = Pedidos::with('cupons')->findOrFail($pedidoId);
-        $cupom = Cupons::where('codigo', $codigo)->first();
+            $desconto = 0;
 
+            if ($request->codigoCupom) {
+                $this->aplicarCupomAoPedido($request->pedidoId, $request->codigoCupom, $request->valor_total);
+                $desconto = Cupons::whereCodigo($request->codigoCupom)->first()->valor;
+            }
+            SDK::setAccessToken(config('services.mercadopago.access_token'));
+
+            $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+            if (!$carrinho || $carrinho->produtos->isEmpty()) {
+                return redirect()->back()->with('error', 'Seu carrinho está vazio!');
+            }
+
+            $preference = new Preference();
+            $items = [];
+
+            $teste = 0;
+            foreach ($carrinho->produtos as $produto) {
+                $item = new Item();
+                $item->title = $produto->nome;
+                $item->quantity = $produto->pivot->quantidade;
+                $aplicarDesconto = ($produto->preco * $desconto) / 100;
+                $teste += ($produto->preco - $aplicarDesconto);
+                $item->unit_price = ((float) $produto->preco - $aplicarDesconto);
+                $item->currency_id = "BRL";
+                $items[] = $item;
+            }
+
+            $preference->items = $items;
+            $preference->back_urls = [
+                "success" => route('checkout.success', ['pedido_id' => $request->pedidoId]),
+                "failure" => route('checkout.failure', ['pedido_id' => $request->pedidoId]),
+                "pending" => route('checkout.pending', ['pedido_id' => $request->pedidoId]),
+            ];
+            $preference->auto_return = "approved";
+
+            $preference->save();
+
+            if (!empty($preference->init_point)) {
+                return redirect()->away($preference->init_point);
+            } else {
+                return redirect()->route('carrinho')->with('error', 'Ocorreu um erro ao processar o pagamento.');
+            }
+        } catch (Exception $e) {
+            return "aconteceu um erro: $e";
+        }
+    }
+
+    public function aplicarCupom(Request $request)
+    {
+        $codigoCupom = $request->codigoCupom;
+        $cupom = Cupons::where('codigo', $codigoCupom)->where('ativo', true)->first();
+
+        if (!$cupom) {
+            return response()->json(['error' => true, 'msg' => 'Cupom inválido ou expirado.']);
+        }
+
+        $carrinho = session()->get('carrinho', []);
+        $subtotal = collect($carrinho)->sum(function ($produto) {
+            return $produto['quantidade'] * $produto['preco'];
+        });
 
         if ($cupom->tipo === 'percentual') {
-            $desconto = ($pedido->total * $cupom->valor) / 100;
+            $desconto = ($subtotal * $cupom->valor) / 100;
         } elseif ($cupom->tipo === 'fixo') {
-            $desconto = min($cupom->valor, $pedido->total);
+            $desconto = min($cupom->valor, $subtotal);
         }
 
-        $pedido->cupons()->attach($cupom->id, [
-            'desconto_aplicado' => $desconto,
+        $novoTotal = $subtotal - $desconto;
+
+        session(['desconto' => $desconto, 'cupom' => $codigoCupom]);
+
+        return response()->json([
+            'error' => false,
+            'novoTotal' => $novoTotal,
         ]);
-
-        $pedido->update([
-            'total' => $valorTotal,
-        ]);
-
-        if ($cupom->quantidade > 0) {
-            $cupom->decrement('quantidade');
-        }
-
-        $pedido->update(['valor_total' => $valorTotal]);
-        return $desconto;
     }
+
 
     public function success(Request $request)
     {
 
+        // dd('teste');
         $pedido_id = $request->pedido_id;
         $paymentId = $request->get('payment_id');
 
@@ -122,7 +147,7 @@ class CheckoutController extends Controller
 
         ]);
         if ($statusPedido->desc == 'Pagamento Aprovado' && $pedido->user) {
-            Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+            $mail = Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
         }
 
         return view('checkout.success', ['payment' => $statusPedido, 'pedido' => $pedido]);

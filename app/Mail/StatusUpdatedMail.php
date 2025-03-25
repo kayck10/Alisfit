@@ -39,7 +39,7 @@ class StatusUpdatedMail extends Mailable
 
     public function build()
     {
-        return $this->from('mixuniversall@gmail.com')  // Defina o "From" aqui
+        return $this->from('alisoriginalfitness@gmail.com')
                     ->subject('Status do Pedido Atualizado')
                     ->view('emails.status_atualizado');
     }

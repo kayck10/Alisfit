@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cupons;
 use App\Models\Pedidos;
+use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 
 class CuponsController extends Controller
@@ -32,8 +33,8 @@ class CuponsController extends Controller
         ]);
 
         Cupons::create($request->all());
-
-        return redirect()->route('cupons.index')->with('success', 'Cupom criado com sucesso!');
+        Toastr::success('Cupom criado com sucesso!', 'Sucesso', ["positionClass" => "toast-top-center"]);
+        return redirect()->route('cupons.index');
     }
 
     public function edit(Cupons $cupom)

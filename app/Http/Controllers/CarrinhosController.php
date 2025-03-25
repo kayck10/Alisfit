@@ -6,6 +6,9 @@ use App\Models\CarrinhoIten;
 use App\Models\Carrinhos;
 use App\Models\Pedidos;
 use App\Models\Produtos;
+use Brian2694\Toastr\Facades\Toastr as FacadesToastr;
+use Brian2694\Toastr\Toastr;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,6 +33,7 @@ class CarrinhosController extends Controller
     public function adicionarProduto(Request $request, $produtoId)
     {
         if (!Auth::check()) {
+            FacadesToastr::error('Você precisa estar logado para adicionar produtos a sua sacola.', 'Falha', ["positionClass" => "toast-top-center"]);
             return redirect()->back()->with('error', 'Faça login para adicionar produtos à sacola.');
         }
 
@@ -65,22 +69,17 @@ class CarrinhosController extends Controller
                 'cor' => $request->cor
             ]);
         }
-
+        FacadesToastr::success('Produto adicionado a sacola.', 'Sucesso', ["positionClass" => "toast-top-center"]);
         return redirect()->back()->with('success', 'Produto adicionado ao carrinho!');
     }
-
-
-
-
-
 
     public function atualizarQuantidade(Request $request, $produtoId)
     {
         $carrinho = Carrinhos::where('user_id', Auth::id())->first();
+
         if ($carrinho) {
-            $carrinho->produtos()->updateExistingPivot($produtoId, [
-                'quantidade' => $request->quantidade
-            ]);
+            $quantidade = max(1, (int) $request->quantidade); // Garante que a quantidade seja no mínimo 1
+            $carrinho->produtos()->updateExistingPivot($produtoId, ['quantidade' => $quantidade]);
 
             $novoCarrinho = $carrinho->fresh();
 
@@ -97,21 +96,63 @@ class CarrinhosController extends Controller
     }
 
 
+
     public function removerProduto($produtoId)
     {
         $carrinho = Carrinhos::where('user_id', Auth::id())->first();
 
         if ($carrinho) {
             $carrinho->produtos()->detach($produtoId);
-
+            FacadesToastr::success('Produto removido da sacola', 'Sucesso', ["positionClass" => "toast-top-center"]);
             return redirect()->back()->with('success', 'Produto removido do carrinho!');
         }
 
         return redirect()->back()->with('error', 'Carrinho não encontrado!');
     }
 
+    public function info()
+    {
+        $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
 
-    public function finalizar(Request $request)
+        if (!$carrinho) {
+            return view('carrinho.info')->with('mensagem', 'Seu carrinho está vazio.');
+        }
+
+        $subtotal = $carrinho->produtos->sum(function ($produto) {
+            return $produto->pivot->quantidade * $produto->preco;
+        });
+
+        $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
+
+        $total = max($subtotal - $desconto, 0);
+
+        return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total'));
+    }
+
+
+    public function finalizar()
+    {
+        $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();
+
+        if (!$carrinho || $carrinho->produtos->isEmpty()) {
+            return redirect()->route('carrinho')->with('error', 'Carrinho vazio!');
+        }
+
+        $desconto = (float) $carrinho->cupons->sum('pivot.desconto_aplicado');
+
+        $subtotal = $carrinho->produtos->sum(function ($produto) {
+            return (float) ($produto->pivot->quantidade * $produto->preco);
+        });
+
+        $valorFrete = (float) session('valorFrete', 0);
+
+        $total = max(0, ($subtotal + $valorFrete) - $desconto);
+        return view('carrinho.finaliza', compact('carrinho', 'desconto', 'total'));
+    }
+
+
+
+    public function finalizarPedido(Request $request)
     {
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
@@ -119,25 +160,39 @@ class CarrinhosController extends Controller
             return redirect()->route('carrinho')->with('error', 'Carrinho vazio!');
         }
 
+        $totalCarrinho = $carrinho->produtos->sum(function ($produto) {
+            return $produto->preco * $produto->pivot->quantidade;
+        });
+
+        $valorFrete = floatval(session('valorFrete', 0));
+
+        $totalPedido = $totalCarrinho + $valorFrete;
+
         $pedido = Pedidos::create([
             'user_id' => Auth::id(),
             'carrinho_id' => $carrinho->id,
-            'total' => $carrinho->produtos->sum(function ($produto) {
-                return $produto->preco * $produto->pivot->quantidade;
-            }),
-            'status' => 'pendente',
-            'status_pedido_id' => 1,
+            'total' => $totalPedido,
+            'status_pedido_id' => 1, // Pendente
+            'valor_frete' => $valorFrete,
             'rua' => $request->rua,
             'numero' => $request->numero,
             'cidade' => $request->cidade,
             'estado' => $request->estado,
+            'bairro' => $request->bairro,
             'cep' => $request->cep,
-
+            'complemento' => $request->complemento,
         ]);
 
+        foreach ($carrinho->produtos as $produto) {
+            CarrinhoIten::where('carrinho_id', $carrinho->id)
+                ->where('produto_id', $produto->id)
+                ->update(['pedido_id' => $pedido->id]);
+        }
 
-        $pedido->load('cupons');
+        // $carrinho->produtos()->detach();
+        // $carrinho->delete();
+        // $pedido->load('cupons');
 
-        return view('carrinho.finaliza', compact('carrinho', 'pedido'));
+        return redirect()->route('checkout', $pedido->id)->with('success', 'Pedido criado com sucesso!');
     }
 }

@@ -150,7 +150,6 @@
             border-radius: 10px;
             cursor: pointer;
             flex: 1 1 calc(50% - 20px);
-            /* Padrão: 2 itens por linha */
             max-width: calc(50% - 20px);
         }
 
@@ -241,7 +240,35 @@
                 max-width: 100%;
             }
         }
+
+        @media (max-width: 768px) {
+            .carousel-products {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .product-card {
+                flex: 1 1 calc(50% - 10px);
+                max-width: calc(50% - 10px);
+            }
+
+            @media (max-width: 768px) {
+                .product-card img {
+                    width: 100%;
+                    height: 180px;
+                    aspect-ratio: 4 / 5;
+                    border-radius: 10px;
+                    object-fit: cover;
+                }
+            }
+
+        }
     </style>
+
+    {{-- {{dd('o')}} --}}
+
+
 
     <!-- Carrossel Fullscreen -->
     <div id="carouselExample" class="carousel slide mb-5" data-bs-ride="carousel">

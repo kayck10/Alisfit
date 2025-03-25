@@ -1,201 +1,146 @@
-    @extends('Layout.principal')
+@extends('Layout.principal')
 
-    @section('content')
-        <link rel="stylesheet" href="iziToast.min.css">
-        <div class="container py-5">
-            <h2 class="text-center mb-5 mt-5">Finalização de Compra</h2>
+@section('content')
+    <div class="container py-5">
+        <h2 class="text-center mt-5 mb-4 fw-bold text-dark">Finalização de Compra</h2>
 
-            <!-- Resumo do Carrinho -->
-            <div class="row">
-                <div class="col-12">
-                    <h4>Resumo do Carrinho</h4>
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Resumo do Carrinho -->
+                <div class="card shadow rounded">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">Resumo do Carrinho</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table text-center align-middle">
+                            <thead class="table-dark text-white">
                                 <tr>
                                     <th>Produto</th>
                                     <th>Imagem</th>
-                                    <th>Quantidade</th>
+                                    <th>Qtd</th>
                                     <th>Preço</th>
                                     <th>Subtotal</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($carrinho->produtos as $produto)
                                     <tr>
-                                        <td>{{ $produto->nome }}</td>
-                                        <td> <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
-                                                alt="{{ $produto->nome }}"
-                                                style="width: 50px; height: 50px; object-fit: cover;">
-                                        </td>
+                                        <td class="fw-semibold">{{ $produto->nome }}</td>
                                         <td>
-                                            <form action="{{ route('carrinho.atualizar', $produto->id) }}" method="POST">
-                                                @csrf
-                                                <input type="number" name="quantidade"
-                                                    value="{{ $produto->pivot->quantidade }}" min="1"
-                                                    class="form-control" style="width: 80px;">
-                                                <button type="submit"
-                                                    class="btn btn-link text-decoration-none">Atualizar</button>
-                                            </form>
+                                            <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
+                                                 alt="{{ $produto->nome }}" class="img-thumbnail rounded" style="width: 50px;">
                                         </td>
-                                        <td>R$ {{ number_format($produto->preco, 2, ',', '.') }}</td>
-                                        <td>R$
-                                            {{ number_format($produto->pivot->quantidade * $produto->preco, 2, ',', '.') }}
-                                        </td>
-                                        <td>
-                                            <form action="{{ route('carrinho.remover', $produto->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger btn-sm">Remover</button>
-                                            </form>
-                                        </td>
+                                        <td class="fw-bold">{{ $produto->pivot->quantidade }}</td>
+                                        <td class="text-success fw-bold">R$ {{ number_format($produto->preco, 2, ',', '.') }}</td>
+                                        <td class="text-danger fw-bold">R$ {{ number_format($produto->pivot->quantidade * $produto->preco, 2, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <!-- Totais do Carrinho -->
-            <div class="row">
-                <div class="col-12 col-md-6">
-                    <h4>Total do Carrinho</h4>
-                    <ul class="list-group">
-                        <li class="list-group-item">Subtotal: R$
-                            {{ number_format(
-                                $carrinho->produtos->sum(function ($produto) {
-                                    return $produto->pivot->quantidade * $produto->preco;
-                                }),
-                                2,
-                                ',',
-                                '.',
-                            ) }}
-                        </li>
+                  <!-- Total do Pedido -->
+                  <div class="card shadow rounded mt-4">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">Total do Pedido</h5>
+                    </div>
+                    <div class="card-body text-dark">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Subtotal:
+                                <strong class="">R$ {{ number_format($carrinho->produtos->sum(fn ($produto) => $produto->pivot->quantidade * $produto->preco), 2, ',', '.') }}</strong>
+                            </li>
+                            @if (isset($desconto) && $desconto > 0)
+                            <li class="list-group-item text-success">Desconto:
+                                -R$ {{ number_format($desconto, 2, ',', '.') }}
+                            </li>
+                            @endif
+                            <div id="infoFrete"></div>
+                            @if (session()->has('valorFrete'))
+                                <li class="list-group-item">Frete: <strong class="">R$ </strong></li>
+                                <li class="list-group-item">Prazo: <strong class=""><span id="prazoEntrega"></span> dias úteis</strong></li>
+                            @endif
+                            @if (session()->has('desconto'))
+                                <li class="list-group-item text-success">Desconto: -R$ {{ number_format(session('desconto'), 2, ',', '.') }}</li>
+                            @endif
 
-                        <form action="{{ route('frete.calcular') }}" method="POST" class="form-inline">
-                            @csrf
-                            <label for="cep" class="mr-2">CEP:</label>
-                            <input type="text" id="cep" name="cep" class="form-control mr-2"
-                                placeholder="Digite o CEP" required>
-                            <button type="submit" class="btn btn-primary">Calcular Frete</button>
-                        </form>
-
-                        @if (session()->has('error'))
-                            <p style="color: red; margin-top: 10px;">{{ session('error') }}</p>
-                        @endif
-
-                        @if (session()->has('valorFrete') && session()->has('prazoFrete'))
-                            <div id="resultado-frete" class="mt-3">
-                                <p><strong>Frete:</strong> R$ {{ session('valorFrete') }}</p>
-                                <p><strong>Prazo de Entrega:</strong> {{ session('prazoFrete') }} dias úteis</p>
-                            </div>
-                        @endif
-
-
-
-                        <li class="list-group-item">
-                            {{-- <form action="{{ route('pedidos.aplicar-cupom', ['pedidoId' => $pedido->id]) }}" method="POST">
-                                @csrf --}}
-                            <div class="input-group">
-                                <input type="text" name="codigo" id="codigo-cupom"
-                                    placeholder="Digite o código do cupom" required class="form-control">
-                                <button type="button" class="btn btn-success" id="aplicar-cupom">Aplicar</button>
-                            </div>
-                            {{-- </form> --}}
-                        </li>
-
-                        @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-
-                        @if (session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-
-                        <li class="list-group-item">
-                            <h5>Total:
-                                <span class="valor-total">
-                                    R$
-                                    {{ number_format($pedido->total_com_desconto, 2, ',', '.') }}
-                                </span>
-
-                            </h5>
-                        </li>
-
-                    </ul>
+                            <li class="list-group-item bg-light">
+                                <h5 class="text-success fw-bold" id="totalPedido" data-total="{{$total}}">Total:
+                                    R$ {{ number_format($total + (float) session('valorFrete', 0) - (float) session('desconto', 0), 2, ',', '.') }}
+                                </h5>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
-                <!-- Checkout -->
-                <form action="{{ route('checkout') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="pedidoId" value="{{ $pedido->id }}">
-                    <input type="hidden" name="valor_total" id="valor-total-input">
-                    <input type="hidden" name="codigoCupom" id="codigo-cupom-input">
-                    <button type="submit" class="btn btn-success btn-lg btn-block">Ir para o Checkout</button>
-                </form>
+                <!-- Calcular Frete -->
+                <div class="card shadow rounded mt-4">
+                    <div class="card-header bg-secondary text-white text-center">
+                        <h5 class="mb-0">Calcular Frete</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        {{-- <form action="{{ route('frete.calcular') }}" method="POST" class="d-flex justify-content-center">
+                            @csrf
+                            <input type="text" id="cep" name="cep" class="form-control w-50 me-2 border-primary" placeholder="Digite o CEP" required>
+                            <button type="submit" class="btn btn-primary fw-bold">Calcular</button>
+                        </form>
+                        @if (session()->has('error'))
+                        <p class="text-danger mt-2 fw-semibold">{{ session('error') }}</p>
+                        @endif --}}
+                        <div class="d-flex justify-content-center">
+                            <input type="text" id="cepCalcular" name="cep" class="form-control w-50 me-2 border-primary" placeholder="Digite o CEP" required>
+                            <button id="calcularFrete" class="btn btn-primary fw-bold">Calcular</button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Endereço de Entrega -->
+                <div id="enderecoEntrega" class="card shadow rounded mt-4 hide">
+                    <div class="card-header bg-secondary text-white text-center">
+                        <h5 class="mb-0">Endereço de Entrega</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('carrinho.finalizarPedido') }}" method="POST">
+                            @csrf
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="rua" class="form-label fw-semibold">Rua</label>
+                                    <input type="text" class="form-control border-primary" id="rua" name="rua" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="numero" class="form-label fw-semibold">Número</label>
+                                    <input type="text" class="form-control border-primary" id="numero" name="numero" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="bairro" class="form-label fw-semibold">Bairro</label>
+                                    <input type="text" class="form-control border-primary" id="bairro" name="bairro" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="cidade" class="form-label fw-semibold">Cidade</label>
+                                    <input type="text" class="form-control border-primary" id="cidade" name="cidade" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="estado" class="form-label fw-semibold">Estado</label>
+                                    <input type="text" class="form-control border-primary" id="estado" name="estado" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="cep" class="form-label fw-semibold">CEP</label>
+                                    <input type="text" class="form-control border-primary" id="cep" name="cep" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="complemento" class="form-label fw-semibold">Complemento</label>
+                                    <input type="text" class="form-control border-primary" id="complemento" name="complemento">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 btn-lg mt-4 fw-bold">
+                                <i class="fas fa-check-circle"></i> Confirmar Pedido
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-        <!-- iziToast CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css">
-
-        <!-- iziToast JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"></script>
-        <script>
-            $('#aplicar-cupom').click(function() {
-                console.log('apliquei');
-                aplicarCupom();
-            });
-            function aplicarCupom() {
-                let id = {{ $pedido->id }};
-                let codigoCupom = $('#codigo-cupom').val();
-                if (codigoCupom !== "") {
-                    $.ajax({
-                        type: "POST",
-                        url: "{{ route('pedidos.aplicar-cupom') }}",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            pedidoId: id,
-                            codigoCupom: codigoCupom
-                        },
-                        success: function(response) {
-                            if (!response.error) {
-                                $('.valor-total').text(formatarDinheiro(response));
-                                $('#valor-total-input').val(response);
-                                $('#codigo-cupom-input').val(codigoCupom);
-                                iziToast.success({
-                                    title: 'Sucesso!',
-                                    message: "Cupom aplicado",
-                                    position: 'topRight'
-                                });
-                                return;
-                            }
-                            $('#valor-total-input').val(response.results);
-                            $('#codigo-cupom-input').val(null);
-
-                            iziToast.error({
-                                title: 'Atenção!',
-                                message: response.msg,
-                                position: 'topRight'
-                            });
-                            $('.valor-total').text(formatarDinheiro(response.results));
-
-                        }
-                    });
-                }
-
-            }
-
-            function formatarDinheiro(valor) {
-                return new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                }).format(valor);
-            }
-        </script>
-    @endsection
+    </div>
+@endsection

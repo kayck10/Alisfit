@@ -51,18 +51,15 @@ class ProdutosController extends Controller
         'tipo_produto_id' => $request->tipo_produto_id,
     ]);
 
-    // Salva as imagens
     if ($request->hasFile('imagens')) {
         foreach ($request->file('imagens') as $imagem) {
-            $imagePath = $imagem->store('produtos', 'public'); // Salva a imagem no storage
+            $imagePath = $imagem->store('produtos', 'public');
             ImagensProduto::create([
                 'produto_id' => $produto->id,
                 'imagem' => $imagePath,
             ]);
         }
     }
-
-    // Salva as informações de tamanhos e cores
     foreach ($request->informacoes as $info) {
         ProdutosTamanhos::create([
             'produto_id' => $produto->id,
@@ -72,7 +69,6 @@ class ProdutosController extends Controller
         ]);
     }
 
-    // Redireciona com mensagem de sucesso
     return redirect()->route('produtos.create')->with('success', 'Produto criado com sucesso!');
 }
     public function index()
@@ -224,7 +220,7 @@ class ProdutosController extends Controller
             ->where('tipo_produto_id', $legging->id)
             ->get();
 
-        return view('produtos.femininosLegging', compact('produtos', 'carrinho'));
+        return view('produtos.femininosLeggings', compact('produtos', 'carrinho'));
     }
 
     public function femininosShorts()

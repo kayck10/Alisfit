@@ -15,11 +15,18 @@ class CarrinhoIten extends Model
         'produto_id',
         'quantidade',
         'tamanho_id',
-        'cor'
+        'cor',
+        'pedido_id',
+        'desconto_aplicado'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function produto()
+    {
+        return $this->belongsTo(Produtos::class, 'produto_id');
     }
 }

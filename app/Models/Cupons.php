@@ -24,16 +24,15 @@ class Cupons extends Model
         'ativo' => 'boolean',
     ];
 
-    public function pedidos()
-    {
-        return $this->belongsToMany(Pedidos::class, 'pedido_cupons')
-                    ->withPivot('desconto_aplicado')
-                    ->withTimestamps();
-    }
-
     public function isValido(): bool
     {
         return $this->ativo && ($this->quantidade > 0) && (!$this->expiracao || $this->expiracao->isFuture());
     }
 
+    public function carrinhos()
+    {
+        return $this->belongsToMany(Carrinhos::class, 'carrinho_cupons')
+            ->withPivot('desconto_aplicado')
+            ->withTimestamps();
+    }
 }

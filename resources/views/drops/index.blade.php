@@ -10,15 +10,12 @@
             background: black !important;
             border: none;
             padding: 6px 12px;
-            /* Botão menor */
             font-size: 13px;
             margin-top: 5px;
-            /* Menor espaço entre elementos */
             color: white;
             width: 75%;
             transition: background 0.3s ease, transform 0.2s ease;
             border-radius: 4px;
-            /* Retangular */
         }
 
         .btn-primary:hover {
@@ -80,12 +77,10 @@
         .product-price,
         .btn-primary {
             margin-top: 6px;
-            /* Reduz a distância entre os elementos */
         }
 
         .btn-primary {
             width: 90%;
-            /* Ocupa melhor o espaço */
             padding: 10px 14px;
             font-size: 15px;
         }
@@ -97,13 +92,22 @@
             }
 
             .filters {
-                position: fixed;
-                left: 20px;
-                /* Aproxima mais da borda */
-                top: 150px;
-                width: 220px;
-                /* Reduzi um pouco a largura */
-                z-index: 1000;
+                position: static;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .filters-toggle {
+                display: block;
+                margin-bottom: 10px;
+            }
+
+            .filters-collapse {
+                display: none;
+            }
+
+            .filters-collapse.show {
+                display: block;
             }
         }
 
@@ -124,62 +128,168 @@
 
     <div class="container">
         <div class="row">
-            <aside class="filters">
-                <h2 class="mb-5"><strong>DROP SATUS</strong></h2>
+            <!-- Botão de Toggle para o Filtro (Visível apenas em telas menores) -->
+            <button class="btn btn-primary filters-toggle d-md-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#filtersCollapse" aria-expanded="false" aria-controls="filtersCollapse">
+                Filtrar
+            </button>
 
-                <h4>Filtrar</h4>
-                <div class="accordion" id="filtersAccordion">
-                    @php
-                        $filtros = ['Categoria', 'Marcas', 'Modalidade', 'Tamanho'];
-                    @endphp
-                    @foreach ($filtros as $index => $filtro)
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="heading{{ $index }}">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapse{{ $index }}" aria-expanded="false"
-                                    aria-controls="collapse{{ $index }}">
-                                    {{ $filtro }}
-                                </button>
-                            </h2>
-                            <div id="collapse{{ $index }}" class="accordion-collapse collapse"
-                                aria-labelledby="heading{{ $index }}" data-bs-parent="#filtersAccordion">
-                                <div class="accordion-body">
-                                    <ul class="list-group">
-                                        <li class="list-group-item">Opção 1</li>
-                                        <li class="list-group-item">Opção 2</li>
-                                        <li class="list-group-item">Opção 3</li>
-                                    </ul>
+            <!-- Filtros -->
+            <aside class="filters">
+                <div class="collapse d-md-block" id="filtersCollapse">
+                    <h2 class="mb-5"><strong>DROP SATUS</strong></h2>
+
+                    <h4>Filtrar</h4>
+                    <div class="accordion" id="filtersAccordion">
+                        @php
+                            $filtros = [
+                                'Categoria' => $colecoes, // Coleções
+                                'Tamanho' => $tamanhos, // Tamanhos
+                                'Gênero' => $generos, // Gêneros
+                                'Cor' => $cores, // Cores (substitua $cores pelos dados reais)
+                            ];
+                        @endphp
+                        @foreach ($filtros as $filtroNome => $opcoes)
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{ $loop->index }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{ $loop->index }}" aria-expanded="false"
+                                        aria-controls="collapse{{ $loop->index }}">
+                                        {{ $filtroNome }}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ $loop->index }}" class="accordion-collapse collapse"
+                                    aria-labelledby="heading{{ $loop->index }}" data-bs-parent="#filtersAccordion">
+                                    <div class="accordion-body">
+                                        <ul class="list-group">
+                                            @foreach ($opcoes as $opcao)
+                                                <li class="list-group-item">
+                                                    <input type="checkbox" name="{{ strtolower($filtroNome) }}[]"
+                                                        value="{{ $opcao->id ?? $opcao }}"
+                                                        id="{{ strtolower($filtroNome) }}_{{ $opcao->id ?? $opcao }}">
+                                                    <label for="{{ strtolower($filtroNome) }}_{{ $opcao->id ?? $opcao }}">
+                                                        {{ $opcao->nome ?? ($opcao->desc ?? $opcao) }}
+                                                    </label>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
+
+                    <!-- Botão para aplicar os filtros -->
+                    <button type="button" id="aplicarFiltros" class="btn btn-primary mt-3">Aplicar Filtros</button>
                 </div>
             </aside>
+        </div>
 
-            <main class="col-md-9 offset-md-3">
-                <div class="row">
-                    @foreach ($produtos as $produto)
-                        <div class="col-md-3 col-sm-6 mb-4">
-                            <div class="product-card">
-                                <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">   @if ($produto->imagens->isNotEmpty())
+        <!-- Produtos -->
+        <main class="col-md-9 offset-md-3">
+            <div class="row">
+                @foreach ($produtos as $produto)
+                    <div class="col-md-3 col-sm-6 mb-4">
+                        <div class="product-card">
+                            <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">
+                                @if ($produto->imagens->isNotEmpty())
                                     <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
                                         alt="{{ $produto->nome }}">
                                 @else
                                     <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
                                 @endif
                             </a>
-                                <p class="product-name">{{ $produto->nome }}</p>
-                                <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
+                            <p class="product-name">{{ $produto->nome }}</p>
+                            <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
 
-                                <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary mt-2">Adicionar a sacola</button>
-                                </form>
+                            <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-primary mt-2">Adicionar a sacola</button>
+                            </form>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </main>
+    </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const aplicarFiltrosBtn = document.getElementById('aplicarFiltros');
+
+            if (aplicarFiltrosBtn) {
+                aplicarFiltrosBtn.addEventListener('click', function() {
+                    // Coletar os filtros selecionados
+                    const filtros = {
+                        colecao_id: [],
+                        tamanho_id: [],
+                        genero_id: [],
+                        cor: [],
+                    };
+
+                    document.querySelectorAll('input[name="categoria[]"]:checked').forEach((checkbox) => {
+                        filtros.colecao_id.push(checkbox.value);
+                    });
+
+                    document.querySelectorAll('input[name="tamanho[]"]:checked').forEach((checkbox) => {
+                        filtros.tamanho_id.push(checkbox.value);
+                    });
+
+                    document.querySelectorAll('input[name="genero[]"]:checked').forEach((checkbox) => {
+                        filtros.genero_id.push(checkbox.value);
+                    });
+
+                    document.querySelectorAll('input[name="cor[]"]:checked').forEach((checkbox) => {
+                        filtros.cor.push(checkbox.value);
+                    });
+
+                    // Enviar os filtros via AJAX
+                    fetch('{{ route('drops.filtrar') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                            body: JSON.stringify(filtros),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Atualizar a lista de produtos
+                            const produtosContainer = document.querySelector(
+                                '.row'); // Container dos produtos
+                            produtosContainer.innerHTML = ''; // Limpar o conteúdo atual
+
+                            data.produtos.forEach(produto => {
+                                const produtoHTML = `
+                        <div class="col-md-3 col-sm-6 mb-4">
+                            <div class="product-card">
+                             <a href="/loja/produto/${produto.id}">
+                                    ${produto.imagens.length > 0 ?
+                                        `<img src="{{ asset('storage/') }}/${produto.imagens[0].imagem}" alt="${produto.nome}">` :
+                                        `<img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">`
+                                    }
+                                </a>
+                                <p class="product-name">${produto.nome}</p>
+                                <p class="product-price">R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}</p>
+                               <form action="{{ route('carrinho.adicionar', ['produtoId' => $produto->id]) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-primary mt-2">Adicionar à sacola</button>
+                            </form>
+
                             </div>
                         </div>
-                    @endforeach
-                </div>
-            </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    `;
+                                produtosContainer.insertAdjacentHTML('beforeend', produtoHTML);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Erro ao filtrar produtos:', error);
+                        });
+                });
+            } else {
+                console.error('Botão "aplicarFiltros" não encontrado.');
+            }
+        });
+    </script>
 @endsection

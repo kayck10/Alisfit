@@ -103,8 +103,6 @@ button,
     flex: 2;
 }
 
-
-
 #navbar {
     display: flex;
     align-items: center;
@@ -393,7 +391,7 @@ button,
     transform: translateY(-5px);
 }
 
-#search-icon,
+#menu-toggle,
 #cart-icon-container,
 #user-icon {
     margin-left: 0px;
@@ -689,35 +687,34 @@ button,
     background-color: #424240;
 }
 
-/* Menu do usuário */
-
+/* Container do ícone do usuário */
 .user-icon-container {
     position: relative;
+    display: inline-block;
 }
 
-.hover-zone {
-    position: absolute;
-    top: 19px;
-    left: 10px;
-    width: 20px;
-    height: 16px;
-    z-index: 9998;
-    background: transparent;
+/* Ícone do usuário */
+.user-icon-container a {
+    color: #333;
+    text-decoration: none;
+    font-size: 1.5rem;
+    display: block;
+    padding: 10px;
 }
 
+/* Dropdown do usuário */
 #user-menu {
     position: absolute;
-    top: 35px;
-    right: -45px;
-    display: none;
+    top: 100%; /* Posiciona o dropdown abaixo do ícone */
+    right: 0;
+    display: none; /* Oculta o dropdown por padrão */
     background-color: #fff;
     border-radius: 4px;
-    padding: 0 10px;
+    padding: 10px 0;
     width: 230px;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    visibility: hidden;
-    opacity: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #ddd;
+    z-index: 1000; /* Garante que o dropdown fique acima de outros elementos */
 }
 
 /* Lista do menu do usuário */
@@ -736,16 +733,7 @@ button,
     border-bottom: none;
 }
 
-/* Manter o menu visível ao passar o mouse */
-.user-icon-container:hover #user-menu,
-.hover-zone:hover + #user-menu,
-#user-menu:hover {
-    display: block;
-    visibility: visible;
-    opacity: 1;
-}
-
-/* Estilo para os links do menu */
+/* Links do menu */
 #user-menu ul li a {
     text-decoration: none;
     color: #333;
@@ -753,14 +741,17 @@ button,
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: color 0.3s ease-in-out;
-    transform: none;
+    transition: color 0.3s ease;
 }
 
 #user-menu ul li a:hover {
-    transform: none;
+    color: #007bff; /* Cor ao passar o mouse */
 }
 
+/* Exibir o dropdown ao passar o mouse sobre o ícone do usuário */
+.user-icon-container:hover #user-menu {
+    display: block;
+}
 /* ----------------------------------------------------------------- Promo Section --------------------------------------------------------------- */
 
 #promo-section {

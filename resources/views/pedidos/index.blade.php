@@ -146,7 +146,7 @@
                                 </span></td>
 
                             <td>R$ {{ number_format($pedido->total, 2, ',', '.') }}</td>
-                            <td>R$ {{ number_format($pedido->getTotalComDescontoAttribute(), 2, ',', '.') }}</td>
+                            {{-- <td>R$ {{ number_format($pedido->getTotalComDescontoAttribute(), 2, ',', '.') }}</td> --}}
                             <td>
                                 <button type="button" class="btn btn-primary visualizarPedido" data-bs-toggle="modal"
                                     data-id="{{ $pedido->id }}" data-bs-target="#exampleModal">
