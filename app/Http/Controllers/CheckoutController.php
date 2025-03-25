@@ -20,16 +20,7 @@ use MercadoPago\Item;
 class CheckoutController extends Controller
 {
 
-    public function checkout($id)
-    {
-        $pedido = Pedidos::findOrFail($id);
 
-        if ($pedido->user_id !== Auth::id()) {
-            return redirect()->route('carrinho')->with('error', 'Você não tem permissão para acessar este pedido.');
-        }
-
-        return view('checkout.checkout', compact('pedido'));
-    }
 
     public function processarCheckout(Request $request)
     {
@@ -118,7 +109,6 @@ class CheckoutController extends Controller
     public function success(Request $request)
     {
 
-        // dd('teste');
         $pedido_id = $request->pedido_id;
         $paymentId = $request->get('payment_id');
 
@@ -131,6 +121,12 @@ class CheckoutController extends Controller
         $pedido->update([
             'payment_id' => $paymentId,
         ]);
+
+        if ($pedido->carrinho) {
+
+            $pedido->carrinho->produtos()->detach();
+            $pedido->carrinho->delete();
+        }
 
         if (!$pedido) {
             return redirect()->route('carrinho.finalizar')->with('error', 'Pedido não encontrado!');
@@ -149,6 +145,7 @@ class CheckoutController extends Controller
         if ($statusPedido->desc == 'Pagamento Aprovado' && $pedido->user) {
             $mail = Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
         }
+
 
         return view('checkout.success', ['payment' => $statusPedido, 'pedido' => $pedido]);
     }

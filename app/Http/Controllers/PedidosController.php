@@ -8,6 +8,7 @@ use App\Models\Carrinhos;
 use App\Models\Cupons;
 use App\Models\Pedidos;
 use App\Models\StatusPedidos;
+use Brian2694\Toastr\Facades\Toastr;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -88,12 +89,7 @@ class PedidosController extends Controller
             'desconto_aplicado' => $desconto,
             'novo_total' => $novoTotal
         ]);
-
-        return response()->json([
-            'error' => false,
-            'msg' => 'Cupom aplicado com sucesso!',
-            'desconto' => $desconto,
-            'novoTotal' => $novoTotal,
-        ]);
+        Toastr::success('Cupom Aplicado', 'Sucesso', ["positionClass" => "toast-top-center"]);
+        return redirect()->back()->with('success', 'Cupom aplicado com sucesso!');
     }
 }

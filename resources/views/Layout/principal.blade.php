@@ -225,16 +225,72 @@
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
             </div>
             <div class="offcanvas-body">
-                <ul id="menu-list">
-                    <li><a href="{{ route('drops') }}">LANÇAMENTOS</a></li>
-                    <li><a href="#">MASCULINO</a></li>
-                    <li><a href="#">FEMININO</a></li>
-                    <li><a href="#">OFERTAS</a></li>
-                    <li><a href="#">COLEÇÕES</a></li>
-                    <li><a href="#">SOBRE NÓS</a></li>
+                <!-- Logo -->
+                <div class="text-center mb-3">
+                    <a href="{{ route('loja.create') }}">
+                        <img src="{{ asset('images/ALis - nova logo-03.png') }}" class="img-fluid" alt="Logo"
+                            style="max-width: 150px;">
+                    </a>
+                </div>
+
+                <!-- Menu -->
+                <ul class="list-unstyled">
+                    <li><a href="{{ route('drops') }}" class="d-block text-decoration-none">LANÇAMENTOS</a></li>
+
+                    <!-- Dropdown Masculino -->
+                    <li>
+                        <a href="#masculinoMenu" class="d-block text-decoration-none"
+                            data-bs-toggle="collapse">MASCULINO ▼</a>
+                        <ul id="masculinoMenu" class="collapse ps-3">
+                            <li><a href="{{ route('produtos.masculinasCamisetas') }}"
+                                    class="d-block text-decoration-none">Camisas</a></li>
+                            <li><a href="{{ route('produtos.masculinosShorts') }}"
+                                    class="d-block text-decoration-none">Shorts</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown Feminino -->
+                    <li>
+                        <a href="#femininoMenu" class="d-block text-decoration-none"
+                            data-bs-toggle="collapse">FEMININO ▼</a>
+                        <ul id="femininoMenu" class="collapse ps-3">
+                            <li><a href="{{ route('produtos.femininosTops') }}"
+                                    class="d-block text-decoration-none">Tops</a></li>
+                            <li><a href="{{ route('produtos.femininosLegging') }}"
+                                    class="d-block text-decoration-none">Leggings</a></li>
+                            <li><a href="{{ route('produtos.femininosShorts') }}"
+                                    class="d-block text-decoration-none">Shorts</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown Ofertas -->
+                    <li>
+                        <a href="#ofertasMenu" class="d-block text-decoration-none" data-bs-toggle="collapse">OFERTAS
+                            ▼</a>
+                        <ul id="ofertasMenu" class="collapse ps-3">
+                            <li><a href="#" class="d-block text-decoration-none">Ofertas Masculinas</a></li>
+                            <li><a href="#" class="d-block text-decoration-none">Ofertas Femininas</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown Coleções -->
+                    <li>
+                        <a href="#colecoesMenu" class="d-block text-decoration-none"
+                            data-bs-toggle="collapse">DROPS ▼</a>
+                        <ul id="colecoesMenu" class="collapse ps-3">
+                            @foreach ($colecoes as $colecao)
+                                <li><a href="{{ route('colecoes.show.loja', $colecao->id) }}"
+                                        class="d-block text-decoration-none">{{ $colecao->nome }}</a></li>
+                            @endforeach
+                        </ul>
+                    </li>
+
+                    <li><a href="{{ route('loja.sobre') }}" class="d-block text-decoration-none">SOBRE NÓS</a></li>
                 </ul>
             </div>
         </div>
+
+
     </section>
 
 
@@ -324,23 +380,28 @@
                     </div>
 
                     <!-- Formulário de Cadastro -->
-                    <form id="registerForm" action="{{ route('cliente.cadastro') }}" method="POST" style="display: none;">
+                    <form id="registerForm" action="{{ route('cliente.cadastro') }}" method="POST"
+                        style="display: none;">
                         @csrf
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="nome" name="nome" required autocomplete="off">
+                            <input type="text" class="form-control" id="nome" name="nome" required
+                                autocomplete="off">
                         </div>
                         <div class="mb-3">
                             <label for="emailCadastro" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="emailCadastro" name="email" required autocomplete="off">
+                            <input type="email" class="form-control" id="emailCadastro" name="email" required
+                                autocomplete="off">
                         </div>
                         <div class="mb-3">
                             <label for="senhaCadastro" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="senhaCadastro" name="senha" required autocomplete="new-password">
+                            <input type="password" class="form-control" id="senhaCadastro" name="senha" required
+                                autocomplete="new-password">
                         </div>
                         <div class="mb-3">
                             <label for="senhaConfirm" class="form-label">Confirmar Senha</label>
-                            <input type="password" class="form-control" id="senhaConfirm" name="senha_confirmation" required autocomplete="new-password">
+                            <input type="password" class="form-control" id="senhaConfirm" name="senha_confirmation"
+                                required autocomplete="new-password">
                         </div>
                         <button type="submit" class="btn btn-success w-100">Criar Conta</button>
                     </form>
@@ -486,96 +547,110 @@
 
 <script>
     $(document).ready(function() {
+        // Busca endereço via CEP
         $("#calcularFrete").click(function() {
-            var cep = $("#cepCalcular").val();
+            var cep = $("#cepCalcular").val().replace(/\D/g, '');
+
+            if (cep.length !== 8) {
+                alert("CEP inválido");
+                return;
+            }
+
+            $.getJSON("https://viacep.com.br/ws/" + cep + "/json/", function(data) {
+                if (data.erro) {
+                    alert("CEP não encontrado");
+                } else {
+                    $("#rua").val(data.logradouro);
+                    $("#bairro").val(data.bairro);
+                    $("#cidade").val(data.localidade);
+                    $("#estado").val(data.uf);
+                    $("#cep").val(cep.replace(/(\d{5})(\d{3})/, "$1-$2"));
+
+                    // Mostra o formulário de endereço
+                    $("#enderecoEntrega").removeClass("hide").slideDown();
+
+                    // Calcula o frete (se necessário)
+                    calcularFrete(cep);
+                }
+            }).fail(function() {
+                alert("Erro ao buscar CEP");
+            });
+        });
+
+        // Finalizar pedido e redirecionar para pagamento
+        $("#finalizarPedido").click(function() {
+            // Validação básica
+            if (!$("#numero").val()) {
+                alert("Por favor, informe o número do endereço");
+                return;
+            }
+
+            // Mostrar loading (opcional)
+            $(this).html('<i class="fas fa-spinner fa-spin"></i> Processando...').prop('disabled',
+                true);
+
+            // Coletar todos os dados
+            var dadosPedido = {
+                _token: "{{ csrf_token() }}",
+                rua: $("#rua").val(),
+                numero: $("#numero").val(),
+                bairro: $("#bairro").val(),
+                cidade: $("#cidade").val(),
+                estado: $("#estado").val(),
+                cep: $("#cep").val().replace(/\D/g, ''),
+                complemento: $("#complemento").val(),
+                valorFrete: parseFloat("{{ session('valorFrete', 0) }}"),
+                codigoCupom: "{{ session('cupom.codigo') }}"
+            };
+
+            // Enviar para o servidor
             $.ajax({
-                url: "https://viacep.com.br/ws/" + cep + "/json/",
-                method: "GET",
+                url: "{{ route('carrinho.finalizarPedido') }}",
+                method: "POST",
+                data: dadosPedido,
                 dataType: "json",
-                success: function(data) {
-                    if (data.erro) {
-                        alert("CEP inválido");
+                success: function(response) {
+                    if (response.redirect) {
+                        window.location.href = response.redirect;
                     } else {
-                        $("#rua").val(data.logradouro);
-                        $("#bairro").val(data.bairro);
-                        $("#cidade").val(data.localidade);
-                        $("#estado").val(data.uf);
-                        $("#cep").val(cep);
-                        $("#enderecoEntrega").removeClass("hide").slideDown();
-                        calcularFrete(cep);
+                        alert("Erro ao processar pedido");
                     }
                 },
-                error: function() {
-                    alert("Erro ao calcular frete");
+                error: function(xhr) {
+                    var errorMsg = xhr.responseJSON?.message || "Erro ao finalizar pedido";
+                    alert(errorMsg);
+                    $("#finalizarPedido").html(
+                        '<i class="fas fa-check-circle"></i> Finalizar e Pagar').prop(
+                        'disabled', false);
                 }
-            })
+            });
         });
-    })
 
-    const calcularFrete = (cep) => {
-        $.ajax({
-            url: "{{ route('frete.calcular') }}",
-            method: "GET",
-            data: {
+        // Função para calcular frete (se necessário)
+        function calcularFrete(cep) {
+            $.get("{{ route('frete.calcular') }}", {
                 cep: cep
-            },
-            dataType: "json",
-            success: function(data) {
+            }, function(data) {
                 if (data.erro) {
-                    alert("CEP inválido");
+                    alert(data.erro);
                 } else {
-                    var total = $("#totalPedido").data("total");
-                    var descontos = $("#totalPedido").data("descontos");
+                    var valorFrete = parseFloat(data.valor);
+                    var prazo = data.prazo;
+
                     $("#infoFrete").html(`
-                        <li class="list-group-item">Frete: <strong class="">R$ ${data.valor} </strong></li>
-                        <li class="list-group-item">Prazo: <strong class=""><span id="prazoEntrega">${data.prazo}</span> dias úteis</strong></li>
-                    `);
+                <li class="list-group-item">Frete: <strong>R$ ${valorFrete.toFixed(2).replace(".", ",")}</strong></li>
+                <li class="list-group-item">Prazo: <strong>${prazo} dias úteis</strong></li>
+            `);
 
+                    // Atualiza o total com o frete
+                    var subtotal = parseFloat($("#totalPedido").data("total"));
+                    var desconto = parseFloat("{{ $desconto ?? 0 }}");
+                    var total = (subtotal + valorFrete) - desconto;
 
-                    $("#totalPedido").html(`Total: R$ ${(total + parseFloat(data.valor)).toFixed(2)}`);
+                    $("#totalPedido").html(`Total: R$ ${total.toFixed(2).replace(".", ",")}`);
                 }
-            },
-            error: function() {
-                alert("Erro ao calcular frete");
-            }
-        })
-    }
-
-    $(document).on('submit', 'form[action="{{ route('carrinho.aplicar-cupom') }}"]', function(e) {
-        e.preventDefault();
-
-        var formData = $(this).serialize();
-        var url = $(this).attr('action');
-
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: formData,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(response) {
-                if (response.error) {
-                    alert(response.msg); // Exibe erro, caso ocorra
-                } else {
-                    $('#total').html(`<strong>Total:</strong> R$ ` + response.novoTotal.toFixed(2));
-                    $('#desconto').html(`<strong>Desconto Aplicado:</strong> R$ ` + response
-                        .desconto.toFixed(2));
-
-                    alert(respons1e.msg);
-                }
-            },
-            error: function(xhr) {
-                if (xhr.status === 422) {
-                    // Erro de validação
-                    alert('Erro de validação: ' + JSON.stringify(xhr.responseJSON.errors));
-                } else if (xhr.status === 500) {
-                    alert('Erro interno no servidor. Verifique o log para mais detalhes.');
-                } else {
-                    alert('Erro ao aplicar o cupom.');
-                }
-            }
-        });
+            }, "json");
+        }
     });
 </script>
 

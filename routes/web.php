@@ -50,7 +50,7 @@ Route::prefix('loja')->group(function () {
             Route::get('/info', [CarrinhosController::class, 'info'])->name('carrinho.informacoes');
             Route::get('/finalizar', [CarrinhosController::class, 'finalizar'])->name('carrinho.finalizar');
             Route::put('atualizar/pedido/{id}', [CarrinhosController::class, 'atualizar'])->name('carrinho.atualizar-pedido');
-            Route::post('/finalizar', [CarrinhosController::class, 'finalizarPedido'])->name('carrinho.finalizarPedido');
+            Route::post('/carrinho/finalizar-pedido', [CarrinhosController::class, 'finalizarPedido'])->name('carrinho.finalizarPedido');
         });
     });
 });
@@ -130,8 +130,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/success', [CheckoutController::class, 'success'])->name('checkout.success');
         Route::get('/failure', [CheckoutController::class, 'failure'])->name('checkout.failure');
         Route::get('/pending', [CheckoutController::class, 'pending'])->name('checkout.pending');
-
-
         Route::get('/{id}', [CheckoutController::class, 'checkout'])->name('checkout');
         Route::post('/processar', [CheckoutController::class, 'processarCheckout'])->name('checkout.processar');
         Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook']);

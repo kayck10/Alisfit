@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CarrinhoIten;
 use App\Models\Carrinhos;
+use App\Models\Cupons;
 use App\Models\Pedidos;
 use App\Models\Produtos;
 use Brian2694\Toastr\Facades\Toastr as FacadesToastr;
@@ -11,6 +12,10 @@ use Brian2694\Toastr\Toastr;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use MercadoPago\Item;
+use MercadoPago\Preference;
+use MercadoPago\SDK;
 
 class CarrinhosController extends Controller
 {
@@ -110,24 +115,32 @@ class CarrinhosController extends Controller
         return redirect()->back()->with('error', 'Carrinho não encontrado!');
     }
 
-    public function info()
-    {
-        $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
+   public function info()
+{
+    $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
 
-        if (!$carrinho) {
-            return view('carrinho.info')->with('mensagem', 'Seu carrinho está vazio.');
-        }
-
-        $subtotal = $carrinho->produtos->sum(function ($produto) {
-            return $produto->pivot->quantidade * $produto->preco;
-        });
-
-        $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
-
-        $total = max($subtotal - $desconto, 0);
-
-        return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total'));
+    if (!$carrinho) {
+        return view('carrinho.info')->with('mensagem', 'Seu carrinho está vazio.');
     }
+
+    $quantidadeProdutos = $carrinho->produtos()->count();
+    $cupomAplicado = $carrinho->cupons()->exists();
+
+    if ($cupomAplicado) {
+        $carrinho->cupons()->detach();
+    }
+
+    $subtotal = $carrinho->produtos->sum(function ($produto) {
+        return $produto->pivot->quantidade * $produto->preco;
+    });
+
+    $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
+
+    $total = max($subtotal - $desconto, 0);
+
+    return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total'));
+}
+
 
 
     public function finalizar()
@@ -150,49 +163,103 @@ class CarrinhosController extends Controller
         return view('carrinho.finaliza', compact('carrinho', 'desconto', 'total'));
     }
 
-
-
     public function finalizarPedido(Request $request)
     {
-        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+        DB::beginTransaction();
+        try {
+            $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();
 
-        if (!$carrinho) {
-            return redirect()->route('carrinho')->with('error', 'Carrinho vazio!');
+            if (!$carrinho) {
+                return response()->json(['message' => 'Carrinho vazio!'], 400);
+            }
+
+            // Calcula totais
+            $subtotal = $carrinho->produtos->sum(function ($produto) {
+                return $produto->preco * $produto->pivot->quantidade;
+            });
+
+            $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
+            $valorFrete = floatval($request->valorFrete);
+            $totalPedido = ($subtotal + $valorFrete) - $desconto;
+
+            // Criar pedido
+            $pedido = Pedidos::create([
+                'user_id' => Auth::id(),
+                'carrinho_id' => $carrinho->id,
+                'total' => $totalPedido,
+                'status_pedido_id' => 1, // Aguardando pagamento
+                'valor_frete' => $valorFrete,
+                'desconto' => $desconto,
+                'rua' => $request->rua,
+                'numero' => $request->numero,
+                'cidade' => $request->cidade,
+                'estado' => $request->estado,
+                'bairro' => $request->bairro,
+                'cep' => $request->cep,
+                'complemento' => $request->complemento,
+            ]);
+
+            // Vincular produtos ao pedido
+            foreach ($carrinho->produtos as $produto) {
+                CarrinhoIten::where('carrinho_id', $carrinho->id)
+                    ->where('produto_id', $produto->id)
+                    ->update(['pedido_id' => $pedido->id]);
+            }
+
+            // Processar pagamento no Mercado Pago
+            SDK::setAccessToken(config('services.mercadopago.access_token'));
+            $preference = new Preference();
+
+            // 1. Adiciona os itens do carrinho
+            $items = [];
+            foreach ($carrinho->produtos as $produto) {
+                $item = new Item();
+                $item->title = $produto->nome;
+                $item->quantity = $produto->pivot->quantidade;
+                $item->unit_price = $produto->preco;
+                $item->currency_id = "BRL";
+                $items[] = $item;
+            }
+
+            // 2. Adiciona o frete como um item separado
+            if ($valorFrete > 0) {
+                $freteItem = new Item();
+                $freteItem->title = "Frete";
+                $freteItem->quantity = 1;
+                $freteItem->unit_price = $valorFrete;
+                $freteItem->currency_id = "BRL";
+                $items[] = $freteItem;
+            }
+
+            $preference->items = $items;
+
+            // 3. Aplica desconto (se houver)
+            if ($desconto > 0) {
+                $preference->deductions = [
+                    [
+                        'type' => 'discount',
+                        'value' => $desconto
+                    ]
+                ];
+            }
+
+            $preference->back_urls = [
+                "success" => route('checkout.success', ['pedido_id' => $pedido->id]),
+                "failure" => route('checkout.failure', ['pedido_id' => $pedido->id]),
+                "pending" => route('checkout.pending', ['pedido_id' => $pedido->id]),
+            ];
+            $preference->auto_return = "approved";
+            $preference->external_reference = $pedido->id; // Importante para vincular ao pedido
+            $preference->save();
+
+            DB::commit();
+
+            return response()->json([
+                'redirect' => $preference->init_point
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Erro ao processar pedido: ' . $e->getMessage()], 500);
         }
-
-        $totalCarrinho = $carrinho->produtos->sum(function ($produto) {
-            return $produto->preco * $produto->pivot->quantidade;
-        });
-
-        $valorFrete = floatval(session('valorFrete', 0));
-
-        $totalPedido = $totalCarrinho + $valorFrete;
-
-        $pedido = Pedidos::create([
-            'user_id' => Auth::id(),
-            'carrinho_id' => $carrinho->id,
-            'total' => $totalPedido,
-            'status_pedido_id' => 1, // Pendente
-            'valor_frete' => $valorFrete,
-            'rua' => $request->rua,
-            'numero' => $request->numero,
-            'cidade' => $request->cidade,
-            'estado' => $request->estado,
-            'bairro' => $request->bairro,
-            'cep' => $request->cep,
-            'complemento' => $request->complemento,
-        ]);
-
-        foreach ($carrinho->produtos as $produto) {
-            CarrinhoIten::where('carrinho_id', $carrinho->id)
-                ->where('produto_id', $produto->id)
-                ->update(['pedido_id' => $pedido->id]);
-        }
-
-        // $carrinho->produtos()->detach();
-        // $carrinho->delete();
-        // $pedido->load('cupons');
-
-        return redirect()->route('checkout', $pedido->id)->with('success', 'Pedido criado com sucesso!');
     }
 }
