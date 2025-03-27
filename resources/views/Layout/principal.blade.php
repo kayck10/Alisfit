@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Alis - Moda Fitness')</title>
+    <title>@yield('title', 'Alis')</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
@@ -23,7 +22,7 @@
         }
 
         /* Ajuste a posição do offcanvas */
-        .offcanvas.offcanvas-end {
+        .offcanvas-carrinho.offcanvas-end {
             top: 0;
             height: auto;
             background-color: #1c1c1c;
@@ -33,7 +32,7 @@
         }
 
         /* Header do offcanvas */
-        .offcanvas-header {
+        .offcanvas-header-carrinho {
             background-color: #2c2c2c;
             /* Cinza escuro */
             color: white;
@@ -46,12 +45,12 @@
         }
 
         /* Corpo do offcanvas */
-        .offcanvas-body {
+        .offcanvas-body-carrinho {
             background-color: #1c1c1c;
         }
 
         /* Estilização da lista de produtos */
-        .list-group-item {
+        .list-group-item-carrinho {
             background-color: #2c2c2c;
             /* Cinza escuro */
             color: white;
@@ -60,14 +59,14 @@
         }
 
         /* Inputs de quantidade */
-        .update-quantity {
+        .update-quantity-carrinho {
             background-color: #333;
             color: white;
             border: 1px solid #555;
         }
 
         /* Botões de adicionar e remover quantidade */
-        .update-quantity-btn {
+        .update-quantity-btn-carrinho {
             background-color: #444;
             color: white;
             border: none;
@@ -98,20 +97,6 @@
         }
 
         /* Rodapé */
-        .bg-light {
-            background-color: #2c2c2c !important;
-            border-top: 2px solid #444;
-        }
-
-        /* Botão de finalizar compra */
-        .btn-dark {
-            background-color: black;
-            border: none;
-        }
-
-        .btn-dark:hover {
-            background-color: #444;
-        }
     </style>
 </head>
 

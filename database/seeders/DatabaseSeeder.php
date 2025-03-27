@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             GeneroSeeder::class,
             TipoProdutoSeeder::class,
             StatusPedidosSeeder::class,
+            UsuarioSeeder::class
         ]);
     }
 }

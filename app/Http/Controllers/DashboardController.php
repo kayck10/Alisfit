@@ -25,9 +25,8 @@ class DashboardController extends Controller
             $valores[] = $pedido->total;
         }
 
-        // Gráfico de Usuários com id_tipo = 4 por mês
         $usuarios = User::selectRaw('COUNT(*) as total, MONTH(created_at) as mes')
-            ->where('id_tipo', 4)
+        ->where('id_tipos_usuarios', 4)
             ->groupBy('mes')
             ->orderBy('mes')
             ->get();
@@ -40,7 +39,7 @@ class DashboardController extends Controller
             $totalUsuarios[] = $usuario->total;
         }
 
-        return view('dashboard', compact('meses', 'valores', 'mesesUsuarios', 'totalUsuarios'));
+        return view('dashboard.index', compact('meses', 'valores', 'mesesUsuarios', 'totalUsuarios'));
     }
 
 }

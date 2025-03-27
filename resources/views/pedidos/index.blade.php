@@ -127,7 +127,6 @@
                         <th>Data</th>
                         <th>Status</th>
                         <th>Total</th>
-                        <th>Desconto</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -136,23 +135,20 @@
                         <tr class="fade-in">
                             <td>{{ $pedido->id }}</td>
                             <td>{{ $pedido->user->name }}</td>
-                            <td>{{ $pedido->created_at->format('Y-m-d') }}</td>
-                            <td> <span class="text-dark">
-                                    @if ($pedido->status)
-                                        {{ $pedido->status->desc }}
-                                    @else
-                                        Desconhecido
-                                    @endif
-                                </span></td>
-
-                            <td>R$ {{ number_format($pedido->total, 2, ',', '.') }}</td>
-                            {{-- <td>R$ {{ number_format($pedido->getTotalComDescontoAttribute(), 2, ',', '.') }}</td> --}}
+                            <td>{{ $pedido->created_at->format('d/m/Y') }}</td>
                             <td>
+                                @if ($pedido->status)
+                                    {{ $pedido->status->desc }}
+                                @else
+                                    Desconhecido
+                                @endif
+                            </td>
+                            <td>R$ {{ number_format($pedido->total, 2, ',', '.') }}</td>
+                            <td>
+                                <!-- Botão para abrir a modal -->
                                 <button type="button" class="btn btn-primary visualizarPedido" data-bs-toggle="modal"
-                                    data-id="{{ $pedido->id }}" data-bs-target="#exampleModal">
+                                    data-id="{{ $pedido->id }}" data-bs-target="#exampleModal{{ $pedido->id }}">
                                     <i class="bi bi-eye-fill"></i>
-                                </button>
-
                                 </button>
                                 <button class="btn btn-warning btn-sm" title="Editar" onclick="window.location.href=''">
                                     <i class="bi bi-pencil"></i>
@@ -168,96 +164,47 @@
             </table>
 
             <!-- Modal Visualizar Pedido -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modalPedidoLabel">Detalhes do Pedido</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div id="pedido-detalhes">
-                                <p><strong>ID do Pedido:</strong> <span id="pedido-id">{{ $pedido->id }}</span></p>
-                                <p><strong>Cliente:</strong> <span id="pedido-cliente">{{ $pedido->user->name }}</span></p>
-                                <p><strong>Data:</strong> <span
-                                        id="pedido-data">{{ $pedido->created_at->format('d/m/Y') }}</span></p>
-                                <p><strong>Total:</strong> R$ <span
-                                        id="pedido-total">{{ number_format($pedido->total, 2, ',', '.') }}</span></p>
-                                <p><strong>Desconto:</strong> R$ <span
-                                        id="pedido-desconto">{{ number_format($pedido->total - $pedido->total_com_desconto, 2, ',', '.') }}</span>
-                                </p>
-                                <p><strong>Status:</strong> <span
-                                        id="pedido-status">{{ $pedido->status ? $pedido->status->desc : 'Desconhecido' }}</span>
-                                </p>
+            @foreach ($pedidos as $pedido)
+                <div class="modal fade" id="exampleModal{{ $pedido->id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $pedido->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalPedidoLabel{{ $pedido->id }}">Detalhes do Pedido #{{ $pedido->id }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="pedido-detalhes">
+                                    <p><strong>ID do Pedido:</strong> {{ $pedido->id }}</p>
+                                    <p><strong>Cliente:</strong> {{ $pedido->user->name }}</p>
+                                    <p><strong>Data:</strong> {{ $pedido->created_at->format('d/m/Y') }}</p>
+                                    <p><strong>Total:</strong> R$ {{ number_format($pedido->total, 2, ',', '.') }}</p>
+                                    <p><strong>Status:</strong> {{ $pedido->status->desc ?? 'Desconhecido' }}</p>
 
-                                <hr>
+                                    <hr>
 
-                                <form action="{{ route('pedidos.atualizar-status', $pedido->id) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="mb-3">
-                                        <label for="statusPedido" class="form-label">Alterar Status:</label>
-                                        <select name="status" id="statusPedido" class="form-control">
-                                            @foreach ($status as $s)
-                                                <option value="{{ $s->id }}" {{ $pedido->status && $pedido->status->id == $s->id ? 'selected' : '' }}>
-                                                    {{ $s->desc }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Atualizar Status</button>
-                                </form>
+                                    <form id="formAtualizarStatus{{ $pedido->id }}" action="{{ route('pedidos.atualizar-status', $pedido->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" id="pedidoIdInput" name="pedido_id" value="{{ $pedido->id }}">
+                                        <div class="mb-3">
+                                            <label for="statusPedido{{ $pedido->id }}" class="form-label">Alterar Status:</label>
+                                            <select name="status" id="statusPedido{{ $pedido->id }}" class="form-control">
+                                                @foreach ($status as $s)
+                                                    <option value="{{ $s->id }}" {{ $pedido->status->id == $s->id ? 'selected' : '' }}>
+                                                        {{ $s->desc }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Atualizar Status</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-
-            <!-- Links de paginação -->
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <div class="pagination-container">
-                    {{ $pedidos->links() }}
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 @endsection
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-rbvoDNYtVfHyksoLPKvsE6E5STz3Uan08n3cJj2S/jfG10zvl29Hld97NQ91fmlk" crossorigin="anonymous">
-</script>
-
-
-<script>
- $('#formAtualizarStatus').on('submit', function(event) {
-    event.preventDefault();
-
-    var pedidoId = $('#pedidoIdInput').val();
-    var statusId = $('#statusPedido').val();
-
-    $.ajax({
-        url: '/pedidos/' + pedidoId + '/status', // URL correta para atualizar o status
-        method: 'PUT',
-        data: {
-            _token: '{{ csrf_token() }}',
-            status: statusId
-        },
-        success: function(response) {
-            if (response.success) {
-                // Atualiza o status na modal
-                $('#pedido-status').text($('#statusPedido option:selected').text());
-                // Fecha a modal
-                $('#exampleModal').modal('hide');
-                alert(response.message); // Exibe a mensagem de sucesso
-            }
-        },
-        error: function(xhr, status, error) {
-            alert('Ocorreu um erro ao atualizar o status.');
-            console.log(xhr.responseText); // Adicione para debugar o erro
-        }
-    });
-});
-
-</script>

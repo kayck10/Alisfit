@@ -9,9 +9,7 @@ use App\Models\Cupons;
 use App\Models\Pedidos;
 use App\Models\StatusPedidos;
 use Brian2694\Toastr\Facades\Toastr;
-use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -19,14 +17,20 @@ class PedidosController extends Controller
 {
 
     public function index()
-{
-    $pedidos = Pedidos::with(['user', 'status', 'carrinho'])
-                      ->where('id_status', 3)
-                      ->paginate(10);
-    $status = StatusPedidos::all();
+    {
+        $pedidos = Pedidos::with(['user', 'status', 'carrinho'])->where('status_pedido_id', 2)->get();
+        $status = StatusPedidos::all(); // Carrega todos os status
 
-    return view('pedidos.index', compact('pedidos', 'status'));
-}
+        return view('pedidos.index', compact('pedidos', 'status'));
+    }
+
+
+    public function show($id)
+    {
+        $pedido = Pedidos::with('user', 'status')->find($id);
+        return response()->json($pedido);
+    }
+
 
 
     public function atualizarStatus(Request $request, $id)
@@ -47,7 +51,6 @@ class PedidosController extends Controller
         return redirect()->back()->with('success', 'Status atualizado com sucesso!');
     }
 
-
     public function aplicarCupomCarrinho(Request $request)
     {
         Log::info('Dados da requisição para aplicar cupom:', $request->all());
@@ -67,7 +70,6 @@ class PedidosController extends Controller
 
 
         $carrinho = Carrinhos::with('produtos')->find($request->carrinhoId);
-        // dd($carrinho->cupons()->where('cupom_id', $cupom->id)->get());
 
         if ($carrinho->cupons()->where('cupom_id', $cupom->id)->exists()) {
             return response()->json(['error' => true, 'msg' => 'Este cupom já foi aplicado ao carrinho.']);
@@ -80,6 +82,8 @@ class PedidosController extends Controller
         $desconto = ($cupom->tipo === 'percentual') ? ($subtotal * $cupom->valor) / 100 : min($cupom->valor, $subtotal);
 
         $carrinho->cupons()->attach($cupom->id, ['desconto_aplicado' => $desconto]);
+
+        // dd($carrinho->cupons()->where('cupom_id', $cupom->id)->exists());
 
         $novoTotal = max($subtotal - $desconto, 0);
 

@@ -17,9 +17,17 @@ use Illuminate\Support\Facades\Log;
 use MercadoPago\Item;
 use MercadoPago\Preference;
 use MercadoPago\SDK;
+use App\Services\FreteService;
 
 class CarrinhosController extends Controller
 {
+    protected $freteService;
+
+    public function __construct(FreteService $freteService)
+    {
+        $this->freteService = $freteService;
+    }
+
     public function carrinho()
     {
 
@@ -174,6 +182,9 @@ class CarrinhosController extends Controller
     {
         DB::beginTransaction();
         try {
+
+            $frete = $this->calcularFrete($request->cep)['valor'];
+
             $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();
 
             if (!$carrinho) {
@@ -186,7 +197,7 @@ class CarrinhosController extends Controller
             });
 
             $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
-            $valorFrete = floatval($request->valorFrete);
+            $valorFrete = floatval($frete);
             $totalPedido = ($subtotal + $valorFrete) - $desconto;
 
             // Criar pedido
@@ -269,4 +280,16 @@ class CarrinhosController extends Controller
             return response()->json(['message' => 'Erro ao processar pedido: ' . $e->getMessage()], 500);
         }
     }
+
+    public function calcularFrete($cep)
+    {
+        $cepDestino = $cep;
+        $frete = $this->freteService->calcularFrete($cepDestino);
+
+        if (isset($frete['error'])) {
+            return redirect()->back()->with('error', $frete['error']);
+        }
+        return $frete;
+    }
+
 }

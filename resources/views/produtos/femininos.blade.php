@@ -1,4 +1,4 @@
-@extends('layout.principal')
+@extends('Layout.principal')
 
 @section('content')
 <div style="margin-top: 100px;" class="container">

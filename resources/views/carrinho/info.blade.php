@@ -33,10 +33,7 @@
                                     <br>
                                     <small id="subtotal"><strong>Subtotal:</strong> R$
                                         {{ number_format($subtotal, 2, ',', '.') }}</small>
-                                    @if ($desconto > 0)
-                                        <small id="desconto"><strong>Desconto Aplicado:</strong> R$
-                                            {{ number_format($desconto, 2, ',', '.') }}</small>
-                                    @endif
+
                                 </div>
 
                                 <form class="update-quantity-form" data-produto-id="{{ $produto->pivot->produto_id }}">
