@@ -202,7 +202,8 @@
                             <p class="product-name">{{ $produto->nome }}</p>
                             <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
 
-                         <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary ">Ver Detalhes</a>
+                            <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary ">Ver
+                                Detalhes</a>
                         </div>
                     </div>
                 @endforeach
@@ -241,45 +242,40 @@
                     });
 
                     fetch('{{ route('drops.filtrar') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify(filtros),
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            const produtosContainer = document.querySelector(
-                                '.row');
-                            produtosContainer.innerHTML = ''; // Limpar o conteúdo atual
-
-                            data.produtos.forEach(produto => {
-                                const produtoHTML = `
-                        <div class="col-md-3 col-sm-6 mb-4">
-                            <div class="product-card">
-                             <a href="/loja/produto/${produto.id}">
-                                    ${produto.imagens.length > 0 ?
-                                        `<img src="{{ asset('storage/') }}/${produto.imagens[0].imagem}" alt="${produto.nome}">` :
-                                        `<img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">`
-                                    }
-                                </a>
-                                <p class="product-name">${produto.nome}</p>
-                                <p class="product-price">R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}</p>
-                               <form action="{{ route('carrinho.adicionar', ['produtoId' => $produto->id]) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-primary mt-2">Adicionar à sacola</button>
-                            </form>
-
-                            </div>
-                        </div>
-                    `;
-                                produtosContainer.insertAdjacentHTML('beforeend', produtoHTML);
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Erro ao filtrar produtos:', error);
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        },
+                        body: JSON.stringify(filtros),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const produtosContainer = document.querySelector(
+                            '.row');
+                        produtosContainer.innerHTML = ''; // Limpar o conteúdo atual
+                        data.produtos.forEach(produto => {
+                            const produtoHTML = `
+                                <div class="col-md-3 col-sm-6 mb-4">
+                                    <div class="product-card">
+                                    <a href="/loja/produto/${produto.id}">
+                                            ${produto.imagens.length > 0 ?
+                                                `<img src="{{ asset('storage/') }}/${produto.imagens[0].imagem}" alt="${produto.nome}">` :
+                                                `<img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">`
+                                            }
+                                        </a>
+                                        <p class="product-name">${produto.nome}</p>
+                                        <p class="product-price">R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}</p>
+                                        <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary ">Ver Detalhes</a>
+                                    </div>
+                                </div>
+                            `;
+                            produtosContainer.insertAdjacentHTML('beforeend', produtoHTML);
                         });
+                    })
+                    .catch(error => {
+                        console.error('Erro ao filtrar produtos:', error);
+                    });
                 });
             } else {
                 console.error('Botão "aplicarFiltros" não encontrado.');
