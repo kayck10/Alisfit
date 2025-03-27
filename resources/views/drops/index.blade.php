@@ -251,27 +251,33 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        const produtosContainer = document.querySelector(
-                            '.row');
-                        produtosContainer.innerHTML = ''; // Limpar o conteúdo atual
+                        const produtosContainer = document.querySelector('.row');
+                        let rotaProdutosDetalhes = "{{ route('produto.detalhes', ':id') }}"; // Aqui você pega a rota base
+                        produtosContainer.innerHTML = '';
+
                         data.produtos.forEach(produto => {
+                            // Troca o :id pela id real do produto
+                            const urlDetalhes = rotaProdutosDetalhes.replace(':id', produto.id);
+
+                            const imagem = produto.imagens.length > 0
+                                ? `/storage/${produto.imagens[0].imagem}`
+                                : '/images/banner/12.png';
+
                             const produtoHTML = `
                                 <div class="col-md-3 col-sm-6 mb-4">
                                     <div class="product-card">
-                                    <a href="/loja/produto/${produto.id}">
-                                            ${produto.imagens.length > 0 ?
-                                                `<img src="{{ asset('storage/') }}/${produto.imagens[0].imagem}" alt="${produto.nome}">` :
-                                                `<img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">`
-                                            }
+                                        <a href="/loja/produto/${produto.id}">
+                                            <img src="${imagem}" alt="${produto.nome}">
                                         </a>
                                         <p class="product-name">${produto.nome}</p>
                                         <p class="product-price">R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}</p>
-                                        <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary ">Ver Detalhes</a>
+                                        <a href="${urlDetalhes}" class="btn btn-primary">Ver Detalhes</a>
                                     </div>
                                 </div>
                             `;
                             produtosContainer.insertAdjacentHTML('beforeend', produtoHTML);
                         });
+                    })
                     })
                     .catch(error => {
                         console.error('Erro ao filtrar produtos:', error);
