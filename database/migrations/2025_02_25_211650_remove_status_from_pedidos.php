@@ -12,14 +12,12 @@ return new class extends Migration
     public function up()
     {
         Schema::table('pedidos', function (Blueprint $table) {
-            $table->dropColumn('status');
         });
     }
 
     public function down()
     {
         Schema::table('pedidos', function (Blueprint $table) {
-            $table->string('status');
         });
     }
 };
