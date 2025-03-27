@@ -25,7 +25,7 @@
                             <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
 
 
-                                <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-dark">Ver Detalhes</a>
+                                <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary">Ver Detalhes</a>
                         </div>
                     </div>
                 @endforeach

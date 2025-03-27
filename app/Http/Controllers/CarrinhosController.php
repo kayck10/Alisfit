@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use MercadoPago\Item;
 use MercadoPago\Preference;
 use MercadoPago\SDK;
@@ -80,6 +81,12 @@ class CarrinhosController extends Controller
 
     public function atualizarQuantidade(Request $request, $produtoId)
     {
+
+        Log::info('Requisição para atualizar carrinho', [
+            'user_id' => Auth::id(),
+            'produtoId' => $produtoId,
+            'quantidade' => $request->quantidade
+        ]);
         $carrinho = Carrinhos::where('user_id', Auth::id())->first();
 
         if ($carrinho) {

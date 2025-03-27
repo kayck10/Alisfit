@@ -358,8 +358,8 @@
                         alt="{{ $relacionado->nome }}" class="img-fluid">
                     <h5 class="mt-3">{{ $relacionado->nome }}</h5>
                     <p>R$ {{ number_format($relacionado->preco, 2, ',', '.') }}</p>
-                    <a href="{{ route('produto.detalhes', $relacionado->id) }}" class="btn btn-primary btn-sm">Ver
-                        Produto</a>
+                    <a href="{{ route('produto.detalhes', $relacionado->id) }}" class="btn btn-dark">Ver
+                        Detalhes</a>
                 </div>
             @endforeach
         </div>

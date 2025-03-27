@@ -16,7 +16,7 @@ use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/', [LoginController::class, 'login'])->name('login');
+Route::get('/login/admin', [LoginController::class, 'login'])->name('login');
 
 Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 Route::post('/login/cliente', [LoginController::class, 'Clistore'])->name('cliente.store');
@@ -24,9 +24,9 @@ Route::post('/cadastro/cliente', [LoginController::class, 'cadastro'])->name('cl
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
+Route::get('/', [PrincipalController::class, 'index'])->name('loja.create');
 
 Route::prefix('loja')->group(function () {
-    Route::get('/', [PrincipalController::class, 'index'])->name('loja.create');
     Route::get('/sobre', [PrincipalController::class, 'sobre'])->name('loja.sobre');
     Route::get('/teste', [PrincipalController::class, 'teste'])->name('teste');
     Route::post('/ajax-request', [PrincipalController::class, 'handleRequest'])->name('ajax.request');

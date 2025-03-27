@@ -21,6 +21,97 @@
         .hide {
             display: none;
         }
+
+        /* Ajuste a posição do offcanvas */
+        .offcanvas.offcanvas-end {
+            top: 0;
+            height: auto;
+            background-color: #1c1c1c;
+            /* Fundo preto */
+            color: white;
+            /* Texto branco */
+        }
+
+        /* Header do offcanvas */
+        .offcanvas-header {
+            background-color: #2c2c2c;
+            /* Cinza escuro */
+            color: white;
+            border-bottom: 2px solid #444;
+        }
+
+        /* Linha divisória */
+        .hr {
+            border-color: #444;
+        }
+
+        /* Corpo do offcanvas */
+        .offcanvas-body {
+            background-color: #1c1c1c;
+        }
+
+        /* Estilização da lista de produtos */
+        .list-group-item {
+            background-color: #2c2c2c;
+            /* Cinza escuro */
+            color: white;
+            border: 1px solid #444;
+            /* Bordas sutis */
+        }
+
+        /* Inputs de quantidade */
+        .update-quantity {
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+        }
+
+        /* Botões de adicionar e remover quantidade */
+        .update-quantity-btn {
+            background-color: #444;
+            color: white;
+            border: none;
+        }
+
+        .update-quantity-btn:hover {
+            background-color: #555;
+        }
+
+        /* Botão de excluir */
+        .btn-transparent {
+            color: white;
+        }
+
+        .btn-transparent:hover {
+            color: #ff4d4d;
+            /* Efeito vermelho ao passar o mouse */
+        }
+
+        /* Barra de progresso */
+        .progress {
+            background-color: #444;
+        }
+
+        .progress-bar {
+            background-color: #28a745;
+            /* Verde para indicar progresso */
+        }
+
+        /* Rodapé */
+        .bg-light {
+            background-color: #2c2c2c !important;
+            border-top: 2px solid #444;
+        }
+
+        /* Botão de finalizar compra */
+        .btn-dark {
+            background-color: black;
+            border: none;
+        }
+
+        .btn-dark:hover {
+            background-color: #444;
+        }
     </style>
 </head>
 
@@ -66,8 +157,8 @@
                     <a href="#">OFERTAS</a>
                     <div class="dropdown">
                         <ul>
-                            <li><a href="">Ofertas Masculinas</a></li>
-                            <li><a href="">Ofertas Femininas</a></li>
+                            <li><a href="{{ route('produtos.masculinos') }}">Ofertas Masculinas</a></li>
+                            <li><a href="{{ route('produtos.femininos') }}">Ofertas Femininas</a></li>
                         </ul>
                     </div>
                 </li>
@@ -133,7 +224,6 @@
             </ul>
         </div>
 
-        <!-- Offcanvas do Carrinho -->
         <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
             <div class="offcanvas-header">
                 <h5 class="mt-2" id="cartOffcanvasLabel"><strong>Carrinho</strong></h5>
@@ -148,6 +238,7 @@
                     <ul class="list-group flex-grow-1">
                         @php
                             $totalCarrinho = 0;
+                            $freteGratisValor = 200;
                         @endphp
                         @foreach ($carrinho->produtos as $produto)
                             @php
@@ -179,7 +270,6 @@
                                         data-action="increase">+</button>
                                 </form>
 
-
                                 <form action="{{ route('carrinho.remover', $produto->pivot->produto_id) }}"
                                     method="POST">
                                     @csrf
@@ -189,33 +279,49 @@
                                 </form>
                             </li>
                         @endforeach
-
                     </ul>
 
                     <hr>
 
-                    <!-- Botão de cupom -->
-                    <div class="mb-3 text-center">
-                        <button id="btnCupom" class="btn btn-outline-secondary btn-sm">Adicionar Cupom</button>
-                        <input type="text" id="inputCupom" class="form-control d-none mt-2"
-                            placeholder="Digite seu cupom">
-                        <button id="applyCupom" class="btn btn-primary d-none mt-2">Aplicar</button>
-                    </div>
-                    <!-- Input hidden para armazenar o ID do pedido -->
-                    <input type="hidden" id="pedidoId" name="pedido_id" value="{{ $pedido ?? '' }}">
+                    <!-- Barra de progresso do frete grátis -->
+                    @php
+                        $valorFaltante = max(0, $freteGratisValor - $totalCarrinho);
+                        $percentual = min(100, ($totalCarrinho / $freteGratisValor) * 100);
+                    @endphp
 
-                    <h5 class="text-end"><strong>Total: R$ {{ number_format($totalCarrinho, 2, ',', '.') }}</strong>
+                    <div class="mt-3">
+                        @if ($totalCarrinho >= $freteGratisValor)
+                            <p class="text-success fw-bold">🎉 Parabéns! Você ganhou frete grátis!</p>
+                        @else
+                            <p class="text-danger">Faltam <strong>R$
+                                    {{ number_format($valorFaltante, 2, ',', '.') }}</strong> para você ganhar frete
+                                grátis.</p>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar"
+                                    style="width: {{ $percentual }}%;" aria-valuenow="{{ $percentual }}"
+                                    aria-valuemin="0" aria-valuemax="100">
+                                    {{ number_format($percentual, 0) }}%
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    <hr>
+
+                    <h5 class="text-end"><strong>Total: R$ <span
+                                id="totalCarrinho">{{ number_format($totalCarrinho, 2, ',', '.') }}</span></strong>
                     </h5>
 
                 @endif
             </div>
-            <!-- Botão Finalizar Compra fixo no fundo -->
+
             @if (isset($carrinho) && !$carrinho->produtos->isEmpty())
                 <div class="p-3 border-top bg-light">
                     <a href="{{ route('carrinho.informacoes') }}" class="btn btn-dark w-100">Finalizar Compra</a>
                 </div>
             @endif
         </div>
+
 
         <!-- Offcanvas Menu -->
         <div class="offcanvas offcanvas-start" tabindex="-1" id="menuOffcanvas"
@@ -275,8 +381,8 @@
 
                     <!-- Dropdown Coleções -->
                     <li>
-                        <a href="#colecoesMenu" class="d-block text-decoration-none"
-                            data-bs-toggle="collapse">DROPS ▼</a>
+                        <a href="#colecoesMenu" class="d-block text-decoration-none" data-bs-toggle="collapse">DROPS
+                            ▼</a>
                         <ul id="colecoesMenu" class="collapse ps-3">
                             @foreach ($colecoes as $colecao)
                                 <li><a href="{{ route('colecoes.show.loja', $colecao->id) }}"
@@ -543,6 +649,60 @@
             $(this).closest("form").submit();
         });
     });
+
+    function atualizarBarraFreteGratis(totalCarrinho) {
+        let valorFreteGratis = 200;
+        let faltando = Math.max(0, valorFreteGratis - totalCarrinho);
+        let percentual = Math.min(100, (totalCarrinho / valorFreteGratis) * 100);
+
+        $(".progress-bar").css("width", percentual + "%").attr("aria-valuenow", percentual);
+
+        if (faltando > 0) {
+            $(".progress").prev("p").html(
+                `Faltam <strong>R$ ${faltando.toFixed(2).replace('.', ',')}</strong> para frete grátis!`);
+        } else {
+            $(".progress").prev("p").html("🎉 Parabéns! Você tem frete grátis!");
+        }
+    }
+
+    // Chamar a função sempre que atualizar o carrinho
+    function atualizarQuantidade(input) {
+        let form = input.closest(".update-quantity-form");
+        let produtoId = form.data("produto-id");
+        let quantidade = input.val();
+
+        $.ajax({
+            url: `/carrinho/atualizar/${produtoId}`,
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: new FormData(form[0]),
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(data) {
+                if (data.success) {
+                    let produtoElement = form.closest('li');
+                    let produtoData = data.produtos.find(produto => produto.pivot.produto_id == produtoId);
+                    let subtotal = produtoData.pivot.quantidade * produtoData.preco;
+
+                    produtoElement.find('.me-auto small:last-child').text(
+                        `Total: R$ ${subtotal.toFixed(2).replace('.', ',')}`
+                    );
+
+                    $(".offcanvas-body h5 strong").text(`Total: R$ ${data.total}`);
+
+                    atualizarBarraFreteGratis(data.total);
+                } else {
+                    alert(data.error);
+                }
+            },
+            error: function(error) {
+                console.error('Erro ao atualizar o carrinho:', error);
+            }
+        });
+    }
 </script>
 
 <script>

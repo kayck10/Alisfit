@@ -279,19 +279,31 @@ button,
     }
 }
 
+/* Para telas menores que 768px */
 @media (max-width: 768px) {
     #header {
         padding: 0 15px;
     }
 
     .logo-container {
-        max-width: 120px;
+        max-width: 250px !important;
+    }
+
+    .logo-container img {
+        width: 100% !important;
+        height: auto;
     }
 }
 
+/* Para telas menores que 480px */
 @media (max-width: 480px) {
     .logo-container {
-        max-width: 100px;
+        max-width: 280px !important;
+    }
+
+    .logo-container img {
+        width: 100% !important;
+        height: auto;
     }
 }
 

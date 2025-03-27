@@ -202,10 +202,7 @@
                             <p class="product-name">{{ $produto->nome }}</p>
                             <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
 
-                            <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-primary mt-2">Adicionar a sacola</button>
-                            </form>
+                         <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary ">Ver Detalhes</a>
                         </div>
                     </div>
                 @endforeach
@@ -220,7 +217,6 @@
 
             if (aplicarFiltrosBtn) {
                 aplicarFiltrosBtn.addEventListener('click', function() {
-                    // Coletar os filtros selecionados
                     const filtros = {
                         colecao_id: [],
                         tamanho_id: [],
@@ -244,7 +240,6 @@
                         filtros.cor.push(checkbox.value);
                     });
 
-                    // Enviar os filtros via AJAX
                     fetch('{{ route('drops.filtrar') }}', {
                             method: 'POST',
                             headers: {
@@ -255,9 +250,8 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            // Atualizar a lista de produtos
                             const produtosContainer = document.querySelector(
-                                '.row'); // Container dos produtos
+                                '.row');
                             produtosContainer.innerHTML = ''; // Limpar o conteúdo atual
 
                             data.produtos.forEach(produto => {

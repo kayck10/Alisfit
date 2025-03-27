@@ -59,51 +59,33 @@
 
 @push('scripts')
 <script>
-    // Gráfico de Barras
-    var ctxBar = document.getElementById('barChart').getContext('2d');
-    var barChart = new Chart(ctxBar, {
+    // Vendas
+    var barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: {!! json_encode($meses) !!},
             datasets: [{
-                label: 'Vendas',
-                data: [10, 20, 30, 40, 50, 60],
-                backgroundColor: '#007bff',
-                borderColor: '#0056b3',
+                label: 'Total de Vendas',
+                data: {!! json_encode($valores) !!},
+                backgroundColor: "rgba(54, 162, 235, 0.6)",
+                borderColor: "rgba(54, 162, 235, 1)",
                 borderWidth: 1
             }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                }
-            }
         }
     });
 
-    // Gráfico de Linhas
-    var ctxLine = document.getElementById('lineChart').getContext('2d');
-    var lineChart = new Chart(ctxLine, {
+    // Usuários
+    var lineChart = new Chart(document.getElementById('lineChart').getContext('2d'), {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: {!! json_encode($mesesUsuarios) !!},
             datasets: [{
-                label: 'Crescimento',
-                data: [2, 4, 6, 8, 10, 12],
-                fill: false,
+                label: 'Usuários com id_tipo = 4',
+                data: {!! json_encode($totalUsuarios) !!},
                 borderColor: '#28a745',
-                tension: 0.1
+                tension: 0.1,
+                fill: false
             }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                }
-            }
         }
     });
 
