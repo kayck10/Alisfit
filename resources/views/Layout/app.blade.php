@@ -17,9 +17,7 @@
             display: flex;
             flex-direction: column;
             background-color: #f8f9fa;
-            /* Fundo claro */
             color: #000;
-            /* Texto preto */
         }
 
         .card {

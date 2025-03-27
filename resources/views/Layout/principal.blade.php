@@ -83,7 +83,6 @@
 
         .btn-transparent:hover {
             color: #ff4d4d;
-            /* Efeito vermelho ao passar o mouse */
         }
 
         /* Barra de progresso */
@@ -93,7 +92,6 @@
 
         .progress-bar {
             background-color: #28a745;
-            /* Verde para indicar progresso */
         }
 
         /* Rodapé */
@@ -169,10 +167,11 @@
                 <!-- Ícone do Menu (Visível apenas em telas menores) -->
                 <li id="search-icon" class="user-icon-container">
                     <a href="#" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas"
-                        aria-controls="menuOffcanvas">
+                        aria-controls="menuOffcanvas" class="d-block d-sm-none">
                         <i class="fa-solid fa-bars"></i>
                     </a>
                 </li>
+
                 <!-- Ícone do Carrinho -->
                 <li id="cart-icon-container">
                     <a href="#" id="cart-icon" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
@@ -191,7 +190,6 @@
                                 <ul>
                                     <li><a href="{{ route('conta') }}">Minha Conta</a></li>
                                     <li><a href="#">Meus Pedidos</a></li>
-                                    <li><a href="#">Lista de Desejos <i class="fa-solid fa-heart"></i></a></li>
                                     <li><a href="#" id="logout-btn">Sair <i
                                                 class="fa-solid fa-right-from-bracket"></i></a></li>
                                 </ul>

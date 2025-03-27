@@ -16,7 +16,7 @@ class PrincipalController extends Controller
 {
     public function index()
     {
-        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])->get();
+        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])->take(4)->get();
         $colecoes = Colecoes::all();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
