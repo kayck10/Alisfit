@@ -32,7 +32,7 @@ class Produtos extends Model
 
     public function imagens()
     {
-        return $this->hasMany(ImagensProdutos::class, 'produto_id', 'id');
+        return $this->hasMany(\App\Models\ImagensProdutos::class, 'produto_id', 'id');
     }
 
     public function genero()
