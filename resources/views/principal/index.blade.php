@@ -294,16 +294,12 @@
     <section id="promo-ticker">
         <div class="ticker-wrap">
             <div class="ticker">
-                <span>FRETE GRÁTIS PARA TODO BRASIL</span>
                 <span>COMPRE AGORA E PARCELE EM ATÉ 10X</span>
                 <span>DEVOLUÇÃO GARANTIDA EM ATÉ 7 DIAS</span>
-                <span>FRETE GRÁTIS PARA TODO BRASIL</span>
                 <span>COMPRE AGORA E PARCELE EM ATÉ 10X</span>
                 <span>DEVOLUÇÃO GARANTIDA EM ATÉ 7 DIAS</span>
-                <span>FRETE GRÁTIS PARA TODO BRASIL</span>
                 <span>COMPRE AGORA E PARCELE EM ATÉ 10X</span>
                 <span>DEVOLUÇÃO GARANTIDA EM ATÉ 7 DIAS</span>
-                <span>FRETE GRÁTIS PARA TODO BRASIL</span>
                 <span>COMPRE AGORA E PARCELE EM ATÉ 10X</span>
                 <span>DEVOLUÇÃO GARANTIDA EM ATÉ 7 DIAS</span>
             </div>

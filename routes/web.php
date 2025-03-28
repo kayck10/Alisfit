@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\CarrinhosController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\ClientesController;
-use App\Http\Controllers\ColecoesController;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;use App\Http\Controllers\ColecoesController;
 use App\Http\Controllers\CuponsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceiroController;
@@ -124,7 +124,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/aplicar-cupom-carrinho', [PedidosController::class, 'aplicarCupomCarrinho'])->name('carrinho.aplicar-cupom');
         Route::put('/{id}/status', [PedidosController::class, 'atualizarStatus'])->name('pedidos.atualizar-status');
         Route::get('/{id}', [PedidosController::class, 'show'])->name('pedidos.show');
-
     });
 
 
@@ -140,3 +139,5 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/calcular-frete', [FreteController::class, 'calcular'])->name('frete.calcular');
 });
+
+

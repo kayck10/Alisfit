@@ -36,7 +36,7 @@ class ProdutosController extends Controller
             'genero_id' => 'required|exists:generos,id',
             'tipo_produto_id' => 'required|exists:tipos_produtos,id',
             'imagens' => 'required|array',
-            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
             'informacoes' => 'required|array',
             'informacoes.*.cor' => 'required|string',
             'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
@@ -74,7 +74,7 @@ class ProdutosController extends Controller
     }
     public function index()
     {
-        $produtos = Produtos::with(['colecao', 'tamanhos'])->get();
+        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])->get();
         return view('produtos.index', compact('produtos'));
     }
 
