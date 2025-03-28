@@ -6,6 +6,7 @@ use App\Models\Carrinhos;
 use App\Models\Colecoes;
 use App\Models\Generos;
 use App\Models\imagensProduto;
+use App\Models\ImagensProdutos;
 use App\Models\Produtos;
 use App\Models\ProdutosTamanhos;
 use App\Models\Tamanhos;
@@ -54,7 +55,7 @@ class ProdutosController extends Controller
         if ($request->hasFile('imagens')) {
             foreach ($request->file('imagens') as $imagem) {
                 $imagePath = $imagem->store('produtos', 'public');
-                ImagensProduto::create([
+                ImagensProdutos::create([
                     'produto_id' => $produto->id,
                     'imagem' => $imagePath,
                 ]);
@@ -106,7 +107,7 @@ class ProdutosController extends Controller
             }
 
             $imagePath = $request->file('imagem')->store('produtos', 'public');
-            $imagem = ImagensProduto::create([
+            $imagem = ImagensProdutos::create([
                 'caminho' => $imagePath
             ]);
             $produto->imagem_id = $imagem->id;
