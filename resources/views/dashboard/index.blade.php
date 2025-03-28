@@ -42,11 +42,11 @@
                     <div class="details-container">
                         <div class="detail-item">
                             <h6>Total de Vendas</h6>
-                            <p class="count">150</p>
+                            <p class="count">0</p>
                         </div>
                         <div class="detail-item">
                             <h6>Novos Clientes</h6>
-                            <p class="count">200</p>
+                            <p class="count">0</p>
                         </div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
         data: {
             labels: {!! json_encode($meses) !!},
             datasets: [{
-                label: 'Total de Vendas',
+                label: 'Total em Vendas',
                 data: {!! json_encode($valores) !!},
                 backgroundColor: "rgba(54, 162, 235, 0.6)",
                 borderColor: "rgba(54, 162, 235, 1)",
@@ -80,7 +80,7 @@
         data: {
             labels: {!! json_encode($mesesUsuarios) !!},
             datasets: [{
-                label: 'Usuários com id_tipo = 4',
+                label: 'Clientes',
                 data: {!! json_encode($totalUsuarios) !!},
                 borderColor: '#28a745',
                 tension: 0.1,
