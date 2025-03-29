@@ -16,10 +16,11 @@
                         <div class="product-card">
                             <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">
                                 @if ($produto->imagens->isNotEmpty())
-                                    <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}" alt="{{ $produto->nome }}">
-                                @else
-                                    <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
-                                @endif
+                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                    alt="{{ $produto->nome }}" class="img-custom">
+                            @else
+                                <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
+                            @endif
                             </a>
                             <p class="product-name">{{ $produto->nome }}</p>
                             <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
