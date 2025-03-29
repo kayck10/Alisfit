@@ -31,12 +31,12 @@ class FreteService
             ->withHeaders(['Accept' => 'application/json'])
             ->post($url, $payload);
 
-            dd($response);
             if (!$response->successful()) {
                 return ["error" => "Erro ao calcular o frete: " . $response->body()];
             }
 
             $data = $response->json();
+            dd($data);
 
 
             if (empty($data)) {
