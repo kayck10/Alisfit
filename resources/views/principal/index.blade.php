@@ -317,8 +317,8 @@
                     <div class="product-image">
                         <a href="{{ route('produto.detalhes', $produto->id) }}">
                             @if ($produto->imagens->isNotEmpty())
-                                <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
-                                    alt="{{ $produto->nome }}">
+                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                    alt="{{ $produto->nome }}" class="img-custom">
                             @else
                                 <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
                             @endif
