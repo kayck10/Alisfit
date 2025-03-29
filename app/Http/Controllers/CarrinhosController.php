@@ -219,12 +219,10 @@ class CarrinhosController extends Controller
 
             // Vincular produtos ao pedido
 
-            dd($carrinho, $pedido->id);
-
-            foreach ($carrinho->produtos as $carrinhoItem => $produto) {
-                CarrinhoIten::where('carrinho_id', $produto->pivot_carrinho_id)
-                ->where('produto_id', $produto->pivot_produto_id)
-                ->update(['pedido_id' => $pedido->id]);
+            foreach ($carrinho->produtos as $produto) {
+                CarrinhoIten::where('carrinho_id', $produto->id)
+                ->where('produto_id', $produto->id)
+                ->update(['pedido_id' => 13]);
             }
 
             // Processar pagamento no Mercado Pago
