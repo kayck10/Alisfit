@@ -218,14 +218,29 @@ class CarrinhosController extends Controller
             ]);
 
             // Vincular produtos ao pedido
-            // dd('oias');
             foreach ($carrinho->produtos as $produto) {
+                // Certifique-se de que o pedido realmente existe no banco de dados
                 if ($pedido && $pedido->exists) {
-                    CarrinhoIten::where('carrinho_id', $carrinho->id)
+                    // Verifica se o item do carrinho realmente existe
+                    $itemCarrinho = CarrinhoIten::where('carrinho_id', $carrinho->id)
                         ->where('produto_id', $produto->id)
-                        ->update(['pedido_id' => $pedido->id]);
+                        ->first();
+
+                    if ($itemCarrinho) {
+                        $itemCarrinho->update(['pedido_id' => $pedido->id]);
+                    } else {
+                        \Log::warning("Item do carrinho não encontrado", [
+                            'carrinho_id' => $carrinho->id,
+                            'produto_id' => $produto->id
+                        ]);
+                    }
+                } else {
+                    \Log::error("Pedido não encontrado no banco de dados.", [
+                        'pedido_id' => $pedido->id ?? 'null'
+                    ]);
                 }
             }
+
 
             // Processar pagamento no Mercado Pago
             SDK::setAccessToken(config('services.mercadopago.access_token'));
