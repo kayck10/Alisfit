@@ -26,12 +26,12 @@ class FreteService
                     ]
                 ]
             ];
-
             $response = Http::withToken($token)
-                ->timeout(30)
-                ->withHeaders(['Accept' => 'application/json'])
-                ->post($url, $payload);
+            ->timeout(30)
+            ->withHeaders(['Accept' => 'application/json'])
+            ->post($url, $payload);
 
+            dd($response);
             if (!$response->successful()) {
                 return ["error" => "Erro ao calcular o frete: " . $response->body()];
             }
