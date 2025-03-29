@@ -130,31 +130,31 @@ class CarrinhosController extends Controller
         return redirect()->back()->with('error', 'Carrinho não encontrado!');
     }
 
-   public function info()
-{
-    $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
+    public function info()
+    {
+        $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
 
-    if (!$carrinho) {
-        return view('carrinho.info')->with('mensagem', 'Seu carrinho está vazio.');
+        if (!$carrinho) {
+            return view('carrinho.info')->with('mensagem', 'Seu carrinho está vazio.');
+        }
+
+        $quantidadeProdutos = $carrinho->produtos()->count();
+        $cupomAplicado = $carrinho->cupons()->exists();
+
+        if ($cupomAplicado) {
+            $carrinho->cupons()->detach();
+        }
+
+        $subtotal = $carrinho->produtos->sum(function ($produto) {
+            return $produto->pivot->quantidade * $produto->preco;
+        });
+
+        $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
+
+        $total = max($subtotal - $desconto, 0);
+
+        return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total'));
     }
-
-    $quantidadeProdutos = $carrinho->produtos()->count();
-    $cupomAplicado = $carrinho->cupons()->exists();
-
-    if ($cupomAplicado) {
-        $carrinho->cupons()->detach();
-    }
-
-    $subtotal = $carrinho->produtos->sum(function ($produto) {
-        return $produto->pivot->quantidade * $produto->preco;
-    });
-
-    $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
-
-    $total = max($subtotal - $desconto, 0);
-
-    return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total'));
-}
 
 
 
@@ -218,11 +218,13 @@ class CarrinhosController extends Controller
             ]);
 
             // Vincular produtos ao pedido
-
+            // dd('oias');
             foreach ($carrinho->produtos as $produto) {
-                CarrinhoIten::where('carrinho_id', $produto->id)
-                ->where('produto_id', $produto->id)
-                ->update(['pedido_id' => 13]);
+                if ($pedido && $pedido->exists) {
+                    CarrinhoIten::where('carrinho_id', $carrinho->id)
+                        ->where('produto_id', $produto->id)
+                        ->update(['pedido_id' => $pedido->id]);
+                }
             }
 
             // Processar pagamento no Mercado Pago
@@ -291,5 +293,4 @@ class CarrinhosController extends Controller
         }
         return $frete;
     }
-
 }
