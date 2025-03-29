@@ -22,11 +22,26 @@
                 <div class="col-md-4 mb-4">
                     <div class="card">
                         @if ($produto->imagens->isNotEmpty())
-                        <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
-                             alt="{{ $produto->nome }}" class="img-custom">
-                    @else
-                        <img src="{{ asset('images/sem-imagem.png') }}" alt="Imagem não disponível" class="img-custom">
-                    @endif
+                            {{-- @dd($produto->imagens->first()->imagem) --}}
+
+                            @php
+                                $path = $produto->imagens->first()->imagem;
+                                $parts = explode('/', $path);
+
+                                // Separando os valores em arrays distintos
+                                $caminho = [$parts[0]];
+                                $filename = [$parts[1]];
+                                // dd($caminho, $filename);
+                            @endphp
+
+                            <img src="{{ route('produtos.imagem', ['caminho' => $caminho[0], 'filename' => $filename[0]]) }}"
+                                alt="{{ $produto->nome }}" class="img-custom">
+
+                            {{-- <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
+                             alt="{{ $produto->nome }}" class="img-custom"> --}}
+                        @else
+                            {{-- <img src="{{ asset('images/sem-imagem.png') }}" alt="Imagem não disponível" class="img-custom"> --}}
+                        @endif
 
                         <div class="card-body">
                             <h5 class="card-title">{{ $produto->nome }}</h5>

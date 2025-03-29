@@ -3,17 +3,21 @@
 use App\Http\Controllers\CarrinhosController;
 use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;use App\Http\Controllers\ColecoesController;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ColecoesController;
 use App\Http\Controllers\CuponsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceiroController;
 use App\Http\Controllers\FreteController;
+use App\Http\Controllers\ImagensProdutoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\PrincipalController;
 use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
+
+use Illuminate\Support\Facades\Response;
 
 
 Route::get('/login/admin', [LoginController::class, 'login'])->name('login');
@@ -141,3 +145,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+Route::get('/imagem/{caminho}/{filename}', [ImagensProdutoController::class, 'getImage'])->name('produtos.imagem');
+
+// 5lZVxTa3gia20vWyvQdyL5DroWKmWETxrECUk8VA.jpg
