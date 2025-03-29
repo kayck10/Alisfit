@@ -27,9 +27,15 @@
                                     <tr>
                                         <td class="fw-semibold">{{ $produto->nome }}</td>
                                         <td>
-                                            <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
-                                                alt="{{ $produto->nome }}" class="img-thumbnail rounded"
-                                                style="width: 50px;">
+                                            @if ($produto->imagens->isNotEmpty())
+                                            <img  src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                                alt="{{ $produto->nome }}" class="miniatura img-custom"
+                                                onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}')" class="img-fluid rounded"
+                                                style="width: 70px; height: 70px; object-fit: cover; margin-right: 10px;">
+                                        @else
+                                            <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão"
+                                                class="miniatura img-custom">
+                                        @endif
                                         </td>
                                         <td class="fw-bold">{{ $produto->pivot->quantidade }}</td>
                                         <td class="text-success fw-bold">R$
