@@ -186,7 +186,6 @@ class CarrinhosController extends Controller
             $frete = $this->calcularFrete($request->cep)['valor'];
 
             $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();
-            dd('oias');
 
             if (!$carrinho) {
                 return response()->json(['message' => 'Carrinho vazio!'], 400);
@@ -201,6 +200,7 @@ class CarrinhosController extends Controller
             $valorFrete = floatval($frete);
             $totalPedido = ($subtotal + $valorFrete) - $desconto;
 
+            dd('oias');
             // Criar pedido
             $pedido = Pedidos::create([
                 'user_id' => Auth::id(),
