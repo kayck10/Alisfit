@@ -130,31 +130,31 @@ class CarrinhosController extends Controller
         return redirect()->back()->with('error', 'Carrinho não encontrado!');
     }
 
-   public function info()
-{
-    $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
+    public function info()
+    {
+        $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
 
-    if (!$carrinho) {
-        return view('carrinho.info')->with('mensagem', 'Seu carrinho está vazio.');
+        if (!$carrinho) {
+            return view('carrinho.info')->with('mensagem', 'Seu carrinho está vazio.');
+        }
+
+        $quantidadeProdutos = $carrinho->produtos()->count();
+        $cupomAplicado = $carrinho->cupons()->exists();
+
+        if ($cupomAplicado) {
+            $carrinho->cupons()->detach();
+        }
+
+        $subtotal = $carrinho->produtos->sum(function ($produto) {
+            return $produto->pivot->quantidade * $produto->preco;
+        });
+
+        $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
+
+        $total = max($subtotal - $desconto, 0);
+
+        return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total'));
     }
-
-    $quantidadeProdutos = $carrinho->produtos()->count();
-    $cupomAplicado = $carrinho->cupons()->exists();
-
-    if ($cupomAplicado) {
-        $carrinho->cupons()->detach();
-    }
-
-    $subtotal = $carrinho->produtos->sum(function ($produto) {
-        return $produto->pivot->quantidade * $produto->preco;
-    });
-
-    $desconto = $carrinho->cupons->sum('pivot.desconto_aplicado');
-
-    $total = max($subtotal - $desconto, 0);
-
-    return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total'));
-}
 
 
 
@@ -217,16 +217,31 @@ class CarrinhosController extends Controller
                 'complemento' => $request->complemento,
             ]);
 
-            // Vincular produtos ao pedido
-            foreach ($carrinho->produtos as $carrinhoItem => $produto) {
-                // dd($carrinho->id, $produto->id, $pedido->id);
-                if(!$carrinho->id || !$produto->id || !$pedido->id){
-                    dd($carrinhoItem);
+            // Verificar se o pedido e o carrinho existem antes de prosseguir
+            if ($pedido && $carrinho && $carrinho->produtos->isNotEmpty()) {
+                foreach ($carrinho->produtos as $produto) {
+                    // Verificar se o produto tem um ID válido
+                    if (isset($produto->id)) {
+                        // Atualizar apenas se o registro existir
+                        $atualizado = CarrinhoIten::where('carrinho_id', $carrinho->id)
+                            ->where('produto_id', $produto->id)
+                            ->exists();
+
+                        if ($atualizado) {
+                            CarrinhoIten::where('carrinho_id', $carrinho->id)
+                                ->where('produto_id', $produto->id)
+                                ->update(['pedido_id' => $pedido->id]);
+                        } else {
+                            return "Item do carrinho nao encontrado, produto: " . $produto->id . " carrinho: " . $carrinho->id;
+                        }
+                    } else {
+                        return "Produto sem ID, produto: " . $produto->id . " carrinho: " . $carrinho->id;
+                    }
                 }
-                CarrinhoIten::where('carrinho_id', $carrinho->id)
-                ->where('produto_id', $produto->id)
-                ->update(['pedido_id' => $pedido->id]);
+            } else {
+                return "Pedido ou carrinho inválido.";
             }
+
 
             // Processar pagamento no Mercado Pago
             SDK::setAccessToken(config('services.mercadopago.access_token'));
@@ -294,5 +309,4 @@ class CarrinhosController extends Controller
         }
         return $frete;
     }
-
 }
