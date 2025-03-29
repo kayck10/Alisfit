@@ -8,6 +8,7 @@ class FreteService
 {
     public function calcularFrete($cepDestino)
     {
+        try {
         $token = env('MELHOR_ENVIO_TOKEN');
         $cepOrigem = "61913080"; // Seu CEP de origem
 
@@ -52,5 +53,9 @@ class FreteService
             "valor" => number_format($opcaoFrete["price"], 2, ',', '.'),
             "prazo" => $opcaoFrete["delivery_time"] ?? 'Indisponível'
         ];
+
+        } catch (\Exception $e) {
+            return ["error" => $e->getMessage()];
+        }
     }
 }

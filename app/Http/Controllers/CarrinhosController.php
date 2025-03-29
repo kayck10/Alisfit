@@ -283,7 +283,6 @@ class CarrinhosController extends Controller
     public function calcularFrete($cep)
     {
         $cepDestino = $cep;
-        dd($cepDestino);
         $frete = $this->freteService->calcularFrete($cepDestino);
 
         if (isset($frete['error'])) {
