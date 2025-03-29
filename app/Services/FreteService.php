@@ -26,7 +26,7 @@ class FreteService
                     ]
                 ]
             ];
-            dd($payload, $token);
+
             $response = Http::withToken($token)
                 ->timeout(30)
                 ->withHeaders(['Accept' => 'application/json'])
