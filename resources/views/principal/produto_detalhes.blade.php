@@ -3,13 +3,19 @@
 <style>
     .produto-container {
         display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 40px;
         margin-top: 80px;
-        flex-wrap: wrap;
     }
 
     .produto-container .col-md-5 {
         flex: 1;
+    }
+
+    .produto-imagem {
+        flex: 1;
+        max-width: 500px;
     }
 
     .produto-container .col-md-7 {
@@ -52,8 +58,10 @@
         }
 
         .produto-info {
-            width: 100%;
-            order: 2;
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .col-md-5 {
@@ -92,13 +100,15 @@
 
 
     .upsell-list {
-        flex-direction: column;
-        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
     }
 
     .upsell-item {
-        width: auto;
-        max-width: 300px;
+        width: 250px;
+        text-align: center;
     }
 
 
@@ -278,73 +288,79 @@
 </style>
 
 @section('content')
-<div class="container">
-    <div class="produto-container">
-        <!-- Imagem principal e miniaturas -->
-        <div class="row">
-            <div class="col-12">
-                <!-- Imagem principal -->
-                <div class="text-center mb-3">
-                    <img id="imagem-principal" src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
-                        alt="{{ $produto->nome }}" class="img-fluid img-produto">
-                </div>
+    <div class="container">
+        <div class="produto-container">
+            <!-- Imagem principal e miniaturas -->
+            <div class="row">
+                <div class="col-12">
+                    <!-- Imagem principal -->
+                    <div class="text-center mb-3">
+                        <img id="imagem-principal" src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
+                            alt="{{ $produto->nome }}" class="img-fluid img-produto">
+                    </div>
 
-                <!-- Miniaturas -->
-                <div class="miniaturas-container d-flex justify-content-center flex-wrap">
-                    @foreach ($produto->imagens as $imagem)
-                        <img src="{{ asset('storage/' . $imagem->imagem) }}" alt="Imagem do produto" class="miniatura"
-                            onclick="trocarImagemPrincipal('{{ asset('storage/' . $imagem->imagem) }}')">
-                    @endforeach
+                    <!-- Miniaturas -->
+                    <div class="miniaturas-container d-flex justify-content-center flex-wrap">
+                        @if ($produto->imagens->isNotEmpty())
+                            <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                alt="{{ $produto->nome }}" class="miniatura img-custom"
+                                onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}')">
+                        @else
+                            <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão" class="miniatura img-custom">
+                        @endif
+
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Restante do conteúdo -->
-        <div class="row mt-4">
-            <div class="col-12 produto-info">
-                <h2>{{ $produto->nome }}</h2>
-                <h4>R$ {{ number_format($produto->preco, 2, ',', '.') }}</h4>
+            <!-- Restante do conteúdo -->
+            <div class="row mt-4">
+                <div class="col-12 produto-info">
+                    <h2>{{ $produto->nome }}</h2>
+                    <h4>R$ {{ number_format($produto->preco, 2, ',', '.') }}</h4>
 
-                <label class="mt-3">Tamanhos disponíveis:</label>
-                <div class="sizes-container mt-4 mb-4">
-                    @foreach ($produto->tamanhos as $tamanho)
-                        <div class="size-box" data-tamanho-id="{{ $tamanho->pivot->tamanho_id }}">
-                            {{ $tamanho->desc }}
-                        </div>
-                    @endforeach
-                </div>
-
-                <label>Cores disponíveis:</label>
-                <div class="mt-3">
-                    @foreach ($produto->tamanhos as $tamanho)
-                        @php
-                            $corHex = $cor_map[$tamanho->pivot->cor] ?? '#000000';
-                        @endphp
-                        <span class="color-box" style="background-color: {{ $corHex }}"></span>
-                    @endforeach
-                </div>
-
-                <hr>
-                <div class="selecao-aviso" id="aviso-selecao">Por favor, escolha tanto o tamanho quanto a cor para adicionar ao carrinho.</div>
-                @if (session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                @endif
-                <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST" onsubmit="return validarSelecao()">
-                    @csrf
-                    <input type="hidden" name="tamanho_id" id="tamanho_id">
-                    <input type="hidden" name="cor" id="cor">
-
-                    <div class="d-grid gap-2 col-12 col-md-6 mx-auto">
-                        <input type="hidden" name="quantidade" value="1">
-                        <button type="submit" class="btn btn-dark btn-lg mt-2">Adicionar à sacola</button>
+                    <label class="mt-3">Tamanhos disponíveis:</label>
+                    <div class="sizes-container mt-4 mb-4">
+                        @foreach ($produto->tamanhos as $tamanho)
+                            <div class="size-box" data-tamanho-id="{{ $tamanho->pivot->tamanho_id }}">
+                                {{ $tamanho->desc }}
+                            </div>
+                        @endforeach
                     </div>
-                </form>
-                <h6 class="mt-5 mb-5">DESCRIÇÃO DO PRODUTO</h6>
-                <p>{{ $produto->descricao }}</p>
+
+                    <label>Cores disponíveis:</label>
+                    <div class="mt-3">
+                        @foreach ($produto->tamanhos as $tamanho)
+                            @php
+                                $corHex = $cor_map[$tamanho->pivot->cor] ?? '#000000';
+                            @endphp
+                            <span class="color-box" style="background-color: {{ $corHex }}"></span>
+                        @endforeach
+                    </div>
+
+                    <hr>
+                    <div class="selecao-aviso" id="aviso-selecao">Por favor, escolha tanto o tamanho quanto a cor para
+                        adicionar ao carrinho.</div>
+                    @if (session('error'))
+                        <div class="alert alert-danger">{{ session('error') }}</div>
+                    @endif
+                    <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST"
+                        onsubmit="return validarSelecao()">
+                        @csrf
+                        <input type="hidden" name="tamanho_id" id="tamanho_id">
+                        <input type="hidden" name="cor" id="cor">
+
+                        <div class="d-grid gap-2 col-12 col-md-6 mx-auto">
+                            <input type="hidden" name="quantidade" value="1">
+                            <button type="submit" class="btn btn-dark btn-lg mt-2">Adicionar à sacola</button>
+                        </div>
+                    </form>
+                    <h6 class="mt-5 mb-5">DESCRIÇÃO DO PRODUTO</h6>
+                    <p>{{ $produto->descricao }}</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
     <hr class="mt-5">
