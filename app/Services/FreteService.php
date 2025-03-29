@@ -32,9 +32,9 @@ class FreteService
             ->post($url, $payload);
 
             if (!$response->successful()) {
+                dd($response->body());
                 return ["error" => "Erro ao calcular o frete: " . $response->body()];
             }
-            dd($response->successful());
 
             $data = $response->json();
 
