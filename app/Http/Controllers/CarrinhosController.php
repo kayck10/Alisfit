@@ -222,8 +222,8 @@ class CarrinhosController extends Controller
             dd($carrinho, $pedido);
 
             foreach ($carrinho->produtos as $carrinhoItem => $produto) {
-                CarrinhoIten::where('carrinho_id', $carrinho->id)
-                ->where('produto_id', $produto->id)
+                CarrinhoIten::where('carrinho_id', $produto->pivot_carrinho_id)
+                ->where('produto_id', $produto->pivot_produto_id)
                 ->update(['pedido_id' => $pedido->id]);
             }
 
