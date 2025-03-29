@@ -184,7 +184,6 @@ class CarrinhosController extends Controller
         try {
 
             $frete = $this->calcularFrete($request->cep)['valor'];
-            dd('oi');
 
             $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();
 
@@ -284,6 +283,7 @@ class CarrinhosController extends Controller
     public function calcularFrete($cep)
     {
         $cepDestino = $cep;
+        dd($cepDestino);
         $frete = $this->freteService->calcularFrete($cepDestino);
 
         if (isset($frete['error'])) {
