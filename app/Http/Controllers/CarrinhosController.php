@@ -180,13 +180,13 @@ class CarrinhosController extends Controller
 
     public function finalizarPedido(Request $request)
     {
+        dd('oi');
         DB::beginTransaction();
         try {
 
             $frete = $this->calcularFrete($request->cep)['valor'];
 
             $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();
-            dd('oi');
 
             if (!$carrinho) {
                 return response()->json(['message' => 'Carrinho vazio!'], 400);
