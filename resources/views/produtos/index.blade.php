@@ -24,18 +24,9 @@
                         @if ($produto->imagens->isNotEmpty())
                             {{-- @dd($produto->imagens->first()->imagem) --}}
 
-                            @php
-                                $path = $produto->imagens->first()->imagem;
-                                $parts = explode('/', $path);
-
-                                // Separando os valores em arrays distintos
-                                $caminho = [$parts[0]];
-                                $filename = [$parts[1]];
-                                // dd($caminho, $filename);
-                            @endphp
-
-                            <img src="{{ route('produtos.imagem', ['caminho' => $caminho[0], 'filename' => $filename[0]]) }}"
+                            <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
                                 alt="{{ $produto->nome }}" class="img-custom">
+
 
                             {{-- <img src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
                              alt="{{ $produto->nome }}" class="img-custom"> --}}
