@@ -16,7 +16,7 @@ use App\Http\Controllers\PrincipalController;
 use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Response;
 
 
@@ -147,4 +147,15 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/imagem/{caminho}/{filename}', [ImagensProdutoController::class, 'getImage'])->name('produtos.imagem');
 
-// 5lZVxTa3gia20vWyvQdyL5DroWKmWETxrECUk8VA.jpg
+
+
+Route::get('/clear-cache', function () {
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('config:clear');
+    Artisan::call('view:clear');
+    Artisan::call('optimize:clear');
+
+    return 'Cache limpo com sucesso!';
+});
+
