@@ -200,7 +200,6 @@ class CarrinhosController extends Controller
             $valorFrete = floatval($frete);
             $totalPedido = ($subtotal + $valorFrete) - $desconto;
 
-            dd('oias');
             // Criar pedido
             $pedido = Pedidos::create([
                 'user_id' => Auth::id(),
@@ -221,13 +220,14 @@ class CarrinhosController extends Controller
             // Vincular produtos ao pedido
             foreach ($carrinho->produtos as $produto) {
                 CarrinhoIten::where('carrinho_id', $carrinho->id)
-                    ->where('produto_id', $produto->id)
-                    ->update(['pedido_id' => $pedido->id]);
+                ->where('produto_id', $produto->id)
+                ->update(['pedido_id' => $pedido->id]);
             }
 
             // Processar pagamento no Mercado Pago
             SDK::setAccessToken(config('services.mercadopago.access_token'));
             $preference = new Preference();
+            dd('oias');
 
             // 1. Adiciona os itens do carrinho
             $items = [];
