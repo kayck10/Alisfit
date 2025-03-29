@@ -218,6 +218,7 @@ class CarrinhosController extends Controller
             ]);
 
             // Vincular produtos ao pedido
+            dd('oias');
             foreach ($carrinho->produtos as $produto) {
                 CarrinhoIten::where('carrinho_id', $carrinho->id)
                 ->where('produto_id', $produto->id)
@@ -227,7 +228,6 @@ class CarrinhosController extends Controller
             // Processar pagamento no Mercado Pago
             SDK::setAccessToken(config('services.mercadopago.access_token'));
             $preference = new Preference();
-            dd('oias');
 
             // 1. Adiciona os itens do carrinho
             $items = [];
