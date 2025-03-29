@@ -271,7 +271,7 @@ class CarrinhosController extends Controller
             $preference->save();
 
             DB::commit();
-
+            dd('oi');
             return response()->json([
                 'redirect' => $preference->init_point
             ]);
