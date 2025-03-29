@@ -218,7 +218,7 @@ class CarrinhosController extends Controller
             ]);
 
             // Vincular produtos ao pedido
-            dd('oias');
+            dd($carrinho->produtos);
             foreach ($carrinho->produtos as $produto) {
                 CarrinhoIten::where('carrinho_id', $carrinho->id)
                 ->where('produto_id', $produto->id)
