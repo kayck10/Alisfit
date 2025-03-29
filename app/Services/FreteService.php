@@ -9,51 +9,50 @@ class FreteService
     public function calcularFrete($cepDestino)
     {
         try {
-        $token = env('MELHOR_ENVIO_TOKEN');
-        $cepOrigem = "61913080"; // Seu CEP de origem
+            $token = env('MELHOR_ENVIO_TOKEN');
+            $cepOrigem = "61913080"; // Seu CEP de origem
 
-        $url = "https://www.melhorenvio.com.br/api/v2/me/shipment/calculate";
+            $url = "https://www.melhorenvio.com.br/api/v2/me/shipment/calculate";
 
-        $payload = [
-            "from" => ["postal_code" => $cepOrigem],
-            "to" => ["postal_code" => $cepDestino],
-            "products" => [
-                [
-                    "height" => 5, // altura em cm
-                    "width" => 20, // largura em cm
-                    "length" => 20, // comprimento em cm
-                    "weight" => 0.5 // peso em kg
+            $payload = [
+                "from" => ["postal_code" => $cepOrigem],
+                "to" => ["postal_code" => $cepDestino],
+                "products" => [
+                    [
+                        "height" => 5, // altura em cm
+                        "width" => 20, // largura em cm
+                        "length" => 20, // comprimento em cm
+                        "weight" => 0.5 // peso em kg
+                    ]
                 ]
-            ]
-        ];
+            ];
+            dd($payload, $token);
+            $response = Http::withToken($token)
+                ->timeout(30)
+                ->withHeaders(['Accept' => 'application/json'])
+                ->post($url, $payload);
 
-        $response = Http::withToken($token)
-            ->timeout(30)
-            ->withHeaders(['Accept' => 'application/json'])
-            ->post($url, $payload);
+            if (!$response->successful()) {
+                return ["error" => "Erro ao calcular o frete: " . $response->body()];
+            }
 
-        if (!$response->successful()) {
-            return ["error" => "Erro ao calcular o frete: " . $response->body()];
-        }
-
-        $data = $response->json();
+            $data = $response->json();
 
 
-        if (empty($data)) {
-            return ["error" => "Nenhuma opção de frete encontrada."];
-        }
+            if (empty($data)) {
+                return ["error" => "Nenhuma opção de frete encontrada."];
+            }
 
-        $opcaoFrete = collect($data)->first(fn($opcao) => isset($opcao["price"]));
+            $opcaoFrete = collect($data)->first(fn($opcao) => isset($opcao["price"]));
 
-        if (!$opcaoFrete) {
-            return ["error" => "Nenhum serviço de frete disponível com preço válido."];
-        }
+            if (!$opcaoFrete) {
+                return ["error" => "Nenhum serviço de frete disponível com preço válido."];
+            }
 
-        return [
-            "valor" => number_format($opcaoFrete["price"], 2, ',', '.'),
-            "prazo" => $opcaoFrete["delivery_time"] ?? 'Indisponível'
-        ];
-
+            return [
+                "valor" => number_format($opcaoFrete["price"], 2, ',', '.'),
+                "prazo" => $opcaoFrete["delivery_time"] ?? 'Indisponível'
+            ];
         } catch (\Exception $e) {
             return ["error" => $e->getMessage()];
         }
