@@ -9,7 +9,8 @@ class FreteService
     public function calcularFrete($cepDestino)
     {
         try {
-            $token = env('MAILCHIMP_API_KEY');
+            $token = config('services.melhor_envio.api_key');
+
             $cepOrigem = "61913080"; // Seu CEP de origem
 
             $url = "https://www.melhorenvio.com.br/api/v2/me/shipment/calculate";

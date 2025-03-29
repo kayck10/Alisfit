@@ -13,6 +13,9 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'melhor_envio' => [
+        'api_key' => env('MELHOR_ENVIO_TOKEN'),
+    ],
 
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
@@ -32,8 +35,8 @@ return [
     ],
 
     'mercadopago' => [
-    'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
-    'public_key' => env('MERCADOPAGO_PUBLIC_KEY'),
-],
+        'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
+        'public_key' => env('MERCADOPAGO_PUBLIC_KEY'),
+    ],
 
 ];
