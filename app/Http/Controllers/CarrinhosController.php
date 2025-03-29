@@ -186,6 +186,7 @@ class CarrinhosController extends Controller
             $frete = $this->calcularFrete($request->cep)['valor'];
 
             $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();
+            dd('oi');
 
             if (!$carrinho) {
                 return response()->json(['message' => 'Carrinho vazio!'], 400);
@@ -271,7 +272,6 @@ class CarrinhosController extends Controller
             $preference->save();
 
             DB::commit();
-            dd('oi');
             return response()->json([
                 'redirect' => $preference->init_point
             ]);
