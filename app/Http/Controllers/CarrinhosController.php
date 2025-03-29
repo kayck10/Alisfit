@@ -221,7 +221,7 @@ class CarrinhosController extends Controller
             foreach ($carrinho->produtos as $carrinhoItem => $produto) {
                 // dd($carrinho->id, $produto->id, $pedido->id);
                 if(!$carrinho->id || !$produto->id || !$pedido->id){
-                    dd($carrinhoItem)
+                    dd($carrinhoItem);
                 }
                 CarrinhoIten::where('carrinho_id', $carrinho->id)
                 ->where('produto_id', $produto->id)
