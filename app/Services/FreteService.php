@@ -35,8 +35,8 @@ class FreteService
                 return ["error" => "Erro ao calcular o frete: " . $response->body()];
             }
 
-            $data = $response->json();
             dd($data);
+            $data = $response->json();
 
 
             if (empty($data)) {
