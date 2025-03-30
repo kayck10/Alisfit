@@ -129,11 +129,10 @@
     const inputImagens = document.getElementById('input-imagens');
     const previewContainer = document.getElementById('preview-imagens');
     const btnAdicionarMais = document.getElementById('adicionar-mais-imagens');
-    let files = []; // Array para armazenar as imagens selecionadas
+    let files = [];
 
-    // Função para exibir as imagens no preview
     function exibirPreview() {
-        previewContainer.innerHTML = ""; // Limpa o preview
+        previewContainer.innerHTML = "";
         files.forEach((file, index) => {
             let reader = new FileReader();
             reader.onload = function (e) {
@@ -142,7 +141,6 @@
                 img.classList.add("img-thumbnail", "me-2");
                 img.style.width = "100px";
 
-                // Adiciona um botão para remover a imagem
                 let removeBtn = document.createElement("button");
                 removeBtn.innerText = "Remover";
                 removeBtn.classList.add("btn", "btn-danger", "btn-sm", "ms-2");
@@ -162,7 +160,6 @@
         });
     }
 
-    // Função para atualizar o input de arquivos
     function atualizarInputImagens() {
         const dataTransfer = new DataTransfer();
         files.forEach(file => dataTransfer.items.add(file));
@@ -177,9 +174,8 @@
         atualizarInputImagens(); // Atualiza o input de arquivos
     });
 
-    // Evento para adicionar mais imagens
     btnAdicionarMais.addEventListener('click', function () {
-        inputImagens.click(); // Abre o seletor de arquivos
+        inputImagens.click();
     });
 });
     </script>

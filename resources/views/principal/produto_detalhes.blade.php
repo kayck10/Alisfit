@@ -290,25 +290,33 @@
 @section('content')
     <div class="container">
         <div class="produto-container">
-            <!-- Imagem principal e miniaturas -->
             <div class="row">
                 <div class="col-12">
                     <!-- Imagem principal -->
                     <div class="text-center mb-3">
-                        <img id="imagem-principal" src="{{ asset('storage/' . $produto->imagens->first()->imagem) }}"
-                            alt="{{ $produto->nome }}" class="img-fluid img-produto">
+                        @if ($produto->imagens->isNotEmpty())
+                            <img id="imagem-principal" src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                 alt="{{ $produto->nome }}" class="img-fluid img-produto">
+                        @else
+                            <img id="imagem-principal" src="{{ asset('images/banner/12.png') }}"
+                                 alt="Imagem padrão" class="img-fluid img-produto">
+                        @endif
                     </div>
 
                     <!-- Miniaturas -->
                     <div class="miniaturas-container d-flex justify-content-center flex-wrap">
-                        @if ($produto->imagens->isNotEmpty())
-                            <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
-                                alt="{{ $produto->nome }}" class="miniatura img-custom"
-                                onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}')">
-                        @else
-                            <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão" class="miniatura img-custom">
-                        @endif
+                        @foreach ($produto->imagens as $imagem)
+                            @php
+                                // Criamos um produto temporário com apenas esta imagem para usar o helper
+                                $tempProduto = new stdClass();
+                                $tempProduto->imagens = collect([$imagem]);
+                            @endphp
 
+                            <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}"
+                                 alt="{{ $produto->nome }}"
+                                 class="miniatura img-custom @if ($loop->first) active @endif"
+                                 onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}')">
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -383,8 +391,13 @@
 
     <script>
         function trocarImagemPrincipal(novaImagem) {
-            // Atualiza a imagem principal
             document.getElementById('imagem-principal').src = novaImagem;
+
+            document.querySelectorAll('.miniatura').forEach(img => {
+                img.classList.remove('active');
+            });
+
+            event.target.classList.add('active');
         }
 
         document.addEventListener("DOMContentLoaded", function() {
