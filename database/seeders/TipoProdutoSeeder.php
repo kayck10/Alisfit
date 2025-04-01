@@ -19,7 +19,6 @@ class TipoProdutoSeeder extends Seeder
             ['desc' => 'Shorts'],
             ['desc' => 'Tops'],
             ['desc' => 'Conjuntos'],
-
         ]);
     }
 }

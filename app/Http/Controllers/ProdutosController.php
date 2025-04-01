@@ -223,7 +223,7 @@ class ProdutosController extends Controller
             ->where('tipo_produto_id', $camiseta->id)
             ->get();
 
-        return view('produtos.masculinasCamisetas', compact('produtos', 'carrinho'));
+        return view('produtos.ofertasM', compact('produtos', 'carrinho'));
     }
 
     public function ofertasF()
@@ -241,7 +241,7 @@ class ProdutosController extends Controller
             ->where('tipo_produto_id', $camiseta->id)
             ->get();
 
-        return view('produtos.masculinasCamisetas', compact('produtos', 'carrinho'));
+        return view('produtos.OfertasF', compact('produtos', 'carrinho'));
     }
 
     public function masculinosShorts()
