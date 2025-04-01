@@ -211,7 +211,7 @@ class ProdutosController extends Controller
     public function ofertasM()
     {
         $masculino = Generos::where('desc', 'Masculino')->first();
-        $camiseta = TiposProdutos::where('desc', 'Conjunto')->first();
+        $camiseta = TiposProdutos::where('desc', 'Conjuntos')->first();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
 
@@ -229,7 +229,7 @@ class ProdutosController extends Controller
     public function ofertasF()
     {
         $masculino = Generos::where('desc', 'Feminino')->first();
-        $camiseta = TiposProdutos::where('desc', 'Conjunto')->first();
+        $camiseta = TiposProdutos::where('desc', 'Conjuntos')->first();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
 
