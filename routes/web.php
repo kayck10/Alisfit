@@ -97,6 +97,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [ProdutosController::class, 'store'])->name('produtos.store');
         Route::get('/edit/{id}', [ProdutosController::class, 'edit'])->name('produtos.edit');
         Route::put('/update/{id}', [ProdutosController::class, 'update'])->name('produtos.update');
+        Route::delete('/remover-imagem/{id}', [ProdutosController::class, 'removerImagem'])->name('produtos.remover-imagem');
         Route::delete('/destroy/{id}', [ProdutosController::class, 'destroy'])->name('produtos.destroy');
     });
 

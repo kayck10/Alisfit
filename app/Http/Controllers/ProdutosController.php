@@ -103,8 +103,9 @@ class ProdutosController extends Controller
             'descricao' => 'nullable|string',
             'preco' => 'required|numeric|min:0',
             'colecao_id' => 'required|exists:colecoes,id',
-            'destaque' => 'nullable|boolean', // Adicione esta validação
-            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'destaque' => 'nullable|boolean',
+            'imagens' => 'nullable|array',
+            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
             'informacoes' => 'sometimes|array',
             'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
             'informacoes.*.cor' => 'required|string',
@@ -119,16 +120,20 @@ class ProdutosController extends Controller
             'destaque' => $request->boolean('destaque'),
         ]);
 
+        // Adicionar novas imagens
         if ($request->hasFile('imagens')) {
             foreach ($request->file('imagens') as $imagem) {
                 $imagePath = $imagem->store('produtos', 'public');
-                $produto->imagens()->create(['imagem' => $imagePath]);
+                ImagensProdutos::create([
+                    'produto_id' => $produto->id,
+                    'imagem' => $imagePath,
+                ]);
             }
         }
 
+        // Atualizar as informações de tamanhos e quantidades
         if ($request->has('informacoes')) {
             $produto->tamanhos()->detach();
-
             foreach ($request->informacoes as $info) {
                 if (!empty($info['tamanhos']) && !empty($info['quantidades'])) {
                     $produto->tamanhos()->attach($info['tamanhos'], [
@@ -141,6 +146,17 @@ class ProdutosController extends Controller
 
         Toastr::success('Produto atualizado com sucesso!', 'Sucesso', ["positionClass" => "toast-top-center"]);
         return redirect()->route('produtos.index')->with('success');
+    }
+
+    public function removerImagem($id)
+    {
+        $imagem = ImagensProdutos::findOrFail($id);
+
+        Storage::disk('public')->delete($imagem->imagem);
+
+        $imagem->delete();
+
+        return response()->json(['success' => true]);
     }
 
 

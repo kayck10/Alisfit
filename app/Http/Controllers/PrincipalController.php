@@ -17,9 +17,9 @@ class PrincipalController extends Controller
     public function index()
     {
         $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])
-        ->where('destaque', true)
-        ->take(4)
-        ->get();
+            ->where('destaque', true)
+            ->take(4)
+            ->get();
         $colecoes = Colecoes::all();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
@@ -118,7 +118,7 @@ class PrincipalController extends Controller
 
     public function produtoDetalhes($id)
     {
-        $produto = Produtos::with('tamanhos', 'imagens')->findOrFail($id);
+        $produto = Produtos::with('tamanhos', 'imagens', 'tipoProduto')->findOrFail($id);
 
         $cor_map = [
             // Cores básicas
@@ -191,14 +191,56 @@ class PrincipalController extends Controller
         ];
 
 
-        $produtosRelacionados = Produtos::where('colecao_id', $produto->colecao_id)
-            ->where('id', '!=', $id)
-            ->take(4)
-            ->get();
+        // 1. Primeiro tenta encontrar produtos complementares
+        $produtosRelacionados = $this->getProdutosComplementares($produto);
+
+        // 2. Se não encontrou suficientes, completa com produtos da mesma coleção
+        if ($produtosRelacionados->count() < 4) {
+            $produtosAdicionais = Produtos::where('colecao_id', $produto->colecao_id)
+                ->where('id', '!=', $id)
+                ->whereNotIn('id', $produtosRelacionados->pluck('id'))
+                ->inRandomOrder()
+                ->take(4 - $produtosRelacionados->count())
+                ->get();
+
+            $produtosRelacionados = $produtosRelacionados->merge($produtosAdicionais);
+        }
 
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
         return view('principal.produto_detalhes', compact('produto', 'produtosRelacionados', 'cor_map', 'carrinho'));
+    }
+
+    private function getProdutosComplementares($produto)
+    {
+        $tipoAtual = strtolower($produto->tipoProduto->desc);
+
+        $tiposRelacionadosNomes = $this->getTiposRelacionados($tipoAtual);
+
+        return Produtos::where('colecao_id', $produto->colecao_id)
+            ->where('id', '!=', $produto->id)
+            ->whereHas('tipoProduto', function ($query) use ($tiposRelacionadosNomes) {
+                $query->whereIn('desc', $tiposRelacionadosNomes);
+            })
+            ->whereHas('tamanhos', function ($query) {
+                $query->where('quantidade', '>', 0);
+            })
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+    }
+
+    private function getTiposRelacionados($tipoProdutoNome)
+    {
+        $mapeamento = [
+            'Camisa' => ['short', 'Calça Legging', 'Conjunto'],
+            'Short' => ['Camisa', 'Conjunto'],
+            'Calça Legging' => ['Camisa', 'Top'],
+            'Conjunto' => ['Camisa', 'Short'],
+            'top' => ['Calça Legging']
+        ];
+
+        return $mapeamento[strtolower($tipoProdutoNome)] ?? ['camisa', 'short', 'legging', 'conjunto', 'top'];
     }
 
     public function showCol(Colecoes $colecao)

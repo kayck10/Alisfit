@@ -18,7 +18,7 @@ class ColecoesController extends Controller
         $request->validate([
             'nome' => 'required|string|max:255',
             'descricao' => 'nullable|string',
-            'imagem' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagem' => 'required|image|mimes:jpeg,png,jpg,gif|max:5024',
         ]);
 
         if ($request->hasFile('imagem')) {
