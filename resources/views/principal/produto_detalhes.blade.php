@@ -202,6 +202,7 @@
             opacity: 0;
             transform: translateY(50px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -254,10 +255,21 @@
         transform: scale(1.05);
     }
 
-    .upsell-item:nth-child(1) { animation-delay: 0.1s; }
-    .upsell-item:nth-child(2) { animation-delay: 0.2s; }
-    .upsell-item:nth-child(3) { animation-delay: 0.3s; }
-    .upsell-item:nth-child(4) { animation-delay: 0.4s; }
+    .upsell-item:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .upsell-item:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .upsell-item:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .upsell-item:nth-child(4) {
+        animation-delay: 0.4s;
+    }
 </style>
 
 @section('content')
@@ -271,8 +283,8 @@
                             <img id="imagem-principal" src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
                                 alt="{{ $produto->nome }}" class="img-produto">
                         @else
-                            <img id="imagem-principal" src="{{ asset('images/banner/12.png') }}"
-                                alt="Imagem padrão" class="img-produto">
+                            <img id="imagem-principal" src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão"
+                                class="img-produto">
                         @endif
                     </div>
 
@@ -284,8 +296,7 @@
                                 $tempProduto->imagens = collect([$imagem]);
                             @endphp
                             <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}"
-                                alt="{{ $produto->nome }}"
-                                class="miniatura @if ($loop->first) active @endif"
+                                alt="{{ $produto->nome }}" class="miniatura @if ($loop->first) active @endif"
                                 onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}')">
                         @endforeach
                     </div>
@@ -360,15 +371,11 @@
 
     <script>
         function trocarImagemPrincipal(novaImagem) {
-            // Atualiza a imagem principal
             document.getElementById('imagem-principal').src = novaImagem;
-
-            // Remove a classe 'active' de todas as miniaturas
             document.querySelectorAll('.miniatura').forEach(img => {
                 img.classList.remove('active');
             });
 
-            // Adiciona a classe 'active' na miniatura clicada
             event.target.classList.add('active');
         }
 
@@ -379,7 +386,8 @@
             // Seleção de tamanhos
             document.querySelectorAll('.size-box').forEach(box => {
                 box.addEventListener('click', function() {
-                    document.querySelectorAll('.size-box').forEach(b => b.classList.remove('selected'));
+                    document.querySelectorAll('.size-box').forEach(b => b.classList.remove(
+                        'selected'));
                     this.classList.add('selected');
                     tamanhoSelecionado = this.getAttribute('data-tamanho-id');
                     document.getElementById('tamanho_id').value = tamanhoSelecionado;
@@ -390,7 +398,8 @@
             // Seleção de cores
             document.querySelectorAll('.color-box').forEach(box => {
                 box.addEventListener('click', function() {
-                    document.querySelectorAll('.color-box').forEach(b => b.classList.remove('selected'));
+                    document.querySelectorAll('.color-box').forEach(b => b.classList.remove(
+                        'selected'));
                     this.classList.add('selected');
                     corSelecionada = this.style.backgroundColor;
                     document.getElementById('cor').value = corSelecionada;

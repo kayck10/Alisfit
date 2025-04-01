@@ -213,15 +213,11 @@ class PrincipalController extends Controller
 
     private function getProdutosComplementares($produto)
     {
-        $tipoAtual = strtolower($produto->tipoProduto->desc);
-
-        $tiposRelacionadosNomes = $this->getTiposRelacionados($tipoAtual);
+        $tiposRelacionados = $this->getTiposRelacionados($produto->tipo_produto_id);
 
         return Produtos::where('colecao_id', $produto->colecao_id)
             ->where('id', '!=', $produto->id)
-            ->whereHas('tipoProduto', function ($query) use ($tiposRelacionadosNomes) {
-                $query->whereIn('desc', $tiposRelacionadosNomes);
-            })
+            ->whereIn('tipo_produto_id', $tiposRelacionados)
             ->whereHas('tamanhos', function ($query) {
                 $query->where('quantidade', '>', 0);
             })
@@ -230,17 +226,17 @@ class PrincipalController extends Controller
             ->get();
     }
 
-    private function getTiposRelacionados($tipoProdutoNome)
+    private function getTiposRelacionados($tipoProdutoId)
     {
         $mapeamento = [
-            'Camisa' => ['short', 'Calça Legging', 'Conjunto'],
-            'Short' => ['Camisa', 'Conjunto'],
-            'Calça Legging' => ['Camisa', 'Top'],
-            'Conjunto' => ['Camisa', 'Short'],
-            'top' => ['Calça Legging']
+            1 => [2, 3, 4], // Camisa (1) mostra shorts (2), leggings (3) e conjuntos (4)
+            2 => [1, 4],    // Short (2) mostra camisas (1) e conjuntos (4)
+            3 => [1, 5],    // Legging (3) mostra camisas (1) e tops (5)
+            4 => [1, 2],    // Conjunto (4) mostra camisas (1) e shorts (2)
+            5 => [3]        // Top (5) mostra leggings (3)
         ];
 
-        return $mapeamento[strtolower($tipoProdutoNome)] ?? ['camisa', 'short', 'legging', 'conjunto', 'top'];
+        return $mapeamento[$tipoProdutoId] ?? [1, 2, 3, 4, 5]; // Default para todos os tipos se não mapeado
     }
 
     public function showCol(Colecoes $colecao)
