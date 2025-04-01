@@ -11,6 +11,7 @@ use App\Models\Produtos;
 use App\Models\ProdutosTamanhos;
 use App\Models\Tamanhos;
 use App\Models\TiposProdutos;
+use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -35,6 +36,7 @@ class ProdutosController extends Controller
             'colecao_id' => 'required|exists:colecoes,id',
             'genero_id' => 'required|exists:generos,id',
             'tipo_produto_id' => 'required|exists:tipos_produtos,id',
+            'destaque' => 'nullable|boolean', // Adicione esta validação
             'imagens' => 'required|array',
             'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
             'informacoes' => 'required|array',
@@ -50,8 +52,10 @@ class ProdutosController extends Controller
             'colecao_id' => $request->colecao_id,
             'genero_id' => $request->genero_id,
             'tipo_produto_id' => $request->tipo_produto_id,
+            'destaque' => $request->boolean('destaque'), // Salva como true/false
         ]);
 
+        // Resto do seu código permanece o mesmo...
         if ($request->hasFile('imagens')) {
             foreach ($request->file('imagens') as $imagem) {
                 $imagePath = $imagem->store('produtos', 'public');
@@ -61,6 +65,7 @@ class ProdutosController extends Controller
                 ]);
             }
         }
+
         foreach ($request->informacoes as $info) {
             ProdutosTamanhos::create([
                 'produto_id' => $produto->id,
@@ -70,7 +75,8 @@ class ProdutosController extends Controller
             ]);
         }
 
-        return redirect()->route('produtos.create')->with('success', 'Produto criado com sucesso!');
+        Toastr::success('Produto criado com sucesso!', 'Sucesso', ["positionClass" => "toast-top-center"]);
+        return redirect()->route('produtos.create')->with('success');
     }
     public function index()
     {
@@ -80,7 +86,7 @@ class ProdutosController extends Controller
 
     public function edit($id)
     {
-        $produto = Produtos::with('tamanhos')->findOrFail($id);
+        $produto = Produtos::with('colecao', 'tamanhos', 'imagens')->findOrFail($id);
         $colecoes = Colecoes::all();
         $tamanhos = Tamanhos::all();
 
@@ -97,30 +103,44 @@ class ProdutosController extends Controller
             'descricao' => 'nullable|string',
             'preco' => 'required|numeric|min:0',
             'colecao_id' => 'required|exists:colecoes,id',
-            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'destaque' => 'nullable|boolean', // Adicione esta validação
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'informacoes' => 'sometimes|array',
+            'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
+            'informacoes.*.cor' => 'required|string',
+            'informacoes.*.quantidades' => 'required|integer|min:1'
         ]);
-
-        if ($request->hasFile('imagem')) {
-            if ($produto->imagem) {
-                Storage::disk('public')->delete($produto->imagem->caminho);
-                $produto->imagem->delete();
-            }
-
-            $imagePath = $request->file('imagem')->store('produtos', 'public');
-            $imagem = ImagensProdutos::create([
-                'caminho' => $imagePath
-            ]);
-            $produto->imagem_id = $imagem->id;
-        }
 
         $produto->update([
             'nome' => $request->nome,
             'descricao' => $request->descricao,
             'preco' => $request->preco,
             'colecao_id' => $request->colecao_id,
+            'destaque' => $request->boolean('destaque'),
         ]);
 
-        return redirect()->route('produtos.index')->with('success', 'Produto atualizado com sucesso!');
+        if ($request->hasFile('imagens')) {
+            foreach ($request->file('imagens') as $imagem) {
+                $imagePath = $imagem->store('produtos', 'public');
+                $produto->imagens()->create(['imagem' => $imagePath]);
+            }
+        }
+
+        if ($request->has('informacoes')) {
+            $produto->tamanhos()->detach();
+
+            foreach ($request->informacoes as $info) {
+                if (!empty($info['tamanhos']) && !empty($info['quantidades'])) {
+                    $produto->tamanhos()->attach($info['tamanhos'], [
+                        'quantidade' => $info['quantidades'],
+                        'cor' => $info['cor'] ?? null
+                    ]);
+                }
+            }
+        }
+
+        Toastr::success('Produto atualizado com sucesso!', 'Sucesso', ["positionClass" => "toast-top-center"]);
+        return redirect()->route('produtos.index')->with('success');
     }
 
 

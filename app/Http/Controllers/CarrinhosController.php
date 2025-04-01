@@ -8,7 +8,6 @@ use App\Models\Cupons;
 use App\Models\Pedidos;
 use App\Models\Produtos;
 use Brian2694\Toastr\Facades\Toastr as FacadesToastr;
-use Brian2694\Toastr\Toastr;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -242,11 +241,9 @@ class CarrinhosController extends Controller
             }
 
 
-            // Processar pagamento no Mercado Pago
             SDK::setAccessToken(config('services.mercadopago.access_token'));
             $preference = new Preference();
 
-            // 1. Adiciona os itens do carrinho
             $items = [];
             foreach ($carrinho->produtos as $produto) {
                 $item = new Item();

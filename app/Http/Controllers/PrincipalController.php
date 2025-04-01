@@ -16,7 +16,10 @@ class PrincipalController extends Controller
 {
     public function index()
     {
-        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])->take(4)->get();
+        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])
+        ->where('destaque', true)
+        ->take(4)
+        ->get();
         $colecoes = Colecoes::all();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
@@ -118,6 +121,7 @@ class PrincipalController extends Controller
         $produto = Produtos::with('tamanhos', 'imagens')->findOrFail($id);
 
         $cor_map = [
+            // Cores básicas
             'preto' => '#000000',
             'branco' => '#FFFFFF',
             'azul' => '#0000FF',
@@ -125,6 +129,65 @@ class PrincipalController extends Controller
             'verde' => '#00FF00',
             'amarelo' => '#FFFF00',
             'roxo' => '#800080',
+
+            // Tons de verde
+            'verde militar' => '#5d5f3d',
+            'verde escuro' => '#006400',
+            'verde floresta' => '#228B22',
+            'verde lima' => '#32CD32',
+            'verde mar' => '#2E8B57',
+            'verde menta' => '#98FF98',
+
+            // Tons de azul
+            'azul marinho' => '#000080',
+            'azul claro' => '#ADD8E6',
+            'azul celeste' => '#87CEEB',
+            'azul aco' => '#4682B4',
+            'azul petroleo' => '#008080',
+            'azul real' => '#4169E1',
+
+            // Tons de vermelho/rosa
+            'vermelho escuro' => '#8B0000',
+            'rosa' => '#FFC0CB',
+            'rosa choque' => '#FF69B4',
+            'vinho' => '#722F37',
+            'carmim' => '#960018',
+            'salmao' => '#FA8072',
+
+            // Tons de amarelo/laranja
+            'laranja' => '#FFA500',
+            'laranja escuro' => '#FF8C00',
+            'dourado' => '#FFD700',
+            'amarelo_creme' => '#FFFDD0',
+            'ambar' => '#FFBF00',
+            'mostarda' => '#FFDB58',
+
+            // Tons de roxo/lilás
+            'lilas' => '#C8A2C8',
+            'lavanda' => '#E6E6FA',
+            'roxo_escuro' => '#301934',
+            'ametista' => '#9966CC',
+            'magenta' => '#FF00FF',
+            'orquidea' => '#DA70D6',
+
+            // Tons terrosos/neutros
+            'marrom' => '#A52A2A',
+            'bege' => '#F5F5DC',
+            'cinza' => '#808080',
+            'cinza_escuro' => '#A9A9A9',
+            'cinza_claro' => '#D3D3D3',
+            'terracota' => '#E2725B',
+            'caramelo' => '#AF6E4D',
+            'chocolate' => '#7B3F00',
+
+            // Cores especiais
+            'turquesa' => '#40E0D0',
+            'ciano' => '#00FFFF',
+            'indigo' => '#4B0082',
+            'prata' => '#C0C0C0',
+            'bronze' => '#CD7F32',
+            'oliva' => '#808000',
+            'verde_azulado' => '#008080'
         ];
 
 
