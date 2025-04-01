@@ -192,6 +192,42 @@ class ProdutosController extends Controller
         return view('produtos.masculinasCamisetas', compact('produtos', 'carrinho'));
     }
 
+    public function ofertasM()
+    {
+        $masculino = Generos::where('desc', 'Masculino')->first();
+        $camiseta = TiposProdutos::where('desc', 'Conjunto')->first();
+        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+
+        if (!$masculino || !$camiseta) {
+            return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
+        }
+
+        $produtos = Produtos::where('genero_id', $masculino->id)
+            ->where('tipo_produto_id', $camiseta->id)
+            ->get();
+
+        return view('produtos.masculinasCamisetas', compact('produtos', 'carrinho'));
+    }
+
+    public function ofertasF()
+    {
+        $masculino = Generos::where('desc', 'Feminino')->first();
+        $camiseta = TiposProdutos::where('desc', 'Conjunto')->first();
+        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+
+
+        if (!$masculino || !$camiseta) {
+            return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
+        }
+
+        $produtos = Produtos::where('genero_id', $masculino->id)
+            ->where('tipo_produto_id', $camiseta->id)
+            ->get();
+
+        return view('produtos.masculinasCamisetas', compact('produtos', 'carrinho'));
+    }
+
     public function masculinosShorts()
     {
         $masculino = Generos::where('desc', 'Masculino')->first();

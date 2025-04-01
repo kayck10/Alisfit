@@ -14,11 +14,12 @@ class TipoProdutoSeeder extends Seeder
     public function run(): void
     {
         DB::table('tipos_produtos')->insert([
-            ['desc' => 'Camiseta'],
             ['desc' => 'Camisa'],
             ['desc' => 'Calça Legging'],
             ['desc' => 'Shorts'],
-            ['desc' => 'Acessórios'],
+            ['desc' => 'Tops'],
+            ['desc' => 'Conjuntos'],
+
         ]);
     }
 }

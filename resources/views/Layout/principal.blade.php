@@ -141,8 +141,8 @@
                     <a href="#">OFERTAS</a>
                     <div class="dropdown">
                         <ul>
-                            <li><a href="{{ route('produtos.masculinos') }}">Ofertas Masculinas</a></li>
-                            <li><a href="{{ route('produtos.femininos') }}">Ofertas Femininas</a></li>
+                            <li><a href="{{ route('produtos.ofertasM') }}">Ofertas Masculinas</a></li>
+                            <li><a href="{{ route('produtos.ofertasF') }}">Ofertas Femininas</a></li>
                         </ul>
                     </div>
                 </li>

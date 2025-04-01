@@ -61,6 +61,9 @@ Route::prefix('produtos')->group(function () {
     Route::get('/femininos', [ProdutosController::class, 'femininos'])->name('produtos.femininos');
     Route::get('/masculinos/camisetas', [ProdutosController::class, 'masculinasCamisetas'])->name('produtos.masculinasCamisetas');
     Route::get('/masculinos/shorts', [ProdutosController::class, 'masculinosShorts'])->name('produtos.masculinosShorts');
+    Route::get('/ofertasM', [ProdutosController::class, 'ofertasM'])->name('produtos.ofertasM');
+    Route::get('/ofertasF', [ProdutosController::class, 'ofertasF'])->name('produtos.ofertasF');
+
     Route::get('/femininos/tops', [ProdutosController::class, 'femininosTops'])->name('produtos.femininosTops');
     Route::get('/femininos/legging', [ProdutosController::class, 'femininosLegging'])->name('produtos.femininosLegging');
     Route::get('/femininos/shorts', [ProdutosController::class, 'femininosShorts'])->name('produtos.femininosShorts');
