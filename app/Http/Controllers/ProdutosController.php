@@ -38,7 +38,7 @@ class ProdutosController extends Controller
             'tipo_produto_id' => 'required|exists:tipos_produtos,id',
             'destaque' => 'nullable|boolean', // Adicione esta validação
             'imagens' => 'required|array',
-            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
+            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:51200',
             'informacoes' => 'required|array',
             'informacoes.*.cor' => 'required|string',
             'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
