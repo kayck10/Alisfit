@@ -105,7 +105,7 @@ class ProdutosController extends Controller
             'colecao_id' => 'required|exists:colecoes,id',
             'destaque' => 'nullable|boolean',
             'imagens' => 'nullable|array',
-            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
+            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif',
             'informacoes' => 'sometimes|array',
             'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
             'informacoes.*.cor' => 'required|string',
