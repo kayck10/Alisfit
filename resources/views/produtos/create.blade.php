@@ -186,7 +186,7 @@
                 document.getElementById('imagens-error').classList.add('d-none');
 
                 files.forEach((file, index) => {
-                    if (file.size > 5120 * 1024) {
+                    if (file.size > 20480 * 1024) {
                         toastr.error(`A imagem ${file.name} excede o tamanho máximo de 5MB`, 'Erro');
                         files.splice(index, 1);
                         return;
