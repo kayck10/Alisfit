@@ -428,12 +428,16 @@
         <h4 class="section-title mb-5"><strong>MAIS VENDIDOS</strong></h4>
         <div class="mais-vendidos-container">
             <div class="mais-vendidos-item">
+               <a href="{{ route('produtos.ofertasM') }}">
                 <img src="{{ asset('images/banner/ofMas.jpeg') }}" alt="Ofertas Masculinas">
                 <div class="overlay">Ofertas Masculinas</div>
+            </a>
             </div>
             <div class="mais-vendidos-item">
+                <a href="{{ route('produtos.ofertasF') }}">
                 <img src="{{ asset('images/banner/ofFem.JPG') }}" alt="Ofertas Femininas">
                 <div class="overlay">Ofertas Femininas</div>
+            </a>
             </div>
         </div>
     </section>

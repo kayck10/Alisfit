@@ -364,8 +364,8 @@
                         <a href="#ofertasMenu" class="d-block text-decoration-none" data-bs-toggle="collapse">OFERTAS
                             ▼</a>
                         <ul id="ofertasMenu" class="collapse ps-3">
-                            <li><a href="#" class="d-block text-decoration-none">Ofertas Masculinas</a></li>
-                            <li><a href="#" class="d-block text-decoration-none">Ofertas Femininas</a></li>
+                            <li><a href="{{route('produtos.ofertasM')}}" class="d-block text-decoration-none">Ofertas Masculinas</a></li>
+                            <li><a href="{{route('produtos.ofertasF')}}" class="d-block text-decoration-none">Ofertas Femininas</a></li>
                         </ul>
                     </li>
 

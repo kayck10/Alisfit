@@ -137,7 +137,10 @@
             <!-- Filtros -->
             <aside class="filters">
                 <div class="collapse d-md-block" id="filtersCollapse">
-                    <h2 class="mb-5"><strong>DROP SATUS</strong></h2>
+                    <h2 class="mb-5"><strong>DROP  @foreach ($colecoes as $colecao)
+                        {{ $colecao->nome }}</a>
+
+                    @endforeach</strong></h2>
 
                     <h4>Filtrar</h4>
                     <div class="accordion" id="filtersAccordion">

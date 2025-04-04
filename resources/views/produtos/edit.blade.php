@@ -160,7 +160,7 @@
                 previewNovasImagens.innerHTML = "";
 
                 novasImagens.forEach((file, index) => {
-                    if (file.size > 5120 * 1024) {
+                    if (file.size > 20480 * 1024) {
                         toastr.error(`A imagem ${file.name} excede o tamanho máximo de 5MB`, 'Erro');
                         return;
                     }

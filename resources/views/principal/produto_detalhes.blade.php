@@ -22,14 +22,33 @@
         align-items: center;
         border-radius: 10px;
         overflow: hidden;
+        position: relative;
+    }
+
+    .img-produto-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
     }
 
     .img-produto {
-        max-width: 100%;
-        max-height: 100%;
+        position: absolute;
+        width: 100%;
+        height: 100%;
         object-fit: contain;
-        transition: transform 0.3s ease;
+        transition: transform 0.5s ease;
         border-radius: 10px;
+    }
+
+    .img-produto.active {
+        opacity: 1;
+        z-index: 1;
+    }
+
+    .img-produto.hidden {
+        opacity: 0;
+        z-index: 0;
     }
 
     .miniaturas-container {
@@ -159,7 +178,6 @@
         border-collapse: collapse;
         margin-top: 10px;
         display: none;
-        /* Inicialmente escondida */
         animation: fadeIn 0.3s ease-in-out;
     }
 
@@ -207,7 +225,6 @@
     .container {
         animation: fadeInUp 0.8s ease-in-out;
     }
-
 
     .upsell-container {
         width: 100%;
@@ -387,19 +404,25 @@
                     @endphp
                     <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}" alt="{{ $produto->nome }}"
                         class="miniatura @if ($loop->first) active @endif"
-                        onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}')">
+                        data-image-index="{{ $loop->index }}"
+                        onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}', {{ $loop->index }})">
                 @endforeach
             </div>
 
-            <!-- Imagem principal -->
+            <!-- Imagem principal com container para swipe -->
             <div class="img-produto-container">
-                @if ($produto->imagens->isNotEmpty())
-                    <img id="imagem-principal" src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
-                        alt="{{ $produto->nome }}" class="img-produto">
-                @else
-                    <img id="imagem-principal" src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão"
-                        class="img-produto">
-                @endif
+                <div class="img-produto-wrapper" id="img-produto-wrapper">
+                    @foreach ($produto->imagens as $imagem)
+                        @php
+                            $tempProduto = new stdClass();
+                            $tempProduto->imagens = collect([$imagem]);
+                        @endphp
+                        <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}"
+                             alt="{{ $produto->nome }}"
+                             class="img-produto @if ($loop->first) active @else hidden @endif"
+                             data-image-index="{{ $loop->index }}">
+                    @endforeach
+                </div>
             </div>
 
             <!-- Detalhes do Produto ao lado da Imagem -->
@@ -490,7 +513,6 @@
             </div>
         </div>
 
-
         <hr class="mt-5">
 
         <div class="upsell-container mb-4">
@@ -510,6 +532,88 @@
         </div>
 
         <script>
+            // Variáveis para controle do swipe
+            let currentImageIndex = 0;
+            let startX = 0;
+            let endX = 0;
+            const images = document.querySelectorAll('.img-produto');
+            const thumbnails = document.querySelectorAll('.miniatura');
+            const wrapper = document.getElementById('img-produto-wrapper');
+
+            // Função para trocar imagem
+            function showImage(index) {
+                // Esconde todas as imagens
+                images.forEach(img => {
+                    img.classList.add('hidden');
+                    img.classList.remove('active');
+                });
+
+                // Mostra a imagem selecionada
+                images[index].classList.remove('hidden');
+                images[index].classList.add('active');
+
+                // Atualiza a miniatura ativa
+                thumbnails.forEach(thumb => {
+                    thumb.classList.remove('active');
+                    if (parseInt(thumb.getAttribute('data-image-index')) === index) {
+                        thumb.classList.add('active');
+                    }
+                });
+
+                currentImageIndex = index;
+            }
+
+            // Função modificada para trocar imagem principal
+            function trocarImagemPrincipal(src, index) {
+                showImage(index);
+            }
+
+            // Eventos para detectar swipe em dispositivos touch
+            wrapper.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            }, false);
+
+            wrapper.addEventListener('touchmove', (e) => {
+                endX = e.touches[0].clientX;
+            }, false);
+
+            wrapper.addEventListener('touchend', () => {
+                if (startX - endX > 50 && currentImageIndex < images.length - 1) {
+                    // Swipe para a esquerda - próxima imagem
+                    showImage(currentImageIndex + 1);
+                } else if (endX - startX > 50 && currentImageIndex > 0) {
+                    // Swipe para a direita - imagem anterior
+                    showImage(currentImageIndex - 1);
+                }
+            }, false);
+
+            // Eventos para detectar swipe com mouse (para desktop)
+            wrapper.addEventListener('mousedown', (e) => {
+                startX = e.clientX;
+                e.preventDefault(); // Previne seleção de texto durante o arrasto
+            }, false);
+
+            wrapper.addEventListener('mousemove', (e) => {
+                if (startX) {
+                    endX = e.clientX;
+                }
+            }, false);
+
+            wrapper.addEventListener('mouseup', () => {
+                if (startX) {
+                    if (startX - endX > 50 && currentImageIndex < images.length - 1) {
+                        // Swipe para a esquerda - próxima imagem
+                        showImage(currentImageIndex + 1);
+                    } else if (endX - startX > 50 && currentImageIndex > 0) {
+                        // Swipe para a direita - imagem anterior
+                        showImage(currentImageIndex - 1);
+                    }
+                    startX = 0;
+                    endX = 0;
+                }
+            }, false);
+
+            // Código JavaScript existente
             document.addEventListener("DOMContentLoaded", function() {
                 let tamanhoSelecionado = null;
                 let corSelecionada = null;
@@ -569,6 +673,30 @@
                         coresContainer.style.display = 'none';
                     }
                 }
+
+                // Validação antes de enviar o formulário
+                function validarSelecao() {
+                    if (!tamanhoSelecionado || !corSelecionada) {
+                        alert('Por favor, selecione um tamanho e uma cor antes de adicionar ao carrinho.');
+                        return false;
+                    }
+                    return true;
+                }
+
+                // Efeito hover nas miniaturas
+                document.querySelectorAll('.miniatura').forEach(img => {
+                    img.addEventListener('mouseenter', function() {
+                        this.style.transform = 'scale(1.1)';
+                        this.style.zIndex = '10';
+                    });
+
+                    img.addEventListener('mouseleave', function() {
+                        if (!this.classList.contains('active')) {
+                            this.style.transform = 'scale(1)';
+                            this.style.zIndex = '1';
+                        }
+                    });
+                });
             });
 
             function toggleTabelaMedidas() {
@@ -594,67 +722,5 @@
                     botao.appendChild(icon);
                 }
             }
-
-            function trocarImagemPrincipal(novaImagem) {
-                document.getElementById('imagem-principal').src = novaImagem;
-                document.querySelectorAll('.miniatura').forEach(img => {
-                    img.classList.remove('active');
-                });
-
-                event.target.classList.add('active');
-            }
-
-            document.addEventListener("DOMContentLoaded", function() {
-                let tamanhoSelecionado = null;
-                let corSelecionada = null;
-
-                // Seleção de tamanhos
-                document.querySelectorAll('.size-box').forEach(box => {
-                    box.addEventListener('click', function() {
-                        document.querySelectorAll('.size-box').forEach(b => b.classList.remove(
-                            'selected'));
-                        this.classList.add('selected');
-                        tamanhoSelecionado = this.getAttribute('data-tamanho-id');
-                        document.getElementById('tamanho_id').value = tamanhoSelecionado;
-                        document.getElementById('aviso-selecao').classList.remove('active');
-                    });
-                });
-
-                // Seleção de cores
-                document.querySelectorAll('.color-box').forEach(box => {
-                    box.addEventListener('click', function() {
-                        document.querySelectorAll('.color-box').forEach(b => b.classList.remove(
-                            'selected'));
-                        this.classList.add('selected');
-                        corSelecionada = this.style.backgroundColor;
-                        document.getElementById('cor').value = corSelecionada;
-                        document.getElementById('aviso-selecao').classList.remove('active');
-                    });
-                });
-
-                // Validação antes de enviar o formulário
-                function validarSelecao() {
-                    if (!tamanhoSelecionado || !corSelecionada) {
-                        document.getElementById('aviso-selecao').classList.add('active');
-                        return false;
-                    }
-                    return true;
-                }
-
-                // Efeito hover nas miniaturas
-                document.querySelectorAll('.miniatura').forEach(img => {
-                    img.addEventListener('mouseenter', function() {
-                        this.style.transform = 'scale(1.1)';
-                        this.style.zIndex = '10';
-                    });
-
-                    img.addEventListener('mouseleave', function() {
-                        if (!this.classList.contains('active')) {
-                            this.style.transform = 'scale(1)';
-                            this.style.zIndex = '1';
-                        }
-                    });
-                });
-            });
         </script>
     @endsection

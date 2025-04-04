@@ -192,7 +192,7 @@ class ProdutosController extends Controller
     public function masculinasCamisetas()
     {
         $masculino = Generos::where('desc', 'Masculino')->first();
-        $camiseta = TiposProdutos::where('desc', 'Camiseta')->first();
+        $camiseta = TiposProdutos::where('desc', 'Camisa', 'Camiseta')->first();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
 
@@ -281,7 +281,7 @@ class ProdutosController extends Controller
     public function femininosLegging()
     {
         $feminino = Generos::where('desc', 'Feminino')->first();
-        $legging = TiposProdutos::where('desc', 'Legging')->first();
+        $legging = TiposProdutos::where('desc', 'Calça Legging')->first();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
         if (!$feminino || !$legging) {
