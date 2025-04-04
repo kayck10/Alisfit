@@ -193,7 +193,8 @@ class PrincipalController extends Controller
             'prata' => '#C0C0C0',
             'bronze' => '#CD7F32',
             'oliva' => '#808000',
-            'verde_azulado' => '#008080'
+            'verde_azulado' => '#008080',
+            'café' => '#6f4e37'
         ];
 
         $tamanhosComCores = $produto->tamanhos->map(function ($tamanho) use ($cor_map) {
