@@ -18,7 +18,7 @@ class PrincipalController extends Controller
     {
         $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])
             ->where('destaque', true)
-            ->take(4)
+            ->take(6)
             ->get();
         $colecoes = Colecoes::all();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
@@ -118,7 +118,13 @@ class PrincipalController extends Controller
 
     public function produtoDetalhes($id)
     {
-        $produto = Produtos::with('tamanhos', 'imagens', 'tipoProduto')->findOrFail($id);
+        $produto = Produtos::with([
+            'tamanhos' => function ($query) {
+                $query->withPivot(['cor']);
+            },
+            'imagens',
+            'tipoProduto'
+        ])->findOrFail($id);
 
         $cor_map = [
             // Cores básicas
@@ -190,11 +196,32 @@ class PrincipalController extends Controller
             'verde_azulado' => '#008080'
         ];
 
+        $tamanhosComCores = $produto->tamanhos->map(function ($tamanho) use ($cor_map) {
+            return [
+                'id' => $tamanho->id,
+                'desc' => $tamanho->desc,
+                'cor' => $tamanho->pivot->cor,
+                'cor_hex' => $cor_map[$tamanho->pivot->cor] ?? '#000000'
+            ];
+        });
 
-        // 1. Primeiro tenta encontrar produtos complementares
+        $tamanhosAgrupados = $tamanhosComCores->groupBy('desc')->map(function ($grupo) {
+            return [
+                'id' => $grupo->first()['id'],
+                'desc' => $grupo->first()['desc'],
+                'cores' => $grupo->map(function ($item) {
+                    return [
+                        'cor' => $item['cor'],
+                        'cor_hex' => $item['cor_hex']
+                    ];
+                })->unique()->values()
+            ];
+        });
+
+
+
         $produtosRelacionados = $this->getProdutosComplementares($produto);
 
-        // 2. Se não encontrou suficientes, completa com produtos da mesma coleção
         if ($produtosRelacionados->count() < 4) {
             $produtosAdicionais = Produtos::where('colecao_id', $produto->colecao_id)
                 ->where('id', '!=', $id)
@@ -208,7 +235,13 @@ class PrincipalController extends Controller
 
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
-        return view('principal.produto_detalhes', compact('produto', 'produtosRelacionados', 'cor_map', 'carrinho'));
+        return view('principal.produto_detalhes', [
+            'produto' => $produto,
+            'tamanhosAgrupados' => $tamanhosAgrupados,
+            'produtosRelacionados' => $produtosRelacionados,
+            'cor_map' => $cor_map,
+            'carrinho' => $carrinho
+        ]);
     }
 
     private function getProdutosComplementares($produto)

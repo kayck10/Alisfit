@@ -55,7 +55,6 @@ class ProdutosController extends Controller
             'destaque' => $request->boolean('destaque'), // Salva como true/false
         ]);
 
-        // Resto do seu código permanece o mesmo...
         if ($request->hasFile('imagens')) {
             foreach ($request->file('imagens') as $imagem) {
                 $imagePath = $imagem->store('produtos', 'public');

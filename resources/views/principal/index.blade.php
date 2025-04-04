@@ -65,18 +65,95 @@
             background-color: rgba(255, 255, 255, 0.3);
         }
 
-        .carousel-products {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            gap: 2px;
-            padding: 20px;
-            scrollbar-width: none;
-            justify-content: center;
+        .products-carousel {
+            position: relative;
+            padding: 0 40px;
+            margin: 30px 0;
         }
 
-        .carousel-products::-webkit-scrollbar {
+        .products-slider {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px 0;
+            scrollbar-width: none;
+            /* Para Firefox */
+        }
+
+        .products-slider::-webkit-scrollbar {
             display: none;
+            /* Para Chrome/Safari */
+        }
+
+        .product-slide {
+            flex: 0 0 auto;
+            width: 280px;
+            scroll-snap-align: start;
+            transition: transform 0.3s ease;
+        }
+
+        .product-slide:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-slide img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            border: none;
+        }
+
+        .carousel-nav.prev {
+            left: 0;
+        }
+
+        .carousel-nav.next {
+            right: 0;
+        }
+
+        .carousel-nav:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .product-slide {
+                width: 220px;
+            }
+
+            .product-slide img {
+                height: 280px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .product-slide {
+                width: 180px;
+            }
+
+            .product-slide img {
+                height: 230px;
+            }
         }
 
         .product-card {
@@ -308,31 +385,41 @@
 
 
 
-    <!-- Produtos em destaque -->
     <section id="product-section">
-        <h1>Produtos em destaque</h1>
-        <div class="carousel-products">
-            @foreach ($produtos as $produto)
-                <div class="product-card" id="product-{{ $produto->id }}">
-                    <div class="product-image">
+        <div class="container">
+            <h1 class="text-center mb-4">Produtos em destaque</h1>
+
+            <div class="products-carousel">
+                <button class="carousel-nav prev" onclick="scrollProducts(-1)">❮</button>
+
+                <div class="products-slider" id="productsSlider">
+                    @foreach ($produtos as $produto)
+                    <div class="product-slide">
                         <a href="{{ route('produto.detalhes', $produto->id) }}">
                             @if ($produto->imagens->isNotEmpty())
                                 <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
-                                    alt="{{ $produto->nome }}" class="img-custom">
+                                     alt="{{ $produto->nome }}"
+                                     class="img-fluid">
                             @else
-                                <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
+                                <img src="{{ asset('images/banner/12.png') }}"
+                                     alt="Imagem padrão"
+                                     class="img-fluid">
                             @endif
                         </a>
+                        <div class="product-details mt-2 text-center">
+                            <h5 class="text-secondary">{{ $produto->nome }}</h5>
+                            <strong>
+                                <p class="text-dark">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
+                            </strong>
+                        </div>
                     </div>
-                    <div class="product-details">
-                        <h5 class="text-secondary">{{ $produto->nome }}</h5>
-                        <strong>
-                            <p class="text-dark">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
-                        </strong>
-                    </div>
+                    @endforeach
                 </div>
-            @endforeach
+
+                <button class="carousel-nav next" onclick="scrollProducts(1)">❯</button>
+            </div>
         </div>
+    </section>
     </section>
 
 
@@ -381,17 +468,49 @@
 
 
     <script>
-        document.getElementById('btn-leia-mais').addEventListener('click', function() {
-            let textoCompleto = document.getElementById('texto-completo');
+         // Função para navegação do carrossel
+         function scrollProducts(direction) {
+            const slider = document.getElementById('productsSlider');
+            const scrollAmount = 300; // Ajuste conforme necessário
 
-            if (textoCompleto.style.display === 'none' || textoCompleto.style.display === '') {
-                textoCompleto.style.display = 'block';
-                this.innerText = 'Leia Menos';
-            } else {
-                textoCompleto.style.display = 'none';
-                this.innerText = 'Leia Mais';
+            slider.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
+        // Opcional: Auto-scroll para dispositivos móveis
+        if (window.innerWidth <= 768) {
+            const slider = document.getElementById('productsSlider');
+            let scrollInterval;
+
+            function startAutoScroll() {
+                scrollInterval = setInterval(() => {
+                    const maxScroll = slider.scrollWidth - slider.clientWidth;
+
+                    if (slider.scrollLeft >= maxScroll) {
+                        slider.scrollTo({ left: 0, behavior: 'smooth' });
+                    } else {
+                        slider.scrollBy({ left: 300, behavior: 'smooth' });
+                    }
+                }, 3000);
             }
-        });
+
+            function stopAutoScroll() {
+                clearInterval(scrollInterval);
+            }
+
+            // Inicia o auto-scroll
+            startAutoScroll();
+
+            // Pausa quando o mouse está sobre o carrossel
+            slider.addEventListener('mouseenter', stopAutoScroll);
+            slider.addEventListener('mouseleave', startAutoScroll);
+
+            // Pausa quando o usuário interage com o touch
+            slider.addEventListener('touchstart', stopAutoScroll);
+            slider.addEventListener('touchend', startAutoScroll);
+        }
     </script>
 
 @endsection

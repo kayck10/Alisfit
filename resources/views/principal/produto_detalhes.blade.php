@@ -3,14 +3,10 @@
 <style>
     .produto-container {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: center;
-        gap: 40px;
+        gap: 20px;
         margin-top: 80px;
-    }
-
-    .produto-container .col-md-5 {
-        flex: 1;
     }
 
     .produto-imagem {
@@ -18,28 +14,19 @@
         max-width: 500px;
     }
 
-    .produto-container .col-md-7 {
-        flex: 2;
-    }
-
-    /* Container da imagem principal */
     .img-produto-container {
-        width: 100%;
-        height: 500px;
+        width: 400px;
+        height: 400px;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: 20px;
-        overflow: hidden;
         border-radius: 10px;
-        background-color: #f8f9fa;
+        overflow: hidden;
     }
 
     .img-produto {
         max-width: 100%;
         max-height: 100%;
-        width: auto;
-        height: auto;
         object-fit: contain;
         transition: transform 0.3s ease;
         border-radius: 10px;
@@ -47,10 +34,9 @@
 
     .miniaturas-container {
         display: flex;
+        flex-direction: column;
         gap: 10px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-        justify-content: center;
+        min-width: 80px;
     }
 
     .miniatura {
@@ -66,15 +52,17 @@
     .miniatura:hover {
         border-color: #007bff;
         transform: scale(1.1);
-        z-index: 10;
     }
 
     .miniatura.active {
         border-color: #007bff;
-        opacity: 1;
     }
 
-    /* Estilos para o botão */
+    .produto-info {
+        flex: 2;
+        padding: 0 20px;
+    }
+
     .btn-dark {
         white-space: nowrap;
         padding: 12px 24px;
@@ -90,68 +78,6 @@
         background-color: #333;
     }
 
-    .btn-dark::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 300%;
-        height: 300%;
-        background: rgba(255, 255, 255, 0.2);
-        transition: all 0.5s ease-in-out;
-        transform: translate(-50%, -50%) scale(0);
-        border-radius: 50%;
-    }
-
-    .btn-dark:hover::before {
-        transform: translate(-50%, -50%) scale(1);
-    }
-
-    @media (max-width: 768px) {
-        .produto-container {
-            flex-direction: column;
-            text-align: center;
-            align-items: center;
-            margin-top: 40px;
-        }
-
-        .img-produto-container {
-            height: 350px;
-        }
-
-        .produto-info {
-            flex: 2;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-        }
-
-        .col-md-5 {
-            order: 1;
-        }
-
-        .img-produto {
-            max-width: 90%;
-            height: auto;
-        }
-
-        .miniatura {
-            width: 60px;
-            height: 60px;
-        }
-
-        .btn-dark {
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .sizes-container,
-        .color-box {
-            justify-content: center;
-        }
-    }
-
-    /* Estilos para tamanhos e cores */
     .color-box {
         width: 30px;
         height: 30px;
@@ -196,7 +122,76 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
 
-    /* Animações */
+    /* Tabela de medidas */
+    .tabela-container {
+        margin-top: 40px;
+    }
+
+    .tabela-toggle {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        color: #333;
+        padding: 8px 15px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    }
+
+    .tabela-toggle:hover {
+        background-color: #e9ecef;
+    }
+
+    .tabela-toggle i {
+        margin-left: 8px;
+        transition: transform 0.3s ease;
+    }
+
+    .tabela-toggle.active i {
+        transform: rotate(180deg);
+    }
+
+    .tabela-medidas {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        display: none;
+        /* Inicialmente escondida */
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .tabela-medidas.show {
+        display: table;
+    }
+
+    .tabela-medidas th,
+    .tabela-medidas td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .tabela-medidas th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .tabela-medidas tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .tabela-medidas tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .tabela-medidas .header-row {
+        background-color: #333;
+        color: white;
+    }
+
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -213,26 +208,34 @@
         animation: fadeInUp 0.8s ease-in-out;
     }
 
-    /* Mensagem de aviso */
-    .selecao-aviso {
-        color: #d9534f;
-        font-weight: bold;
-        margin-top: 10px;
-        text-align: center;
-        font-size: 16px;
-        display: none;
+
+    .upsell-container {
+        width: 100%;
+        overflow: hidden;
+        padding: 0 15px;
     }
 
-    .selecao-aviso.active {
-        display: block;
-    }
-
-    /* Produtos relacionados */
     .upsell-list {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
+        gap: 15px;
+        overflow-x: auto;
+        padding-bottom: 20px;
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+
+    .upsell-list::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .upsell-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .upsell-list::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
     }
 
     .upsell-item {
@@ -243,193 +246,415 @@
         animation: fadeInUp 0.8s ease-in-out forwards;
     }
 
-    .upsell-item img {
+    .upsell-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .upsell-image {
         width: 100%;
-        height: 300px;
+        height: 150px;
         object-fit: cover;
-        border-radius: 10px;
-        transition: transform 0.3s ease;
+        border-radius: 5px;
     }
 
-    .upsell-item img:hover {
-        transform: scale(1.05);
+    .upsell-item h5 {
+        font-size: 16px;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .upsell-item:nth-child(1) {
-        animation-delay: 0.1s;
+    .upsell-item p {
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 10px;
     }
 
-    .upsell-item:nth-child(2) {
-        animation-delay: 0.2s;
+    @media (min-width: 768px) {
+        .upsell-list {
+            flex-wrap: wrap;
+            justify-content: center;
+            overflow-x: visible;
+        }
+
+        .upsell-item {
+            width: 200px;
+        }
+
+        .upsell-image {
+            height: 180px;
+        }
     }
 
-    .upsell-item:nth-child(3) {
-        animation-delay: 0.3s;
+    @media (min-width: 992px) {
+        .upsell-item {
+            width: 220px;
+        }
     }
 
-    .upsell-item:nth-child(4) {
-        animation-delay: 0.4s;
+    @media (max-width: 992px) {
+        .produto-container {
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .miniaturas-container {
+            flex-direction: row;
+            order: 2;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .img-produto-container {
+            order: 1;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .produto-info {
+            order: 3;
+            width: 100%;
+            padding: 20px 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .img-produto-container {
+            height: 350px;
+        }
+
+        .img-produto {
+            max-width: 90%;
+            height: auto;
+        }
+
+        .miniatura {
+            width: 60px;
+            height: 60px;
+        }
+
+        .btn-dark {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .sizes-container,
+        .color-box {
+            justify-content: center;
+        }
+
+        .tabela-medidas {
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .produto-container {
+            margin-top: 40px;
+        }
+
+        .img-produto-container {
+            height: 300px;
+        }
+
+        .miniatura {
+            width: 50px;
+            height: 50px;
+        }
+
+        .tabela-medidas {
+            font-size: 12px;
+        }
+
+        .tabela-medidas th,
+        .tabela-medidas td {
+            padding: 5px;
+        }
     }
 </style>
 
 @section('content')
     <div class="container">
         <div class="produto-container">
-            <div class="row">
-                <div class="col-12">
-                    <!-- Imagem principal -->
-                    <div class="img-produto-container mb-3">
-                        @if ($produto->imagens->isNotEmpty())
-                            <img id="imagem-principal" src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
-                                alt="{{ $produto->nome }}" class="img-produto">
-                        @else
-                            <img id="imagem-principal" src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão"
-                                class="img-produto">
-                        @endif
-                    </div>
-
-                    <!-- Miniaturas -->
-                    <div class="miniaturas-container">
-                        @foreach ($produto->imagens as $imagem)
-                            @php
-                                $tempProduto = new stdClass();
-                                $tempProduto->imagens = collect([$imagem]);
-                            @endphp
-                            <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}"
-                                alt="{{ $produto->nome }}" class="miniatura @if ($loop->first) active @endif"
-                                onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}')">
-                        @endforeach
-                    </div>
-                </div>
+            <!-- Miniaturas ao lado -->
+            <div class="miniaturas-container">
+                @foreach ($produto->imagens as $imagem)
+                    @php
+                        $tempProduto = new stdClass();
+                        $tempProduto->imagens = collect([$imagem]);
+                    @endphp
+                    <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}" alt="{{ $produto->nome }}"
+                        class="miniatura @if ($loop->first) active @endif"
+                        onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}')">
+                @endforeach
             </div>
 
-            <!-- Restante do conteúdo -->
-            <div class="row mt-4">
-                <div class="col-12 produto-info">
-                    <h2>{{ $produto->nome }}</h2>
-                    <h4>R$ {{ number_format($produto->preco, 2, ',', '.') }}</h4>
+            <!-- Imagem principal -->
+            <div class="img-produto-container">
+                @if ($produto->imagens->isNotEmpty())
+                    <img id="imagem-principal" src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                        alt="{{ $produto->nome }}" class="img-produto">
+                @else
+                    <img id="imagem-principal" src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão"
+                        class="img-produto">
+                @endif
+            </div>
 
-                    <label class="mt-3">Tamanhos disponíveis:</label>
-                    <div class="sizes-container mt-4 mb-4">
-                        @foreach ($produto->tamanhos as $tamanho)
-                            <div class="size-box" data-tamanho-id="{{ $tamanho->pivot->tamanho_id }}">
-                                {{ $tamanho->desc }}
-                            </div>
-                        @endforeach
-                    </div>
+            <!-- Detalhes do Produto ao lado da Imagem -->
+            <div class="produto-info">
+                <h2>{{ $produto->nome }}</h2>
+                <h4>R$ {{ number_format($produto->preco, 2, ',', '.') }}</h4>
 
-                    <label>Cores disponíveis:</label>
-                    <div class="mt-3">
-                        @foreach ($produto->tamanhos as $tamanho)
-                            @php
-                                $corHex = $cor_map[$tamanho->pivot->cor] ?? '#000000';
-                            @endphp
-                            <span class="color-box" style="background-color: {{ $corHex }}"></span>
-                        @endforeach
-                    </div>
-
-                    <hr>
-                    <div class="selecao-aviso" id="aviso-selecao">Por favor, escolha tanto o tamanho quanto a cor para
-                        adicionar ao carrinho.</div>
-                    @if (session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
-                    <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST"
-                        onsubmit="return validarSelecao()">
-                        @csrf
-                        <input type="hidden" name="tamanho_id" id="tamanho_id">
-                        <input type="hidden" name="cor" id="cor">
-
-                        <div class="d-grid gap-2 col-12 col-md-6 mx-auto">
-                            <input type="hidden" name="quantidade" value="1">
-                            <button type="submit" class="btn btn-dark btn-lg mt-2">Adicionar à sacola</button>
+                <label class="mt-3">Tamanhos disponíveis:</label>
+                <div class="sizes-container mt-4 mb-4">
+                    @foreach ($tamanhosAgrupados as $tamanho)
+                        <div class="size-box" data-tamanho-id="{{ $tamanho['id'] }}"
+                            data-cores='@json($tamanho['cores'])'>
+                            {{ $tamanho['desc'] }}
                         </div>
-                    </form>
-                    <h6 class="mt-5 mb-5">DESCRIÇÃO DO PRODUTO</h6>
-                    <p>{{ $produto->descricao }}</p>
+                    @endforeach
+                </div>
+
+                <!-- Container das cores (inicialmente escondido) -->
+                <div id="cores-container" style="display: none;">
+                    <label>Cores disponíveis:</label>
+                    <div class="mt-3" id="cores-opcoes"></div>
+                </div>
+
+                <hr>
+                <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST"
+                    onsubmit="return validarSelecao()">
+                    @csrf
+                    <input type="hidden" name="tamanho_id" id="tamanho_id">
+                    <input type="hidden" name="cor" id="cor">
+
+                    <div class="d-grid gap-2 col-12 col-md-6 mx-auto">
+                        <input type="hidden" name="quantidade" value="1">
+                        <button type="submit" class="btn btn-dark btn-lg mt-2">Adicionar à sacola</button>
+                    </div>
+                </form>
+
+                <h6 class="mt-5 mb-5">DESCRIÇÃO DO PRODUTO</h6>
+                <p>{{ $produto->descricao }}</p>
+
+                <!-- Tabela de Medidas recolhível -->
+                <div class="tabela-container">
+                    <button class="tabela-toggle" onclick="toggleTabelaMedidas()">
+                        Ver Tabela de Medidas
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+
+                    <table class="tabela-medidas">
+                        <tr class="header-row">
+                            <th>Tamanho</th>
+                            <th>Comprimento (cm)</th>
+                            <th>Largura (cm)</th>
+                            <th>Altura (cm)</th>
+                        </tr>
+                        <tr>
+                            <td>PP</td>
+                            <td>65</td>
+                            <td>45</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>P</td>
+                            <td>70</td>
+                            <td>50</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>M</td>
+                            <td>75</td>
+                            <td>55</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>G</td>
+                            <td>80</td>
+                            <td>60</td>
+                            <td>10</td>
+                        </tr>
+                        <tr>
+                            <td>GG</td>
+                            <td>85</td>
+                            <td>65</td>
+                            <td>10</td>
+                        </tr>
+                    </table>
+                    <p class="mt-3" style="display: none;" id="medidas-nota"><small>* Medidas aproximadas. Podem variar em
+                            até 2cm.</small></p>
                 </div>
             </div>
         </div>
-    </div>
 
-    <hr class="mt-5">
 
-    <div class="upsell-container mb-4 text-center">
-        <h5 class="mb-5"><strong> VOCÊ TAMBÉM VAI GOSTAR </strong></h5>
-        <div class="upsell-list">
-            @foreach ($produtosRelacionados as $relacionado)
-                <div class="upsell-item text-center mx-3 mb-4">
-                    <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($relacionado) }}"
-                        alt="{{ $relacionado->nome }}" class="img-fluid">
-                    <h5 class="mt-3">{{ $relacionado->nome }}</h5>
-                    <p>R$ {{ number_format($relacionado->preco, 2, ',', '.') }}</p>
-                    <a href="{{ route('produto.detalhes', $relacionado->id) }}" class="btn btn-dark">Ver Detalhes</a>
-                </div>
-            @endforeach
+        <hr class="mt-5">
+
+        <div class="upsell-container mb-4">
+            <h5 class="mb-4 text-center"><strong>VOCÊ TAMBÉM VAI GOSTAR</strong></h5>
+            <div class="upsell-list">
+                @foreach ($produtosRelacionados as $relacionado)
+                    <div class="upsell-item">
+                        <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($relacionado) }}"
+                            alt="{{ $relacionado->nome }}" class="upsell-image">
+                        <h5 class="mt-2">{{ $relacionado->nome }}</h5>
+                        <p>R$ {{ number_format($relacionado->preco, 2, ',', '.') }}</p>
+                        <a href="{{ route('produto.detalhes', $relacionado->id) }}" class="btn btn-dark btn-sm">Ver
+                            Detalhes</a>
+                    </div>
+                @endforeach
+            </div>
         </div>
-    </div>
 
-    <script>
-        function trocarImagemPrincipal(novaImagem) {
-            document.getElementById('imagem-principal').src = novaImagem;
-            document.querySelectorAll('.miniatura').forEach(img => {
-                img.classList.remove('active');
-            });
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                let tamanhoSelecionado = null;
+                let corSelecionada = null;
 
-            event.target.classList.add('active');
-        }
+                // Seleção de tamanhos
+                document.querySelectorAll('.size-box').forEach(box => {
+                    box.addEventListener('click', function() {
+                        // Remove seleção anterior
+                        document.querySelectorAll('.size-box').forEach(b => b.classList.remove(
+                            'selected'));
+                        this.classList.add('selected');
 
-        document.addEventListener("DOMContentLoaded", function() {
-            let tamanhoSelecionado = null;
-            let corSelecionada = null;
+                        // Define o tamanho selecionado
+                        tamanhoSelecionado = this.getAttribute('data-tamanho-id');
+                        document.getElementById('tamanho_id').value = tamanhoSelecionado;
 
-            // Seleção de tamanhos
-            document.querySelectorAll('.size-box').forEach(box => {
-                box.addEventListener('click', function() {
-                    document.querySelectorAll('.size-box').forEach(b => b.classList.remove(
-                        'selected'));
-                    this.classList.add('selected');
-                    tamanhoSelecionado = this.getAttribute('data-tamanho-id');
-                    document.getElementById('tamanho_id').value = tamanhoSelecionado;
-                    document.getElementById('aviso-selecao').classList.remove('active');
+                        // Limpa seleção de cor anterior
+                        corSelecionada = null;
+                        document.getElementById('cor').value = '';
+
+                        // Mostra as cores disponíveis para este tamanho
+                        mostrarCoresParaTamanho(this);
+                    });
                 });
-            });
 
-            // Seleção de cores
-            document.querySelectorAll('.color-box').forEach(box => {
-                box.addEventListener('click', function() {
-                    document.querySelectorAll('.color-box').forEach(b => b.classList.remove(
-                        'selected'));
-                    this.classList.add('selected');
-                    corSelecionada = this.style.backgroundColor;
-                    document.getElementById('cor').value = corSelecionada;
-                    document.getElementById('aviso-selecao').classList.remove('active');
-                });
-            });
+                function mostrarCoresParaTamanho(tamanhoBox) {
+                    const coresContainer = document.getElementById('cores-container');
+                    const coresOpcoes = document.getElementById('cores-opcoes');
 
-            // Validação antes de enviar o formulário
-            function validarSelecao() {
-                if (!tamanhoSelecionado || !corSelecionada) {
-                    document.getElementById('aviso-selecao').classList.add('active');
-                    return false;
+                    // Limpa cores anteriores
+                    coresOpcoes.innerHTML = '';
+
+                    // Obtém as cores do atributo data-cores
+                    const cores = JSON.parse(tamanhoBox.getAttribute('data-cores'));
+
+                    if (cores && cores.length > 0) {
+                        // Cria os botões de cor
+                        cores.forEach(cor => {
+                            const colorBox = document.createElement('span');
+                            colorBox.className = 'color-box';
+                            colorBox.style.backgroundColor = cor.cor_hex;
+                            colorBox.dataset.cor = cor.cor;
+                            colorBox.title = cor.cor; // Tooltip com o nome da cor
+
+                            colorBox.addEventListener('click', function() {
+                                document.querySelectorAll('.color-box').forEach(b => b.classList.remove(
+                                    'selected'));
+                                this.classList.add('selected');
+                                corSelecionada = this.dataset.cor;
+                                document.getElementById('cor').value = corSelecionada;
+                            });
+
+                            coresOpcoes.appendChild(colorBox);
+                        });
+                        coresContainer.style.display = 'block';
+                    } else {
+                        coresContainer.style.display = 'none';
+                    }
                 }
-                return true;
+            });
+
+            function toggleTabelaMedidas() {
+                const tabela = document.querySelector('.tabela-medidas');
+                const botao = document.querySelector('.tabela-toggle');
+                const nota = document.getElementById('medidas-nota');
+
+                tabela.classList.toggle('show');
+                botao.classList.toggle('active');
+
+                if (tabela.classList.contains('show')) {
+                    nota.style.display = 'block';
+                    botao.textContent = 'Ocultar Tabela de Medidas';
+                } else {
+                    nota.style.display = 'none';
+                    botao.textContent = 'Ver Tabela de Medidas';
+                }
+
+                // Adiciona ou remove o ícone de seta
+                if (!botao.querySelector('i')) {
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-chevron-down';
+                    botao.appendChild(icon);
+                }
             }
 
-            // Efeito hover nas miniaturas
-            document.querySelectorAll('.miniatura').forEach(img => {
-                img.addEventListener('mouseenter', function() {
-                    this.style.transform = 'scale(1.1)';
-                    this.style.zIndex = '10';
+            function trocarImagemPrincipal(novaImagem) {
+                document.getElementById('imagem-principal').src = novaImagem;
+                document.querySelectorAll('.miniatura').forEach(img => {
+                    img.classList.remove('active');
                 });
 
-                img.addEventListener('mouseleave', function() {
-                    if (!this.classList.contains('active')) {
-                        this.style.transform = 'scale(1)';
-                        this.style.zIndex = '1';
+                event.target.classList.add('active');
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                let tamanhoSelecionado = null;
+                let corSelecionada = null;
+
+                // Seleção de tamanhos
+                document.querySelectorAll('.size-box').forEach(box => {
+                    box.addEventListener('click', function() {
+                        document.querySelectorAll('.size-box').forEach(b => b.classList.remove(
+                            'selected'));
+                        this.classList.add('selected');
+                        tamanhoSelecionado = this.getAttribute('data-tamanho-id');
+                        document.getElementById('tamanho_id').value = tamanhoSelecionado;
+                        document.getElementById('aviso-selecao').classList.remove('active');
+                    });
+                });
+
+                // Seleção de cores
+                document.querySelectorAll('.color-box').forEach(box => {
+                    box.addEventListener('click', function() {
+                        document.querySelectorAll('.color-box').forEach(b => b.classList.remove(
+                            'selected'));
+                        this.classList.add('selected');
+                        corSelecionada = this.style.backgroundColor;
+                        document.getElementById('cor').value = corSelecionada;
+                        document.getElementById('aviso-selecao').classList.remove('active');
+                    });
+                });
+
+                // Validação antes de enviar o formulário
+                function validarSelecao() {
+                    if (!tamanhoSelecionado || !corSelecionada) {
+                        document.getElementById('aviso-selecao').classList.add('active');
+                        return false;
                     }
+                    return true;
+                }
+
+                // Efeito hover nas miniaturas
+                document.querySelectorAll('.miniatura').forEach(img => {
+                    img.addEventListener('mouseenter', function() {
+                        this.style.transform = 'scale(1.1)';
+                        this.style.zIndex = '10';
+                    });
+
+                    img.addEventListener('mouseleave', function() {
+                        if (!this.classList.contains('active')) {
+                            this.style.transform = 'scale(1)';
+                            this.style.zIndex = '1';
+                        }
+                    });
                 });
             });
-        });
-    </script>
-@endsection
+        </script>
+    @endsection
