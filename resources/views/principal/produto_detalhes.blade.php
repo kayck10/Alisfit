@@ -520,8 +520,10 @@
             <div class="upsell-list">
                 @foreach ($produtosRelacionados as $relacionado)
                     <div class="upsell-item">
+                         <a href="{{ route('produto.detalhes', $relacionado->id) }}">
                         <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($relacionado) }}"
                             alt="{{ $relacionado->nome }}" class="upsell-image">
+                        </a>
                         <h5 class="mt-2">{{ $relacionado->nome }}</h5>
                         <p>R$ {{ number_format($relacionado->preco, 2, ',', '.') }}</p>
                         <a href="{{ route('produto.detalhes', $relacionado->id) }}" class="btn btn-dark btn-sm">Ver
