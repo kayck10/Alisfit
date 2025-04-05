@@ -12,6 +12,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\PrincipalController;
 use App\Http\Controllers\ProdutosController;
+use App\Http\Controllers\TabelaMedidasController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -33,7 +34,7 @@ Route::prefix('loja')->group(function () {
     Route::post('/ajax-request', [PrincipalController::class, 'handleRequest'])->name('ajax.request');
     Route::get('produtos', [PrincipalController::class, 'produtos'])->name('produtos');
     Route::get('drops', [PrincipalController::class, 'drops'])->name('drops');
-    Route::post('drops/filtrar', [PrincipalController::class, 'filtrarDrops'])->name('drops.filtrar');
+    Route::post('/drops/filtrar', [PrincipalController::class, 'filtrarDrops'])->name('drops.filtrar');
     Route::get('produto/{id}', [PrincipalController::class, 'produtoDetalhes'])->name('produto.detalhes');
     Route::get('/colecoes/{colecao}', [PrincipalController::class, 'showCol'])->name('colecoes.show.loja');
     Route::get('/informacoes', [PrincipalController::class, 'informacoes'])->name('informacoes');
@@ -76,6 +77,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('financeiro')->group(function () {
         Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
+    });
+
+    Route::prefix('Medidas')->group(function () {
+        Route::get('/create', [TabelaMedidasController::class, 'create'])->name('medidas.create');
+        Route::post('/store', [TabelaMedidasController::class, 'store'])->name('medidas.store');
+        Route::get('/{produto}/show', [TabelaMedidasController::class, 'show'])->name('medidas.show');
+
+
     });
 
     // Coleções

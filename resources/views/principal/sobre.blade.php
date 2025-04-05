@@ -4,7 +4,7 @@
 <main>
 
     <!-- Banner Principal -->
-    <section class="banner" style="background: url('{{ asset('images/banner/b1.jpg') }}') center/cover no-repeat;">
+    <section class="banner" style="background: url('{{ asset('images/banner/banner003.JPG') }}') center/cover no-repeat;">
         <div class="overlay d-flex align-items-center justify-content-center">
             <h1 class="text-white display-3 fw-bold">Quem somos</h1>
         </div>

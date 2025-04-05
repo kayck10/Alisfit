@@ -16,7 +16,7 @@
 
     .img-produto-container {
         width: 400px;
-        height: 400px;
+        height: 800px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -144,70 +144,62 @@
     /* Tabela de medidas */
     .tabela-container {
         margin-top: 40px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
     }
 
     .tabela-toggle {
         background-color: #f8f9fa;
-        border: 1px solid #ddd;
+        border: none;
         color: #333;
-        padding: 8px 15px;
-        font-size: 14px;
-        border-radius: 5px;
+        padding: 12px 20px;
+        font-size: 16px;
+        width: 100%;
+        text-align: left;
         cursor: pointer;
-        display: inline-flex;
+        display: flex;
+        justify-content: space-between;
         align-items: center;
         transition: all 0.3s ease;
-        margin-bottom: 10px;
     }
 
     .tabela-toggle:hover {
         background-color: #e9ecef;
     }
 
-    .tabela-toggle i {
-        margin-left: 8px;
-        transition: transform 0.3s ease;
-    }
-
-    .tabela-toggle.active i {
-        transform: rotate(180deg);
+    #tabela-medidas-content {
+        display: none;
+        padding: 20px;
+        background: #fff;
     }
 
     .tabela-medidas {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 10px;
-        display: none;
-        animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .tabela-medidas.show {
-        display: table;
+        margin-bottom: 15px;
+        animation: fadeIn 0.3s ease;
     }
 
     .tabela-medidas th,
     .tabela-medidas td {
-        border: 1px solid #ddd;
-        padding: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 12px;
         text-align: center;
     }
 
     .tabela-medidas th {
-        background-color: #f2f2f2;
-        font-weight: bold;
+        background-color: #f5f5f5;
+        font-weight: 600;
     }
 
     .tabela-medidas tr:nth-child(even) {
-        background-color: #f9f9f9;
+        background-color: #fafafa;
     }
 
     .tabela-medidas tr:hover {
         background-color: #f1f1f1;
-    }
-
-    .tabela-medidas .header-row {
-        background-color: #333;
-        color: white;
     }
 
     @keyframes fadeInUp {
@@ -339,12 +331,12 @@
 
     @media (max-width: 768px) {
         .img-produto-container {
-            height: 350px;
+            height: 500px;
         }
 
         .img-produto {
             max-width: 90%;
-            height: auto;
+            height: 700px;
         }
 
         .miniatura {
@@ -418,9 +410,9 @@
                             $tempProduto->imagens = collect([$imagem]);
                         @endphp
                         <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}"
-                             alt="{{ $produto->nome }}"
-                             class="img-produto @if ($loop->first) active @else hidden @endif"
-                             data-image-index="{{ $loop->index }}">
+                            alt="{{ $produto->nome }}"
+                            class="img-produto @if ($loop->first) active @else hidden @endif"
+                            data-image-index="{{ $loop->index }}">
                     @endforeach
                 </div>
             </div>
@@ -462,67 +454,64 @@
                 <h6 class="mt-5 mb-5">DESCRIÇÃO DO PRODUTO</h6>
                 <p>{{ $produto->descricao }}</p>
 
-                <!-- Tabela de Medidas recolhível -->
-                <div class="tabela-container">
-                    <button class="tabela-toggle" onclick="toggleTabelaMedidas()">
-                        Ver Tabela de Medidas
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
+                @if ($produto->medidas->count() > 0)
+                    <div class="tabela-container">
+                        <button class="tabela-toggle" onclick="toggleTabelaMedidas()">
+                            <span>
+                                <i class="fas fa-ruler-combined me-2"></i>Tabela de Medidas
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
 
-                    <table class="tabela-medidas">
-                        <tr class="header-row">
-                            <th>Tamanho</th>
-                            <th>Comprimento (cm)</th>
-                            <th>Largura (cm)</th>
-                            <th>Altura (cm)</th>
-                        </tr>
-                        <tr>
-                            <td>PP</td>
-                            <td>65</td>
-                            <td>45</td>
-                            <td>10</td>
-                        </tr>
-                        <tr>
-                            <td>P</td>
-                            <td>70</td>
-                            <td>50</td>
-                            <td>10</td>
-                        </tr>
-                        <tr>
-                            <td>M</td>
-                            <td>75</td>
-                            <td>55</td>
-                            <td>10</td>
-                        </tr>
-                        <tr>
-                            <td>G</td>
-                            <td>80</td>
-                            <td>60</td>
-                            <td>10</td>
-                        </tr>
-                        <tr>
-                            <td>GG</td>
-                            <td>85</td>
-                            <td>65</td>
-                            <td>10</td>
-                        </tr>
-                    </table>
-                    <p class="mt-3" style="display: none;" id="medidas-nota"><small>* Medidas aproximadas. Podem variar em
-                            até 2cm.</small></p>
-                </div>
+                        <div id="tabela-medidas-content">
+                            <table class="table table-bordered tabela-medidas">
+                                <thead>
+                                    <tr>
+                                        <th>Tamanho</th>
+                                        <th>Tórax (cm)</th>
+                                        <th>Cintura (cm)</th>
+                                        <th>Quadril (cm)</th>
+                                        <th>Comprimento (cm)</th>
+                                        <th>Altura (cm)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($produto->medidas->sortBy('tamanho') as $medida)
+                                        <tr>
+                                            <td>{{ $medida->tamanho }}</td>
+                                            <td>{{ $medida->torax ?? '-' }}</td>
+                                            <td>{{ $medida->cintura ?? '-' }}</td>
+                                            <td>{{ $medida->quadril ?? '-' }}</td>
+                                            <td>{{ $medida->comprimento ?? '-' }}</td>
+                                            <td>{{ $medida->altura ?? '-' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                            @if ($produto->medidas->first()->observacoes)
+                                <div class="alert alert-info mt-3">
+                                    <strong>Observações:</strong> {{ $produto->medidas->first()->observacoes }}
+                                </div>
+                            @endif
+
+                            <p class="text-muted"><small>* Medidas podem variar em até 2cm.</small></p>
+                        </div>
+                    </div>
+                @endif
+
             </div>
         </div>
-
-        <hr class="mt-5">
+        <hr class="">
 
         <div class="upsell-container mb-4">
             <h5 class="mb-4 text-center"><strong>VOCÊ TAMBÉM VAI GOSTAR</strong></h5>
             <div class="upsell-list">
                 @foreach ($produtosRelacionados as $relacionado)
                     <div class="upsell-item">
-                         <a href="{{ route('produto.detalhes', $relacionado->id) }}">
-                        <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($relacionado) }}"
-                            alt="{{ $relacionado->nome }}" class="upsell-image">
+                        <a href="{{ route('produto.detalhes', $relacionado->id) }}">
+                            <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($relacionado) }}"
+                                alt="{{ $relacionado->nome }}" class="upsell-image">
                         </a>
                         <h5 class="mt-2">{{ $relacionado->nome }}</h5>
                         <p>R$ {{ number_format($relacionado->preco, 2, ',', '.') }}</p>
@@ -620,23 +609,18 @@
                 let tamanhoSelecionado = null;
                 let corSelecionada = null;
 
-                // Seleção de tamanhos
                 document.querySelectorAll('.size-box').forEach(box => {
                     box.addEventListener('click', function() {
-                        // Remove seleção anterior
                         document.querySelectorAll('.size-box').forEach(b => b.classList.remove(
                             'selected'));
                         this.classList.add('selected');
 
-                        // Define o tamanho selecionado
                         tamanhoSelecionado = this.getAttribute('data-tamanho-id');
                         document.getElementById('tamanho_id').value = tamanhoSelecionado;
 
-                        // Limpa seleção de cor anterior
                         corSelecionada = null;
                         document.getElementById('cor').value = '';
 
-                        // Mostra as cores disponíveis para este tamanho
                         mostrarCoresParaTamanho(this);
                     });
                 });
@@ -645,14 +629,11 @@
                     const coresContainer = document.getElementById('cores-container');
                     const coresOpcoes = document.getElementById('cores-opcoes');
 
-                    // Limpa cores anteriores
                     coresOpcoes.innerHTML = '';
 
-                    // Obtém as cores do atributo data-cores
                     const cores = JSON.parse(tamanhoBox.getAttribute('data-cores'));
 
                     if (cores && cores.length > 0) {
-                        // Cria os botões de cor
                         cores.forEach(cor => {
                             const colorBox = document.createElement('span');
                             colorBox.className = 'color-box';
@@ -676,7 +657,6 @@
                     }
                 }
 
-                // Validação antes de enviar o formulário
                 function validarSelecao() {
                     if (!tamanhoSelecionado || !corSelecionada) {
                         alert('Por favor, selecione um tamanho e uma cor antes de adicionar ao carrinho.');
@@ -685,7 +665,6 @@
                     return true;
                 }
 
-                // Efeito hover nas miniaturas
                 document.querySelectorAll('.miniatura').forEach(img => {
                     img.addEventListener('mouseenter', function() {
                         this.style.transform = 'scale(1.1)';
@@ -702,27 +681,18 @@
             });
 
             function toggleTabelaMedidas() {
-                const tabela = document.querySelector('.tabela-medidas');
-                const botao = document.querySelector('.tabela-toggle');
-                const nota = document.getElementById('medidas-nota');
+    const content = document.getElementById('tabela-medidas-content');
+    const icon = document.querySelector('.tabela-toggle .fa-chevron-down');
+    const table = document.querySelector('.tabela-medidas');
 
-                tabela.classList.toggle('show');
-                botao.classList.toggle('active');
-
-                if (tabela.classList.contains('show')) {
-                    nota.style.display = 'block';
-                    botao.textContent = 'Ocultar Tabela de Medidas';
-                } else {
-                    nota.style.display = 'none';
-                    botao.textContent = 'Ver Tabela de Medidas';
-                }
-
-                // Adiciona ou remove o ícone de seta
-                if (!botao.querySelector('i')) {
-                    const icon = document.createElement('i');
-                    icon.className = 'fas fa-chevron-down';
-                    botao.appendChild(icon);
-                }
-            }
+    if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        table.style.display = 'table'; // Garante que a tabela será mostrada
+        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+    } else {
+        content.style.display = 'none';
+        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+    }
+}
         </script>
     @endsection

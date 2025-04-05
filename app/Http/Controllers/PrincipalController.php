@@ -87,35 +87,60 @@ class PrincipalController extends Controller
 
     public function filtrarDrops(Request $request)
     {
-        $filtros = $request->only(['colecao_id', 'tamanho_id', 'genero_id', 'cor']);
+        $filtros = $request->validate([
+            'colecao_id' => 'nullable|array',
+            'colecao_id.*' => 'integer|exists:colecoes,id',
+            'tamanho_id' => 'nullable|array',
+            'tamanho_id.*' => 'integer|exists:tamanhos,id',
+            'genero_id' => 'nullable|array',
+            'genero_id.*' => 'integer|exists:generos,id',
+            'cor' => 'nullable|array',
+            'cor.*' => 'string'
+        ]);
 
-        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens', 'genero']);
+        $query = Produtos::with(['colecao', 'tamanhos', 'imagens', 'genero']);
 
+        // Aplicar filtros
         if (!empty($filtros['colecao_id'])) {
-            $produtos->whereIn('colecao_id', $filtros['colecao_id']);
+            $query->whereIn('colecao_id', $filtros['colecao_id']);
         }
 
         if (!empty($filtros['tamanho_id'])) {
-            $produtos->whereHas('tamanhos', function ($query) use ($filtros) {
-                $query->whereIn('tamanho_id', $filtros['tamanho_id']);
+            $query->whereHas('tamanhos', function($q) use ($filtros) {
+                $q->whereIn('tamanho_id', $filtros['tamanho_id']);
             });
         }
 
         if (!empty($filtros['genero_id'])) {
-            $produtos->whereIn('genero_id', $filtros['genero_id']);
+            $query->whereIn('genero_id', $filtros['genero_id']);
         }
 
         if (!empty($filtros['cor'])) {
-            $produtos->whereHas('tamanhos', function ($query) use ($filtros) {
-                $query->whereIn('cor', $filtros['cor']);
+            $query->whereHas('tamanhos', function($q) use ($filtros) {
+                $q->whereIn('cor', $filtros['cor']);
             });
         }
 
-        $produtos = $produtos->get();
+        $produtos = $query->get();
 
-        return response()->json(['produtos' => $produtos]);
+        // Formatar os dados para a resposta
+        $produtosFormatados = $produtos->map(function($produto) {
+            return [
+                'id' => $produto->id,
+                'nome' => $produto->nome,
+                'preco' => (float) $produto->preco,
+                'imagens' => $produto->imagens->map(function($imagem) {
+                    return [
+                        'url' => \App\Helpers\ImageHelper::getProdutoImagemUrl($imagem->produto)
+                    ];
+                })
+            ];
+        });
+
+        return response()->json([
+            'produtos' => $produtosFormatados
+        ]);
     }
-
     public function produtoDetalhes($id)
     {
         $produto = Produtos::with([
@@ -123,7 +148,8 @@ class PrincipalController extends Controller
                 $query->withPivot(['cor']);
             },
             'imagens',
-            'tipoProduto'
+            'tipoProduto',
+             'medidas'
         ])->findOrFail($id);
 
         $cor_map = [
@@ -241,7 +267,8 @@ class PrincipalController extends Controller
             'tamanhosAgrupados' => $tamanhosAgrupados,
             'produtosRelacionados' => $produtosRelacionados,
             'cor_map' => $cor_map,
-            'carrinho' => $carrinho
+            'carrinho' => $carrinho,
+            'medidas' => $produto->medidas
         ]);
     }
 

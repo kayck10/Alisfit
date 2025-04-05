@@ -16,6 +16,11 @@ class Produtos extends Model
         return $this->belongsTo(Colecoes::class);
     }
 
+    public function medidas()
+    {
+        return $this->hasMany(TabelaMedidas::class, 'produto_id');
+    }
+
     public function carrinhos()
     {
         return $this->belongsToMany(Carrinhos::class, 'carrinho_produtos')
@@ -26,8 +31,8 @@ class Produtos extends Model
     public function tamanhos()
     {
         return $this->belongsToMany(Tamanhos::class, 'produtos_tamanhos', 'produto_id', 'tamanho_id')
-                    ->withPivot('quantidade', 'cor')
-                    ->withTimestamps();
+            ->withPivot('quantidade', 'cor')
+            ->withTimestamps();
     }
 
     public function imagens()
@@ -44,6 +49,4 @@ class Produtos extends Model
     {
         return $this->belongsTo(TiposProdutos::class, 'tipo_produto_id');
     }
-
-
 }

@@ -85,6 +85,34 @@
             font-size: 15px;
         }
 
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 992px) {
             .col-md-4 {
                 flex: 0 0 50%;
@@ -126,6 +154,10 @@
         }
     </style>
 
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
     <div class="container">
         <div class="row">
             <!-- Botão de Toggle para o Filtro (Visível apenas em telas menores) -->
@@ -137,19 +169,19 @@
             <!-- Filtros -->
             <aside class="filters">
                 <div class="collapse d-md-block" id="filtersCollapse">
-                    <h2 class="mb-5"><strong>DROP  @foreach ($colecoes as $colecao)
-                        {{ $colecao->nome }}</a>
-
-                    @endforeach</strong></h2>
+                    <h2 class="mb-5"><strong>DROP @foreach ($colecoes as $colecao)
+                                {{ $colecao->nome }}</a>
+                            @endforeach
+                        </strong></h2>
 
                     <h4>Filtrar</h4>
                     <div class="accordion" id="filtersAccordion">
                         @php
                             $filtros = [
-                                'Categoria' => $colecoes, // Coleções
-                                'Tamanho' => $tamanhos, // Tamanhos
-                                'Gênero' => $generos, // Gêneros
-                                'Cor' => $cores, // Cores (substitua $cores pelos dados reais)
+                                'categoria' => $colecoes, // Coleções
+                                'tamanho' => $tamanhos, // Tamanhos
+                                'gênero' => $generos, // Gêneros
+                                'cor' => $cores, // Cores
                             ];
                         @endphp
                         @foreach ($filtros as $filtroNome => $opcoes)
@@ -158,7 +190,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapse{{ $loop->index }}" aria-expanded="false"
                                         aria-controls="collapse{{ $loop->index }}">
-                                        {{ $filtroNome }}
+                                        {{ ucfirst($filtroNome) }}
                                     </button>
                                 </h2>
                                 <div id="collapse{{ $loop->index }}" class="accordion-collapse collapse"
@@ -167,10 +199,10 @@
                                         <ul class="list-group">
                                             @foreach ($opcoes as $opcao)
                                                 <li class="list-group-item">
-                                                    <input type="checkbox" name="{{ strtolower($filtroNome) }}[]"
+                                                    <input type="checkbox" name="{{ $filtroNome }}[]"
                                                         value="{{ $opcao->id ?? $opcao }}"
-                                                        id="{{ strtolower($filtroNome) }}_{{ $opcao->id ?? $opcao }}">
-                                                    <label for="{{ strtolower($filtroNome) }}_{{ $opcao->id ?? $opcao }}">
+                                                        id="{{ $filtroNome }}_{{ $opcao->id ?? $opcao }}">
+                                                    <label for="{{ $filtroNome }}_{{ $opcao->id ?? $opcao }}">
                                                         {{ $opcao->nome ?? ($opcao->desc ?? $opcao) }}
                                                     </label>
                                                 </li>
@@ -184,110 +216,130 @@
 
                     <!-- Botão para aplicar os filtros -->
                     <button type="button" id="aplicarFiltros" class="btn btn-primary mt-3">Aplicar Filtros</button>
+                    <button type="button" id="limparFiltros" class="btn btn-secondary mt-2">Limpar Filtros</button>
                 </div>
             </aside>
         </div>
 
         <!-- Produtos -->
         <main class="col-md-9 offset-md-3">
-            <div class="row">
+            <div class="row" id="produtosContainer">
                 @foreach ($produtos as $produto)
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="product-card">
                             <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">
                                 @if ($produto->imagens->isNotEmpty())
-                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
-                                    alt="{{ $produto->nome }}" class="img-custom">
-                            @else
-                                <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
-                            @endif
+                                    <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                        alt="{{ $produto->nome }}" class="img-fluid">
+                                @else
+                                    <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão" class="img-fluid">
+                                @endif
                             </a>
                             <p class="product-name">{{ $produto->nome }}</p>
                             <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
-
-                            <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary ">Ver
-                                Detalhes</a>
+                            <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary">Ver Detalhes</a>
                         </div>
                     </div>
                 @endforeach
             </div>
         </main>
     </div>
-    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const aplicarFiltrosBtn = document.getElementById('aplicarFiltros');
+            const limparFiltrosBtn = document.getElementById('limparFiltros');
+            const loadingOverlay = document.querySelector('.loading-overlay');
+
+            function showLoading() {
+                loadingOverlay.style.display = 'flex';
+            }
+
+            function hideLoading() {
+                loadingOverlay.style.display = 'none';
+            }
 
             if (aplicarFiltrosBtn) {
                 aplicarFiltrosBtn.addEventListener('click', function() {
+                    showLoading();
+
+                    // Coletar todos os filtros selecionados
                     const filtros = {
-                        colecao_id: [],
-                        tamanho_id: [],
-                        genero_id: [],
-                        cor: [],
+                        colecao_id: Array.from(document.querySelectorAll('input[name="categoria[]"]:checked')).map(el => el.value),
+                        tamanho_id: Array.from(document.querySelectorAll('input[name="tamanho[]"]:checked')).map(el => el.value),
+                        genero_id: Array.from(document.querySelectorAll('input[name="gênero[]"]:checked')).map(el => el.value),
+                        cor: Array.from(document.querySelectorAll('input[name="cor[]"]:checked')).map(el => el.value)
                     };
 
-                    document.querySelectorAll('input[name="categoria[]"]:checked').forEach((checkbox) => {
-                        filtros.colecao_id.push(checkbox.value);
-                    });
-
-                    document.querySelectorAll('input[name="tamanho[]"]:checked').forEach((checkbox) => {
-                        filtros.tamanho_id.push(checkbox.value);
-                    });
-
-                    document.querySelectorAll('input[name="genero[]"]:checked').forEach((checkbox) => {
-                        filtros.genero_id.push(checkbox.value);
-                    });
-
-                    document.querySelectorAll('input[name="cor[]"]:checked').forEach((checkbox) => {
-                        filtros.cor.push(checkbox.value);
-                    });
-
-                    fetch('{{ route('drops.filtrar') }}', {
+                    // Fazer a requisição AJAX
+                    fetch('{{ route("drops.filtrar") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
                         },
-                        body: JSON.stringify(filtros),
+                        body: JSON.stringify(filtros)
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro na requisição');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        const produtosContainer = document.querySelector('.row');
-                        let rotaProdutosDetalhes = "{{ route('produto.detalhes', ':id') }}"; // Aqui você pega a rota base
+                        const produtosContainer = document.getElementById('produtosContainer');
                         produtosContainer.innerHTML = '';
 
-                        data.produtos.forEach(produto => {
-                            // Troca o :id pela id real do produto
-                            const urlDetalhes = rotaProdutosDetalhes.replace(':id', produto.id);
+                        if (data.produtos.length === 0) {
+                            produtosContainer.innerHTML = `
+                                <div class="col-12 text-center py-5">
+                                    <h4>Nenhum produto encontrado com os filtros selecionados</h4>
+                                </div>
+                            `;
+                            return;
+                        }
 
+                        data.produtos.forEach(produto => {
                             const imagem = produto.imagens.length > 0
-                                ? `/storage/${produto.imagens[0].imagem}`
-                                : '/images/banner/12.png';
+                                ? produto.imagens[0].url
+                                : "{{ asset('images/banner/12.png') }}";
 
                             const produtoHTML = `
                                 <div class="col-md-3 col-sm-6 mb-4">
                                     <div class="product-card">
                                         <a href="/loja/produto/${produto.id}">
-                                            <img src="${imagem}" alt="${produto.nome}">
+                                            <img src="${imagem}" alt="${produto.nome}" class="img-fluid">
                                         </a>
                                         <p class="product-name">${produto.nome}</p>
-                                        <p class="product-price">R$ ${parseFloat(produto.preco).toFixed(2).replace('.', ',')}</p>
-                                        <a href="${urlDetalhes}" class="btn btn-primary">Ver Detalhes</a>
+                                        <p class="product-price">R$ ${produto.preco.toFixed(2).replace('.', ',')}</p>
+                                        <a href="/loja/produto/${produto.id}" class="btn btn-primary">Ver Detalhes</a>
                                     </div>
                                 </div>
                             `;
                             produtosContainer.insertAdjacentHTML('beforeend', produtoHTML);
                         });
                     })
-                    })
                     .catch(error => {
-                        console.error('Erro ao filtrar produtos:', error);
+                        console.error('Erro:', error);
+                        alert('Ocorreu um erro ao filtrar os produtos. Por favor, tente novamente.');
+                    })
+                    .finally(() => {
+                        hideLoading();
                     });
                 });
-            } else {
-                console.error('Botão "aplicarFiltros" não encontrado.');
+            }
+
+            if (limparFiltrosBtn) {
+                limparFiltrosBtn.addEventListener('click', function() {
+                    // Desmarca todos os checkboxes
+                    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+
+                    // Recarrega a página para mostrar todos os produtos
+                    window.location.reload();
+                });
             }
         });
     </script>

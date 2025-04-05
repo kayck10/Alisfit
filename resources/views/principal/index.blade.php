@@ -472,32 +472,71 @@
 
 
     <script>
-         // Função para navegação do carrossel
-         function scrollProducts(direction) {
+        // Função para navegação do carrossel
+        function scrollProducts(direction) {
             const slider = document.getElementById('productsSlider');
             const scrollAmount = 300; // Ajuste conforme necessário
+            const maxScroll = slider.scrollWidth - slider.clientWidth;
 
-            slider.scrollBy({
-                left: direction * scrollAmount,
-                behavior: 'smooth'
-            });
+            // Verifica se está no final e indo para a direita
+            if (direction > 0 && slider.scrollLeft >= maxScroll - 10) {
+                // Volta suavemente para o início
+                slider.scrollTo({
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            }
+            // Verifica se está no início e indo para a esquerda
+            else if (direction < 0 && slider.scrollLeft <= 10) {
+                // Vai suavemente para o final
+                slider.scrollTo({
+                    left: maxScroll,
+                    behavior: 'smooth'
+                });
+            }
+            else {
+                // Scroll normal
+                slider.scrollBy({
+                    left: direction * scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
         }
 
-        // Opcional: Auto-scroll para dispositivos móveis
+        // Opcional: Auto-scroll infinito para dispositivos móveis
         if (window.innerWidth <= 768) {
             const slider = document.getElementById('productsSlider');
             let scrollInterval;
+            let isScrolling = false;
+
+            function autoScroll() {
+                if (isScrolling) return;
+
+                isScrolling = true;
+                const maxScroll = slider.scrollWidth - slider.clientWidth;
+                const currentScroll = slider.scrollLeft;
+
+                if (currentScroll >= maxScroll - 10) {
+                    // Volta suavemente para o início
+                    slider.scrollTo({
+                        left: 0,
+                        behavior: 'smooth'
+                    }).then(() => {
+                        isScrolling = false;
+                    });
+                } else {
+                    // Scroll normal
+                    slider.scrollBy({
+                        left: 300,
+                        behavior: 'smooth'
+                    }).then(() => {
+                        isScrolling = false;
+                    });
+                }
+            }
 
             function startAutoScroll() {
-                scrollInterval = setInterval(() => {
-                    const maxScroll = slider.scrollWidth - slider.clientWidth;
-
-                    if (slider.scrollLeft >= maxScroll) {
-                        slider.scrollTo({ left: 0, behavior: 'smooth' });
-                    } else {
-                        slider.scrollBy({ left: 300, behavior: 'smooth' });
-                    }
-                }, 3000);
+                scrollInterval = setInterval(autoScroll, 3000);
             }
 
             function stopAutoScroll() {
