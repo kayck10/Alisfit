@@ -9,12 +9,12 @@
             <a href="{{ route('colecoes.create') }}" class="btn btn-success">Criar Coleção</a>
         </div>
 
-        <div class="row">
+        <div  class="row">
             @foreach ($colecoes as $colecao)
-                <div class="col-md-4 col-sm-6 mb-4">
+                <div style="margin-bottom: 250px;" class="col-md-4 col-sm-6 mb-4">
                     <div class="card shadow-sm">
-                        <img src="{{ asset('storage/' . $colecao->imagem) }}" class="card-img-top" alt="{{ $colecao->nome }}"
-                            style="height: 200px; object-fit: cover;">
+                        <img src="{{ \App\Helpers\ImageHelper::getColecaoImagemUrl($colecao) }}" alt="{{ $colecao->nome }}" class="card-img-top">
+
                         <div class="card-body">
                             <h5 class="card-title">{{ $colecao->nome }}</h5>
                             <p class="card-text">{{ $colecao->descricao ?? 'Sem descrição' }}</p>

@@ -14,4 +14,13 @@ class ImageHelper
 
         return asset('images/default.png'); // Imagem padrão se não houver
     }
+
+    public static function getColecaoImagemUrl($colecao)
+    {
+        if ($colecao->imagem) {
+            return asset('storage/' . $colecao->imagem);
+        }
+
+        return asset('images/default.png');
+    }
 }
