@@ -1,32 +1,33 @@
 <style>
     .user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-width: 600px; /* Limita a largura máxima */
-    margin: 20px auto; /* Centraliza na tela */
-}
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-width: 600px;
+        /* Limita a largura máxima */
+        margin: 20px auto;
+        /* Centraliza na tela */
+    }
 
-.info-item {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin: 10px 0;
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-    font-size: 16px;
-}
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin: 10px 0;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        font-size: 16px;
+    }
 
-.info-item strong {
-    font-weight: bold;
-    color: #333;
-}
+    .info-item strong {
+        font-weight: bold;
+        color: #333;
+    }
 
-.info-item span {
-    color: #555;
-}
-
+    .info-item span {
+        color: #555;
+    }
 </style>
 
 <h2>Dados Pessoais</h2>
