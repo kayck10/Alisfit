@@ -15,8 +15,9 @@
     }
 
     .img-produto-container {
-        width: 400px;
-        height: 800px;
+        width: 100%;
+        max-width: 500px;
+        height: 600px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -30,6 +31,11 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
+        cursor: grab;
+    }
+
+    .img-produto-wrapper:active {
+        cursor: grabbing;
     }
 
     .img-produto {
@@ -51,30 +57,30 @@
         z-index: 0;
     }
 
-    .miniaturas-container {
+    /* Indicadores de slide */
+    .slide-indicators {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
         display: flex;
-        flex-direction: column;
-        gap: 10px;
-        min-width: 80px;
+        justify-content: center;
+        gap: 8px;
+        z-index: 2;
     }
 
-    .miniatura {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 5px;
+    .slide-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.5);
         cursor: pointer;
-        border: 2px solid transparent;
         transition: all 0.3s ease;
     }
 
-    .miniatura:hover {
-        border-color: #007bff;
-        transform: scale(1.1);
-    }
-
-    .miniatura.active {
-        border-color: #007bff;
+    .slide-indicator.active {
+        background-color: #fff;
+        transform: scale(1.2);
     }
 
     .produto-info {
@@ -207,7 +213,6 @@
             opacity: 0;
             transform: translateY(50px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
@@ -267,119 +272,39 @@
         border-radius: 5px;
     }
 
-    .upsell-item h5 {
-        font-size: 16px;
-        margin-bottom: 5px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .upsell-item p {
-        font-size: 14px;
-        color: #333;
-        margin-bottom: 10px;
-    }
-
-    @media (min-width: 768px) {
-        .upsell-list {
-            flex-wrap: wrap;
-            justify-content: center;
-            overflow-x: visible;
-        }
-
-        .upsell-item {
-            width: 200px;
-        }
-
-        .upsell-image {
-            height: 180px;
-        }
-    }
-
-    @media (min-width: 992px) {
-        .upsell-item {
-            width: 220px;
-        }
-    }
-
+    /* Estilos para dispositivos móveis */
     @media (max-width: 992px) {
         .produto-container {
             flex-wrap: wrap;
             gap: 30px;
-        }
-
-        .miniaturas-container {
-            flex-direction: row;
-            order: 2;
-            width: 100%;
-            justify-content: center;
+            margin-top: 40px;
         }
 
         .img-produto-container {
-            order: 1;
             width: 100%;
-            max-width: 400px;
+            height: 400px;
+            max-width: 100%;
         }
 
         .produto-info {
-            order: 3;
             width: 100%;
-            padding: 20px 0;
+            padding: 0;
         }
     }
 
     @media (max-width: 768px) {
         .img-produto-container {
-            height: 500px;
-        }
-
-        .img-produto {
-            max-width: 90%;
-            height: 700px;
-        }
-
-        .miniatura {
-            width: 60px;
-            height: 60px;
-        }
-
-        .btn-dark {
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .sizes-container,
-        .color-box {
-            justify-content: center;
-        }
-
-        .tabela-medidas {
-            font-size: 14px;
+            height: 350px;
         }
     }
 
     @media (max-width: 576px) {
-        .produto-container {
-            margin-top: 40px;
-        }
-
         .img-produto-container {
             height: 300px;
-        }
-
-        .miniatura {
-            width: 50px;
-            height: 50px;
-        }
-
-        .tabela-medidas {
-            font-size: 12px;
-        }
-
-        .tabela-medidas th,
-        .tabela-medidas td {
-            padding: 5px;
+            border-radius: 0;
+            margin-left: -15px;
+            margin-right: -15px;
+            width: calc(100% + 30px);
         }
     }
 </style>
@@ -387,20 +312,6 @@
 @section('content')
     <div class="container">
         <div class="produto-container">
-            <!-- Miniaturas ao lado -->
-            <div class="miniaturas-container">
-                @foreach ($produto->imagens as $imagem)
-                    @php
-                        $tempProduto = new stdClass();
-                        $tempProduto->imagens = collect([$imagem]);
-                    @endphp
-                    <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}" alt="{{ $produto->nome }}"
-                        class="miniatura @if ($loop->first) active @endif"
-                        data-image-index="{{ $loop->index }}"
-                        onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}', {{ $loop->index }})">
-                @endforeach
-            </div>
-
             <!-- Imagem principal com container para swipe -->
             <div class="img-produto-container">
                 <div class="img-produto-wrapper" id="img-produto-wrapper">
@@ -413,6 +324,13 @@
                             alt="{{ $produto->nome }}"
                             class="img-produto @if ($loop->first) active @else hidden @endif"
                             data-image-index="{{ $loop->index }}">
+                    @endforeach
+                </div>
+                <!-- Indicadores de slide -->
+                <div class="slide-indicators">
+                    @foreach ($produto->imagens as $imagem)
+                        <div class="slide-indicator @if ($loop->first) active @endif"
+                             data-image-index="{{ $loop->index }}"></div>
                     @endforeach
                 </div>
             </div>
@@ -499,7 +417,6 @@
                         </div>
                     </div>
                 @endif
-
             </div>
         </div>
         <hr class="">
@@ -523,12 +440,12 @@
         </div>
 
         <script>
-            // Variáveis para controle do swipe
+            // Variáveis para controle do slider
             let currentImageIndex = 0;
             let startX = 0;
             let endX = 0;
             const images = document.querySelectorAll('.img-produto');
-            const thumbnails = document.querySelectorAll('.miniatura');
+            const indicators = document.querySelectorAll('.slide-indicator');
             const wrapper = document.getElementById('img-produto-wrapper');
 
             // Função para trocar imagem
@@ -543,20 +460,15 @@
                 images[index].classList.remove('hidden');
                 images[index].classList.add('active');
 
-                // Atualiza a miniatura ativa
-                thumbnails.forEach(thumb => {
-                    thumb.classList.remove('active');
-                    if (parseInt(thumb.getAttribute('data-image-index')) === index) {
-                        thumb.classList.add('active');
+                // Atualiza os indicadores
+                indicators.forEach(indicator => {
+                    indicator.classList.remove('active');
+                    if (parseInt(indicator.getAttribute('data-image-index')) === index) {
+                        indicator.classList.add('active');
                     }
                 });
 
                 currentImageIndex = index;
-            }
-
-            // Função modificada para trocar imagem principal
-            function trocarImagemPrincipal(src, index) {
-                showImage(index);
             }
 
             // Eventos para detectar swipe em dispositivos touch
@@ -604,7 +516,15 @@
                 }
             }, false);
 
-            // Código JavaScript existente
+            // Adiciona clique nos indicadores
+            indicators.forEach(indicator => {
+                indicator.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-image-index'));
+                    showImage(index);
+                });
+            });
+
+            // Código JavaScript existente para seleção de tamanho e cor
             document.addEventListener("DOMContentLoaded", function() {
                 let tamanhoSelecionado = null;
                 let corSelecionada = null;
@@ -664,35 +584,21 @@
                     }
                     return true;
                 }
-
-                document.querySelectorAll('.miniatura').forEach(img => {
-                    img.addEventListener('mouseenter', function() {
-                        this.style.transform = 'scale(1.1)';
-                        this.style.zIndex = '10';
-                    });
-
-                    img.addEventListener('mouseleave', function() {
-                        if (!this.classList.contains('active')) {
-                            this.style.transform = 'scale(1)';
-                            this.style.zIndex = '1';
-                        }
-                    });
-                });
             });
 
             function toggleTabelaMedidas() {
-    const content = document.getElementById('tabela-medidas-content');
-    const icon = document.querySelector('.tabela-toggle .fa-chevron-down');
-    const table = document.querySelector('.tabela-medidas');
+                const content = document.getElementById('tabela-medidas-content');
+                const icon = document.querySelector('.tabela-toggle .fa-chevron-down');
+                const table = document.querySelector('.tabela-medidas');
 
-    if (content.style.display === 'none' || content.style.display === '') {
-        content.style.display = 'block';
-        table.style.display = 'table'; // Garante que a tabela será mostrada
-        icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-    } else {
-        content.style.display = 'none';
-        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-    }
-}
+                if (content.style.display === 'none' || content.style.display === '') {
+                    content.style.display = 'block';
+                    table.style.display = 'table';
+                    icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                } else {
+                    content.style.display = 'none';
+                    icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                }
+            }
         </script>
     @endsection

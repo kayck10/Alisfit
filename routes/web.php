@@ -30,6 +30,8 @@ Route::get('/', [PrincipalController::class, 'index'])->name('loja.create');
 
 Route::prefix('loja')->group(function () {
     Route::get('/sobre', [PrincipalController::class, 'sobre'])->name('loja.sobre');
+    Route::get('/entrega', [PrincipalController::class, 'entrega'])->name('loja.entrega');
+    Route::get('/trocas', [PrincipalController::class, 'trocas'])->name('loja.trocas');
     Route::get('/teste', [PrincipalController::class, 'teste'])->name('teste');
     Route::post('/ajax-request', [PrincipalController::class, 'handleRequest'])->name('ajax.request');
     Route::get('produtos', [PrincipalController::class, 'produtos'])->name('produtos');
@@ -38,7 +40,6 @@ Route::prefix('loja')->group(function () {
     Route::get('produto/{id}', [PrincipalController::class, 'produtoDetalhes'])->name('produto.detalhes');
     Route::get('/colecoes/{colecao}', [PrincipalController::class, 'showCol'])->name('colecoes.show.loja');
     Route::get('/informacoes', [PrincipalController::class, 'informacoes'])->name('informacoes');
-
     Route::get('/conta', [PrincipalController::class, 'conta'])->name('conta');
     Route::get('/conta/{page}', [PrincipalController::class, 'carregarPagina'])->name('conta.pagina');
 
@@ -64,7 +65,6 @@ Route::prefix('produtos')->group(function () {
     Route::get('/masculinos/shorts', [ProdutosController::class, 'masculinosShorts'])->name('produtos.masculinosShorts');
     Route::get('/ofertasM', [ProdutosController::class, 'ofertasM'])->name('produtos.ofertasM');
     Route::get('/ofertasF', [ProdutosController::class, 'ofertasF'])->name('produtos.ofertasF');
-
     Route::get('/femininos/tops', [ProdutosController::class, 'femininosTops'])->name('produtos.femininosTops');
     Route::get('/femininos/legging', [ProdutosController::class, 'femininosLegging'])->name('produtos.femininosLegging');
     Route::get('/femininos/shorts', [ProdutosController::class, 'femininosShorts'])->name('produtos.femininosShorts');
@@ -79,12 +79,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
     });
 
-    Route::prefix('Medidas')->group(function () {
+    Route::prefix('medidas')->group(function () {
         Route::get('/create', [TabelaMedidasController::class, 'create'])->name('medidas.create');
         Route::post('/store', [TabelaMedidasController::class, 'store'])->name('medidas.store');
-        Route::get('/{produto}/show', [TabelaMedidasController::class, 'show'])->name('medidas.show');
-
-
+        Route::get('/show/{produto_id?}', [TabelaMedidasController::class, 'show'])->name('medidas.show');
+        Route::put('/{medida}/update', [TabelaMedidasController::class, 'update'])->name('medidas.update');
+        Route::delete('/{medida}/destroy', [TabelaMedidasController::class, 'destroy'])->name('medidas.destroy');
     });
 
     // Coleções

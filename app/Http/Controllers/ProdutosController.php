@@ -36,7 +36,9 @@ class ProdutosController extends Controller
             'colecao_id' => 'required|exists:colecoes,id',
             'genero_id' => 'required|exists:generos,id',
             'tipo_produto_id' => 'required|exists:tipos_produtos,id',
-            'destaque' => 'nullable|boolean', // Adicione esta validação
+            'destaque' => 'nullable|boolean',
+            'lancamento' => 'nullable|boolean',
+            'oferta' => 'nullable|boolean',
             'imagens' => 'required|array',
             'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|',
             'informacoes' => 'required|array',
@@ -52,8 +54,11 @@ class ProdutosController extends Controller
             'colecao_id' => $request->colecao_id,
             'genero_id' => $request->genero_id,
             'tipo_produto_id' => $request->tipo_produto_id,
-            'destaque' => $request->boolean('destaque'), // Salva como true/false
+            'destaque' => $request->boolean('destaque'),
+            'lancamento' => $request->boolean('lancamento'),
+            'oferta' => $request->boolean('oferta'),
         ]);
+
 
         if ($request->hasFile('imagens')) {
             foreach ($request->file('imagens') as $imagem) {
@@ -213,13 +218,15 @@ class ProdutosController extends Controller
         $camiseta = TiposProdutos::where('desc', 'Conjuntos')->first();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
-
         if (!$masculino || !$camiseta) {
             return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
         }
 
         $produtos = Produtos::where('genero_id', $masculino->id)
-            ->where('tipo_produto_id', $camiseta->id)
+            ->where(function ($query) use ($camiseta) {
+                $query->where('oferta', 1)
+                    ->orWhere('tipo_produto_id', $camiseta->id);
+            })
             ->get();
 
         return view('produtos.ofertasM', compact('produtos', 'carrinho'));
@@ -227,21 +234,24 @@ class ProdutosController extends Controller
 
     public function ofertasF()
     {
-        $masculino = Generos::where('desc', 'Feminino')->first();
-        $camiseta = TiposProdutos::where('desc', 'Conjuntos')->first();
+        $feminino = Generos::where('desc', 'Feminino')->first();
+        $conjuntos = TiposProdutos::where('desc', 'Conjuntos')->first();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
-
-        if (!$masculino || !$camiseta) {
+        if (!$feminino || !$conjuntos) {
             return redirect()->route('loja.create')->with('error', 'Categoria não encontrada.');
         }
 
-        $produtos = Produtos::where('genero_id', $masculino->id)
-            ->where('tipo_produto_id', $camiseta->id)
+        $produtos = Produtos::where('genero_id', $feminino->id)
+            ->where(function($query) use ($conjuntos) {
+                $query->where('oferta', 1)
+                      ->orWhere('tipo_produto_id', $conjuntos->id);
+            })
             ->get();
 
         return view('produtos.OfertasF', compact('produtos', 'carrinho'));
     }
+
 
     public function masculinosShorts()
     {

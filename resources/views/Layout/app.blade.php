@@ -197,7 +197,7 @@
                                     <a class="dropdown-item" href="{{route('medidas.create')}}">Criar</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="">Ver Todos</a>
+                                    <a class="dropdown-item" href="{{route('medidas.show')}}">Ver Todos</a>
                                 </li>
                             </ul>
                         </li>

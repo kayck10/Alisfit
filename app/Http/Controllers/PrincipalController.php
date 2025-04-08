@@ -34,7 +34,15 @@ class PrincipalController extends Controller
         return view('principal.sobre');
     }
 
+    public function entrega()
+    {
+        return view('principal.entrega');
+    }
 
+    public function trocas()
+    {
+        return view('principal.trocas');
+    }
 
     public function produtos()
     {
@@ -54,7 +62,8 @@ class PrincipalController extends Controller
 
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
-        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens', 'genero']);
+        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens', 'genero'])
+            ->where('lancamento', 1);
 
         if ($request->has('colecao_id')) {
             $produtos->whereIn('colecao_id', $request->colecao_id);

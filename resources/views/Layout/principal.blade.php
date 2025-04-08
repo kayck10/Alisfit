@@ -411,9 +411,8 @@
             <div class="col">
                 <h4>{{ __('Dúvidas') }}</h4>
                 <a href="{{ route('loja.sobre') }}">{{ __('Sobre nós') }}</a>
-                <a href="{{ route('informacoes') }}">{{ __('Informações de entrega') }}</a>
-                <a href="{{ route('informacoes') }}">{{ __('Política de Privacidade') }}</a>
-                <a href="{{ route('informacoes') }}">{{ __('Termos & Condições') }}</a>
+                <a href="{{ route('loja.entrega') }}">{{ __('Informações de entrega') }}</a>
+                <a href="{{ route('loja.trocas') }}">{{ __('Política de Trocas e Devoluçõese') }}</a>
                 <a href="{{ route('informacoes') }}">{{ __('Fale Conosco') }}</a>
             </div>
 

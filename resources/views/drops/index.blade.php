@@ -169,9 +169,7 @@
             <!-- Filtros -->
             <aside class="filters">
                 <div class="collapse d-md-block" id="filtersCollapse">
-                    <h2 class="mb-5"><strong>DROP @foreach ($colecoes as $colecao)
-                                {{ $colecao->nome }}</a>
-                            @endforeach
+                    <h2 class="mb-5"><strong>DROPS</a>
                         </strong></h2>
 
                     <h4>Filtrar</h4>

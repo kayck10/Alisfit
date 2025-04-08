@@ -78,6 +78,22 @@
                         <label class="form-check-label" for="destaque">Produto em Destaque</label>
                         <small class="text-muted d-block">Marcar para exibir este produto na seção de destaques</small>
                     </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input type="checkbox" name="lancamento" id="lancamento" class="form-check-input" value="1">
+                                <label class="form-check-label" for="lancamento">Produto Lançamento</label>
+                                <small class="text-muted d-block">Marcar para destacar como novo lançamento</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input type="checkbox" name="oferta" id="oferta" class="form-check-input" value="1">
+                                <label class="form-check-label" for="oferta">Produto em Oferta</label>
+                                <small class="text-muted d-block">Marcar para destacar como produto em promoção</small>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Campo de imagens -->
                     <div class="mb-3">
                         <label class="form-label">Imagens: <span class="text-danger">*</span></label>
