@@ -39,8 +39,8 @@ class ProdutosController extends Controller
             'destaque' => 'nullable|boolean',
             'lancamento' => 'nullable|boolean',
             'oferta' => 'nullable|boolean',
-            'imagens' => 'required|array',
-            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|',
+            'imagens' => 'required|array|max:15',
+            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif',
             'informacoes' => 'required|array',
             'informacoes.*.cor' => 'required|string',
             'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
@@ -61,11 +61,15 @@ class ProdutosController extends Controller
 
 
         if ($request->hasFile('imagens')) {
-            foreach ($request->file('imagens') as $imagem) {
+            // Garante a ordem correta usando array_values
+            $imagens = array_values($request->file('imagens'));
+
+            foreach ($imagens as $index => $imagem) {
                 $imagePath = $imagem->store('produtos', 'public');
                 ImagensProdutos::create([
                     'produto_id' => $produto->id,
                     'imagem' => $imagePath,
+                    // Ordem será determinada pelo índice
                 ]);
             }
         }
@@ -245,9 +249,9 @@ class ProdutosController extends Controller
         }
 
         $produtos = Produtos::where('genero_id', $feminino->id)
-            ->where(function($query) use ($conjuntos) {
+            ->where(function ($query) use ($conjuntos) {
                 $query->where('oferta', 1)
-                      ->orWhere('tipo_produto_id', $conjuntos->id);
+                    ->orWhere('tipo_produto_id', $conjuntos->id);
             })
             ->get();
 

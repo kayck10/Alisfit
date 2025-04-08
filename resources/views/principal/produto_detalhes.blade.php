@@ -423,20 +423,23 @@
 
         <div class="upsell-container mb-4">
             <h5 class="mb-4 text-center"><strong>VOCÊ TAMBÉM VAI GOSTAR</strong></h5>
-            <div class="upsell-list">
-                @foreach ($produtosRelacionados as $relacionado)
-                    <div class="upsell-item">
-                        <a href="{{ route('produto.detalhes', $relacionado->id) }}">
-                            <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($relacionado) }}"
-                                alt="{{ $relacionado->nome }}" class="upsell-image">
-                        </a>
-                        <h5 class="mt-2">{{ $relacionado->nome }}</h5>
-                        <p>R$ {{ number_format($relacionado->preco, 2, ',', '.') }}</p>
-                        <a href="{{ route('produto.detalhes', $relacionado->id) }}" class="btn btn-dark btn-sm">Ver
-                            Detalhes</a>
-                    </div>
-                @endforeach
-            </div>
+            @if($produtosRelacionados->count() > 0)
+                <div class="upsell-list">
+                    @foreach ($produtosRelacionados as $relacionado)
+                        <div class="upsell-item">
+                            <a href="{{ route('produto.detalhes', $relacionado->id) }}">
+                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($relacionado) }}"
+                                    alt="{{ $relacionado->nome }}" class="upsell-image">
+                            </a>
+                            <h5 class="mt-2">{{ $relacionado->nome }}</h5>
+                            <p>R$ {{ number_format($relacionado->preco, 2, ',', '.') }}</p>
+                            <a href="{{ route('produto.detalhes', $relacionado->id) }}" class="btn btn-dark btn-sm">Ver Detalhes</a>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-center">Nenhum produto complementar encontrado.</p>
+            @endif
         </div>
 
         <script>

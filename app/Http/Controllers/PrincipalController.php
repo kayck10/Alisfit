@@ -115,7 +115,7 @@ class PrincipalController extends Controller
         }
 
         if (!empty($filtros['tamanho_id'])) {
-            $query->whereHas('tamanhos', function($q) use ($filtros) {
+            $query->whereHas('tamanhos', function ($q) use ($filtros) {
                 $q->whereIn('tamanho_id', $filtros['tamanho_id']);
             });
         }
@@ -125,7 +125,7 @@ class PrincipalController extends Controller
         }
 
         if (!empty($filtros['cor'])) {
-            $query->whereHas('tamanhos', function($q) use ($filtros) {
+            $query->whereHas('tamanhos', function ($q) use ($filtros) {
                 $q->whereIn('cor', $filtros['cor']);
             });
         }
@@ -133,12 +133,12 @@ class PrincipalController extends Controller
         $produtos = $query->get();
 
         // Formatar os dados para a resposta
-        $produtosFormatados = $produtos->map(function($produto) {
+        $produtosFormatados = $produtos->map(function ($produto) {
             return [
                 'id' => $produto->id,
                 'nome' => $produto->nome,
                 'preco' => (float) $produto->preco,
-                'imagens' => $produto->imagens->map(function($imagem) {
+                'imagens' => $produto->imagens->map(function ($imagem) {
                     return [
                         'url' => \App\Helpers\ImageHelper::getProdutoImagemUrl($imagem->produto)
                     ];
@@ -158,7 +158,7 @@ class PrincipalController extends Controller
             },
             'imagens',
             'tipoProduto',
-             'medidas'
+            'medidas'
         ])->findOrFail($id);
 
         $cor_map = [
@@ -254,20 +254,7 @@ class PrincipalController extends Controller
             ];
         });
 
-
-
         $produtosRelacionados = $this->getProdutosComplementares($produto);
-
-        if ($produtosRelacionados->count() < 4) {
-            $produtosAdicionais = Produtos::where('colecao_id', $produto->colecao_id)
-                ->where('id', '!=', $id)
-                ->whereNotIn('id', $produtosRelacionados->pluck('id'))
-                ->inRandomOrder()
-                ->take(4 - $produtosRelacionados->count())
-                ->get();
-
-            $produtosRelacionados = $produtosRelacionados->merge($produtosAdicionais);
-        }
 
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
@@ -283,30 +270,33 @@ class PrincipalController extends Controller
 
     private function getProdutosComplementares($produto)
     {
-        $tiposRelacionados = $this->getTiposRelacionados($produto->tipo_produto_id);
+        $tipoProdutoAtual = $produto->tipoProduto->desc; // "Camisa", "Short", etc (exatamente como está no BD)
 
-        return Produtos::where('colecao_id', $produto->colecao_id)
-            ->where('id', '!=', $produto->id)
-            ->whereIn('tipo_produto_id', $tiposRelacionados)
+        $query = Produtos::where('id', '!=', $produto->id)
+            ->where('genero_id', $produto->genero_id)
             ->whereHas('tamanhos', function ($query) {
                 $query->where('quantidade', '>', 0);
             })
-            ->inRandomOrder()
-            ->take(4)
-            ->get();
+            ->whereHas('tipoProduto', function ($query) use ($tipoProdutoAtual) {
+                $tiposRelacionados = $this->getTiposRelacionados($tipoProdutoAtual);
+                $query->whereIn('desc', $tiposRelacionados);
+            });
+
+        return $query->inRandomOrder()->take(4)->get();
     }
 
-    private function getTiposRelacionados($tipoProdutoId)
+    private function getTiposRelacionados($tipoProdutoAtual)
     {
+        // Mapeamento usando os nomes EXATOS do banco de dados
         $mapeamento = [
-            1 => [2, 3, 4], // Camisa (1) mostra shorts (2), leggings (3) e conjuntos (4)
-            2 => [1, 4],    // Short (2) mostra camisas (1) e conjuntos (4)
-            3 => [1, 5],    // Legging (3) mostra camisas (1) e tops (5)
-            4 => [1, 2],    // Conjunto (4) mostra camisas (1) e shorts (2)
-            5 => [3]        // Top (5) mostra leggings (3)
+            'Camisa' => ['Short', 'Calça Legging', 'Conjunto'],
+            'Short' => ['Camisa', 'Conjunto'],
+            'Calça Legging' => ['Camisa', 'Top'],
+            'Top' => ['Calça Legging'],
+            'Conjunto' => ['Camisa', 'Short']
         ];
 
-        return $mapeamento[$tipoProdutoId] ?? [1, 2, 3, 4, 5]; // Default para todos os tipos se não mapeado
+        return $mapeamento[$tipoProdutoAtual] ?? ['Camisa', 'Short', 'Calça Legging', 'Top', 'Conjunto'];
     }
 
     public function showCol(Colecoes $colecao)

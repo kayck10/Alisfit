@@ -238,14 +238,12 @@
                 });
             }
 
-            // Atualiza o input de arquivos com as imagens selecionadas
             function atualizarInputImagens() {
                 const dataTransfer = new DataTransfer();
                 novasImagens.forEach(file => dataTransfer.items.add(file));
                 inputImagens.files = dataTransfer.files;
             }
 
-            // Configura os botões para remover imagens existentes
             document.querySelectorAll('.remove-imagem-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const card = this.closest('.card');

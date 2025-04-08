@@ -81,14 +81,16 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-check">
-                                <input type="checkbox" name="lancamento" id="lancamento" class="form-check-input" value="1">
+                                <input type="checkbox" name="lancamento" id="lancamento" class="form-check-input"
+                                    value="1">
                                 <label class="form-check-label" for="lancamento">Produto Lançamento</label>
                                 <small class="text-muted d-block">Marcar para destacar como novo lançamento</small>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-check">
-                                <input type="checkbox" name="oferta" id="oferta" class="form-check-input" value="1">
+                                <input type="checkbox" name="oferta" id="oferta" class="form-check-input"
+                                    value="1">
                                 <label class="form-check-label" for="oferta">Produto em Oferta</label>
                                 <small class="text-muted d-block">Marcar para destacar como produto em promoção</small>
                             </div>
@@ -113,7 +115,8 @@
                     <div class="mb-3">
                         <label class="form-label">Tamanhos e Cores: <span class="text-danger">*</span></label>
                         <div id="tamanhos-container"></div>
-                        <div id="tamanhos-error" class="text-danger d-none">É necessário adicionar pelo menos um tamanho com
+                        <div id="tamanhos-error" class="text-danger d-none">É necessário adicionar pelo menos um tamanho
+                            com
                             cor e quantidade.</div>
                         <button type="button" class="btn btn-primary mt-2" onclick="adicionarTamanho()">Adicionar
                             Tamanho</button>
@@ -127,50 +130,52 @@
 
     <script>
         let contador = 0;
+        let fileOrderCounter = 0;
+        let files = [];
 
         function adicionarTamanho() {
             contador++;
             let container = document.getElementById('tamanhos-container');
             let html = `
-            <div class="tamanho-item border p-3 mb-3">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Tamanho: <span class="text-danger">*</span></label>
-                            <select name="informacoes[${contador}][tamanhos]" class="form-control" required>
-                                <option value="" selected disabled>Selecione o tamanho</option>
-                                @foreach ($tamanhos as $tamanho)
-                                    <option value="{{ $tamanho->id }}">{{ $tamanho->desc }}</option>
-                                @endforeach
-                            </select>
-                            <div class="invalid-feedback">Selecione um tamanho</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Cor: <span class="text-danger">*</span></label>
-                            <input type="text" name="informacoes[${contador}][cor]" class="form-control" placeholder="Digite a cor" required>
-                            <div class="invalid-feedback">Informe a cor</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="mb-3">
-                            <label class="form-label">Quantidade: <span class="text-danger">*</span></label>
-                            <input type="number" name="informacoes[${contador}][quantidades]" class="form-control" placeholder="Quantidade" min="1" required>
-                            <div class="invalid-feedback">Quantidade mínima: 1</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-1 d-flex align-items-end">
-                        <button type="button" class="btn btn-danger" onclick="removerTamanho(this)">
-                            <i class="fas fa-trash"></i> Remover
-                        </button>
-                    </div>
+    <div class="tamanho-item border p-3 mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label class="form-label">Tamanho: <span class="text-danger">*</span></label>
+                    <select name="informacoes[${contador}][tamanhos]" class="form-control" required>
+                        <option value="" selected disabled>Selecione o tamanho</option>
+                        @foreach ($tamanhos as $tamanho)
+                            <option value="{{ $tamanho->id }}">{{ $tamanho->desc }}</option>
+                        @endforeach
+                    </select>
+                    <div class="invalid-feedback">Selecione um tamanho</div>
                 </div>
             </div>
-        `;
+
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <label class="form-label">Cor: <span class="text-danger">*</span></label>
+                    <input type="text" name="informacoes[${contador}][cor]" class="form-control" placeholder="Digite a cor" required>
+                    <div class="invalid-feedback">Informe a cor</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="mb-3">
+                    <label class="form-label">Quantidade: <span class="text-danger">*</span></label>
+                    <input type="number" name="informacoes[${contador}][quantidades]" class="form-control" placeholder="Quantidade" min="1" required>
+                    <div class="invalid-feedback">Quantidade mínima: 1</div>
+                </div>
+            </div>
+
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-danger" onclick="removerTamanho(this)">
+                    <i class="fas fa-trash"></i> Remover
+                </button>
+            </div>
+        </div>
+    </div>
+    `;
             container.insertAdjacentHTML('beforeend', html);
             document.getElementById('tamanhos-error').classList.add('d-none');
         }
@@ -187,27 +192,25 @@
             const inputImagens = document.getElementById('input-imagens');
             const previewContainer = document.getElementById('preview-imagens');
             const btnAdicionarMais = document.getElementById('adicionar-mais-imagens');
-            let files = [];
+
+            // Objeto para armazenar promessas de carregamento
+            const loadingPromises = [];
 
             function exibirPreview() {
                 previewContainer.innerHTML = "";
 
                 if (files.length === 0) {
                     previewContainer.innerHTML =
-                        '<div class="alert alert-warning">Nenhuma imagem selecionada</div>';
+                    '<div class="alert alert-warning">Nenhuma imagem selecionada</div>';
                     document.getElementById('imagens-error').classList.remove('d-none');
                     return;
                 }
 
                 document.getElementById('imagens-error').classList.add('d-none');
 
-                files.forEach((file, index) => {
-                    if (file.size > 20480 * 1024) {
-                        toastr.error(`A imagem ${file.name} excede o tamanho máximo de 5MB`, 'Erro');
-                        files.splice(index, 1);
-                        return;
-                    }
-
+                // Ordena as imagens pela ordem de seleção
+                files.sort((a, b) => a.order - b.order).forEach((file, index) => {
+                    // Verificação de tipo e tamanho
                     const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
                     if (!validTypes.includes(file.type)) {
                         toastr.error(`O arquivo ${file.name} não é uma imagem válida`, 'Erro');
@@ -215,64 +218,94 @@
                         return;
                     }
 
-                    let reader = new FileReader();
-                    reader.onload = function(e) {
-                        let card = document.createElement("div");
-                        card.classList.add("card", "d-inline-block", "me-3", "mb-3");
-                        card.style.width = "180px";
+                    // Cria um container para a imagem que será preenchido quando carregar
+                    const card = document.createElement("div");
+                    card.classList.add("card", "d-inline-block", "me-3", "mb-3");
+                    card.style.width = "180px";
+                    card.dataset.index = index;
 
-                        let cardBody = document.createElement("div");
-                        cardBody.classList.add("card-body", "text-center");
+                    const cardBody = document.createElement("div");
+                    cardBody.classList.add("card-body", "text-center");
 
-                        // Imagem
-                        let img = document.createElement("img");
-                        img.src = e.target.result;
-                        img.classList.add("img-fluid", "mb-2");
-                        img.style.maxHeight = "120px";
-                        img.style.objectFit = "cover";
+                    // Placeholder enquanto a imagem carrega
+                    const placeholder = document.createElement("div");
+                    placeholder.innerHTML =
+                        '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+                    cardBody.appendChild(placeholder);
 
-                        // Nome do arquivo
-                        let fileName = document.createElement("div");
-                        fileName.textContent = file.name.length > 15 ?
-                            file.name.substring(0, 15) + '...' : file.name;
-                        fileName.classList.add("small", "text-muted", "text-truncate");
+                    // Processa a imagem em uma Promise
+                    const promise = new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            // Remove o placeholder
+                            cardBody.removeChild(placeholder);
 
-                        // Botão de remoção
-                        let removeBtn = document.createElement("button");
-                        removeBtn.innerHTML = '<i class="fas fa-trash"></i> Remover';
-                        removeBtn.classList.add("btn", "btn-danger", "btn-sm", "w-100");
-                        removeBtn.onclick = function(e) {
-                            e.preventDefault();
-                            files.splice(index, 1);
-                            exibirPreview();
-                            atualizarInputImagens();
+                            // Cria a imagem
+                            const img = document.createElement("img");
+                            img.src = e.target.result;
+                            img.classList.add("img-fluid", "mb-2");
+                            img.style.maxHeight = "120px";
+                            img.style.objectFit = "cover";
+                            cardBody.prepend(img);
+
+                            // Nome do arquivo
+                            const fileName = document.createElement("div");
+                            fileName.textContent = file.name.length > 15 ?
+                                file.name.substring(0, 15) + '...' : file.name;
+                            fileName.classList.add("small", "text-muted", "text-truncate");
+
+                            // Botão de remoção
+                            const removeBtn = document.createElement("button");
+                            removeBtn.innerHTML = '<i class="fas fa-trash"></i> Remover';
+                            removeBtn.classList.add("btn", "btn-danger", "btn-sm", "w-100");
+                            removeBtn.onclick = function(e) {
+                                e.preventDefault();
+                                files.splice(index, 1);
+                                // Reordena os índices
+                                files.forEach((f, i) => f.order = i);
+                                exibirPreview();
+                                atualizarInputImagens();
+                            };
+
+                            cardBody.appendChild(fileName);
+                            cardBody.appendChild(removeBtn);
+                            resolve();
                         };
+                        reader.readAsDataURL(file);
+                    });
 
-                        cardBody.appendChild(img);
-                        cardBody.appendChild(fileName);
-                        cardBody.appendChild(removeBtn);
-                        card.appendChild(cardBody);
-                        previewContainer.appendChild(card);
-                    };
-                    reader.readAsDataURL(file);
+                    loadingPromises.push(promise);
+                    card.appendChild(cardBody);
+                    previewContainer.appendChild(card);
                 });
+
+                // Atualiza contador
+                const counter = document.createElement('div');
+                counter.className = 'small text-muted mt-2';
+                counter.textContent = `${files.length}/15 imagens adicionadas`;
+                previewContainer.appendChild(counter);
             }
 
             function atualizarInputImagens() {
                 const dataTransfer = new DataTransfer();
                 files.forEach(file => dataTransfer.items.add(file));
                 inputImagens.files = dataTransfer.files;
-
-                if (files.length > 0) {
-                    inputImagens.classList.remove('is-invalid');
-                } else {
-                    inputImagens.classList.add('is-invalid');
-                }
             }
 
             inputImagens.addEventListener('change', function(event) {
                 const newFiles = Array.from(event.target.files);
                 if (newFiles.length > 0) {
+                    // Verifica limite de 15 imagens
+                    if (files.length + newFiles.length > 15) {
+                        toastr.error('Limite máximo de 15 imagens atingido', 'Erro');
+                        return;
+                    }
+
+                    // Adiciona a ordem sequencial
+                    newFiles.forEach((file, index) => {
+                        file.order = fileOrderCounter++;
+                    });
+
                     files = files.concat(newFiles);
                     exibirPreview();
                     atualizarInputImagens();
@@ -341,7 +374,6 @@
 
                 if (!isValid) {
                     e.preventDefault();
-                    // Mostra mensagem de erro com Brian Toast
                     toastr.error('Por favor, preencha todos os campos obrigatórios corretamente.',
                         'Erro de Validação');
 
