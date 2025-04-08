@@ -109,7 +109,7 @@ class ProdutosController extends Controller
             'colecao_id' => 'required|exists:colecoes,id',
             'destaque' => 'nullable|boolean',
             'imagens' => 'nullable|array',
-            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif|max:51200',
+            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif',
             'informacoes' => 'sometimes|array',
             'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
             'informacoes.*.cor' => 'required|string',
@@ -122,6 +122,8 @@ class ProdutosController extends Controller
             'preco' => $request->preco,
             'colecao_id' => $request->colecao_id,
             'destaque' => $request->boolean('destaque'),
+            'lancamento' => $request->boolean('lancamento'),
+            'oferta' => $request->boolean('oferta'),
         ]);
 
         // Adicionar novas imagens

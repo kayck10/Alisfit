@@ -62,7 +62,11 @@
                     @foreach ($produto->imagens as $imagem)
                         <div class="card d-inline-block me-3 mb-3" style="width: 180px;" data-id="{{ $imagem->id }}">
                             <div class="card-body text-center">
-                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                @php
+                                    $tempProduto = new stdClass();
+                                    $tempProduto->imagens = collect([$imagem]);
+                                @endphp
+                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($tempProduto) }}"
                                     class="img-fluid mb-2" style="max-height: 120px; object-fit: cover;">
                                 <div class="small text-muted text-truncate">
                                     {{ basename($imagem->imagem) }}
@@ -80,12 +84,29 @@
             </div>
 
 
-
             <div class="mb-3 form-check form-switch">
                 <input type="checkbox" name="destaque" id="destaque" class="form-check-input" value="1"
                     {{ $produto->destaque ? 'checked' : '' }}>
                 <label class="form-check-label" for="destaque">Produto em Destaque</label>
                 <small class="text-muted d-block">Marcar para exibir este produto na seção de destaques</small>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input type="checkbox" name="lancamento" id="lancamento" class="form-check-input" value="1"
+                            {{ $produto->lancamento ? 'checked' : '' }}>
+                        <label class="form-check-label" for="lancamento">Produto Lançamento</label>
+                        <small class="text-muted d-block">Marcar para destacar como novo lançamento</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input type="checkbox" name="oferta" id="oferta" class="form-check-input" value="1"
+                            {{ $produto->oferta ? 'checked' : '' }}>
+                        <label class="form-check-label" for="oferta">Produto em Oferta</label>
+                        <small class="text-muted d-block">Marcar para destacar como produto em promoção</small>
+                    </div>
+                </div>
             </div>
 
             <div class="mb-3">
@@ -106,8 +127,8 @@
                             <div class="col-md-3">
                                 <label for="cor_{{ $index }}" class="form-label">Cor</label>
                                 <input type="text" name="informacoes[{{ $index }}][cor]"
-                                    id="cor_{{ $index }}" class="form-control" value="{{ $tamanho->pivot->cor }}"
-                                    required>
+                                    id="cor_{{ $index }}" class="form-control"
+                                    value="{{ $tamanho->pivot->cor }}" required>
                             </div>
                             <div class="col-md-3">
                                 <label for="quantidade_{{ $index }}" class="form-label">Quantidade</label>
@@ -149,6 +170,9 @@
                 const files = Array.from(event.target.files);
 
                 if (files.length > 0) {
+                    files.forEach((file, index) => {
+                        file.order = novasImagens.length; // Mantém a ordem sequencial
+                    });
                     novasImagens = novasImagens.concat(files);
                     exibirPreviewNovasImagens();
                     atualizarInputImagens();
@@ -160,7 +184,7 @@
                 previewNovasImagens.innerHTML = "";
 
                 novasImagens.forEach((file, index) => {
-                    if (file.size > 20480 * 1024) {
+                    if (file.size > 50480 * 1024) {
                         toastr.error(`A imagem ${file.name} excede o tamanho máximo de 5MB`, 'Erro');
                         return;
                     }
