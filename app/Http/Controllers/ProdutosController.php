@@ -175,7 +175,6 @@ class ProdutosController extends Controller
         }
 
 
-        // Adicionar novas imagens
         if ($request->hasFile('imagens')) {
             foreach ($request->file('imagens') as $imagem) {
                 $imagePath = $imagem->store('produtos', 'public');
@@ -186,7 +185,6 @@ class ProdutosController extends Controller
             }
         }
 
-        // Atualizar as informações de tamanhos e quantidades
         if ($request->has('informacoes')) {
             $produto->tamanhos()->detach();
             foreach ($request->informacoes as $info) {
