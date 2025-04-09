@@ -168,4 +168,3 @@ Route::get('/clear-cache', function () {
 
     return 'Cache limpo com sucesso!';
 });
-

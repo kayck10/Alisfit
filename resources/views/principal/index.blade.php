@@ -341,6 +341,19 @@
             }
 
         }
+
+        .carousel-inner img {
+            height: 1100px;
+            /* Altura padrão */
+            object-fit: cover;
+            /* Cobre todo o espaço sem distorcer */
+        }
+
+        @media (max-width: 768px) {
+            .carousel-inner img {
+                height: 1000px;
+            }
+        }
     </style>
 
     {{-- {{dd('o')}} --}}
@@ -351,7 +364,7 @@
     <div id="carouselExample" class="carousel slide mb-5" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="{{ asset('images/banner/banner00.JPG') }}" class="d-block w-100" alt="Banner 1">
+                <img src="{{ asset('images/banner/IMGBANNER.jfif') }}" class="d-block w-100" alt="Banner 1">
             </div>
             <div class="carousel-item">
                 <img src="{{ asset('images/banner/banner002.JPG') }}" class="d-block w-100" alt="Banner 2">
@@ -394,25 +407,22 @@
 
                 <div class="products-slider" id="productsSlider">
                     @foreach ($produtos as $produto)
-                    <div class="product-slide">
-                        <a href="{{ route('produto.detalhes', $produto->id) }}">
-                            @if ($produto->imagens->isNotEmpty())
-                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
-                                     alt="{{ $produto->nome }}"
-                                     class="img-fluid">
-                            @else
-                                <img src="{{ asset('images/banner/12.png') }}"
-                                     alt="Imagem padrão"
-                                     class="img-fluid">
-                            @endif
-                        </a>
-                        <div class="product-details mt-2 text-center">
-                            <h5 class="text-secondary">{{ $produto->nome }}</h5>
-                            <strong>
-                                <p class="text-dark">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
-                            </strong>
+                        <div class="product-slide">
+                            <a href="{{ route('produto.detalhes', $produto->id) }}">
+                                @if ($produto->imagens->isNotEmpty())
+                                    <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                        alt="{{ $produto->nome }}" class="img-fluid">
+                                @else
+                                    <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão" class="img-fluid">
+                                @endif
+                            </a>
+                            <div class="product-details mt-2 text-center">
+                                <h5 class="text-secondary">{{ $produto->nome }}</h5>
+                                <strong>
+                                    <p class="text-dark">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
+                                </strong>
+                            </div>
                         </div>
-                    </div>
                     @endforeach
                 </div>
 
@@ -428,16 +438,16 @@
         <h4 class="section-title mb-5"><strong>MAIS VENDIDOS</strong></h4>
         <div class="mais-vendidos-container">
             <div class="mais-vendidos-item">
-               <a href="{{ route('produtos.ofertasM') }}">
-                <img src="{{ asset('images/banner/ofMas.jpeg') }}" alt="Ofertas Masculinas">
-                <div class="overlay">Ofertas Masculinas</div>
-            </a>
+                <a href="{{ route('produtos.ofertasM') }}">
+                    <img src="{{ asset('images/banner/ofMas.jpeg') }}" alt="Ofertas Masculinas">
+                    <div class="overlay">Ofertas Masculinas</div>
+                </a>
             </div>
             <div class="mais-vendidos-item">
                 <a href="{{ route('produtos.ofertasF') }}">
-                <img src="{{ asset('images/banner/ofFem.JPG') }}" alt="Ofertas Femininas">
-                <div class="overlay">Ofertas Femininas</div>
-            </a>
+                    <img src="{{ asset('images/banner/ofFem.JPG') }}" alt="Ofertas Femininas">
+                    <div class="overlay">Ofertas Femininas</div>
+                </a>
             </div>
         </div>
     </section>
@@ -493,8 +503,7 @@
                     left: maxScroll,
                     behavior: 'smooth'
                 });
-            }
-            else {
+            } else {
                 // Scroll normal
                 slider.scrollBy({
                     left: direction * scrollAmount,
