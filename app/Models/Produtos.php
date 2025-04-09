@@ -49,4 +49,16 @@ class Produtos extends Model
     {
         return $this->belongsTo(TiposProdutos::class, 'tipo_produto_id');
     }
+
+    // Produtos relacionados a este produto
+    public function relacionados()
+    {
+        return $this->belongsToMany(Produtos::class, 'produto_relacionados', 'produto_id', 'relacionado_id')->withTimestamps();
+    }
+
+    // Produtos que têm este como relacionado (opcional, mas útil)
+    public function relacionadosPor()
+    {
+        return $this->belongsToMany(Produtos::class, 'produto_relacionados', 'relacionado_id', 'produto_id')->withTimestamps();
+    }
 }

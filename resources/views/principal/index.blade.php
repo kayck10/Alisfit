@@ -342,22 +342,22 @@
 
         }
 
+
+    .carousel-inner img {
+        width: 100%;
+        height: 100vh;
+        object-fit: cover;
+        object-position: center center; /* Garante centralização */
+    }
+
+    @media (max-width: 768px) {
         .carousel-inner img {
-            height: 1100px;
-            /* Altura padrão */
+            height: 60vh; /* Reduz um pouco no mobile */
             object-fit: cover;
-            /* Cobre todo o espaço sem distorcer */
+            object-position: center center;
         }
-
-        @media (max-width: 768px) {
-            .carousel-inner img {
-                height: 1000px;
-            }
-        }
+    }
     </style>
-
-    {{-- {{dd('o')}} --}}
-
 
 
     <!-- Carrossel Fullscreen -->

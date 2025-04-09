@@ -228,6 +228,20 @@
                                 </li>
                             </ul>
                         </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark py-3" href="#" id="dropdownMenuGraficos"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false"> Tipos de Produtos
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuGraficos">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('tipos-produtos.create') }}">Criar</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{route('tipos-produtos.index')}}">Ver Todos</a>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>

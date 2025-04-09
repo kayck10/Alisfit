@@ -485,18 +485,15 @@
 
             wrapper.addEventListener('touchend', () => {
                 if (startX - endX > 50 && currentImageIndex < images.length - 1) {
-                    // Swipe para a esquerda - próxima imagem
                     showImage(currentImageIndex + 1);
                 } else if (endX - startX > 50 && currentImageIndex > 0) {
-                    // Swipe para a direita - imagem anterior
                     showImage(currentImageIndex - 1);
                 }
             }, false);
 
-            // Eventos para detectar swipe com mouse (para desktop)
             wrapper.addEventListener('mousedown', (e) => {
                 startX = e.clientX;
-                e.preventDefault(); // Previne seleção de texto durante o arrasto
+                e.preventDefault();
             }, false);
 
             wrapper.addEventListener('mousemove', (e) => {
@@ -508,10 +505,8 @@
             wrapper.addEventListener('mouseup', () => {
                 if (startX) {
                     if (startX - endX > 50 && currentImageIndex < images.length - 1) {
-                        // Swipe para a esquerda - próxima imagem
                         showImage(currentImageIndex + 1);
                     } else if (endX - startX > 50 && currentImageIndex > 0) {
-                        // Swipe para a direita - imagem anterior
                         showImage(currentImageIndex - 1);
                     }
                     startX = 0;
@@ -519,7 +514,6 @@
                 }
             }, false);
 
-            // Adiciona clique nos indicadores
             indicators.forEach(indicator => {
                 indicator.addEventListener('click', function() {
                     const index = parseInt(this.getAttribute('data-image-index'));
@@ -527,7 +521,6 @@
                 });
             });
 
-            // Código JavaScript existente para seleção de tamanho e cor
             document.addEventListener("DOMContentLoaded", function() {
                 let tamanhoSelecionado = null;
                 let corSelecionada = null;
@@ -562,7 +555,7 @@
                             colorBox.className = 'color-box';
                             colorBox.style.backgroundColor = cor.cor_hex;
                             colorBox.dataset.cor = cor.cor;
-                            colorBox.title = cor.cor; // Tooltip com o nome da cor
+                            colorBox.title = cor.cor;
 
                             colorBox.addEventListener('click', function() {
                                 document.querySelectorAll('.color-box').forEach(b => b.classList.remove(

@@ -50,6 +50,21 @@
             </div>
 
             <div class="mb-3">
+                <label for="relacionados" class="form-label">Produtos Relacionados</label>
+                <select name="relacionados[]" id="relacionados" class="form-control" multiple>
+                    @foreach ($todosProdutos as $p)
+                        @if ($p->id !== $produto->id) {{-- evita relacionar com ele mesmo --}}
+                            <option value="{{ $p->id }}" {{ in_array($p->id, $produto->relacionados->pluck('id')->toArray()) ? 'selected' : '' }}>
+                                {{ $p->nome }}
+                            </option>
+                        @endif
+                    @endforeach
+                </select>
+                <small class="text-muted">Segure Ctrl (ou Cmd no Mac) para selecionar múltiplos produtos.</small>
+            </div>
+
+
+            <div class="mb-3">
                 <label class="form-label">Imagens</label>
                 <input type="file" id="input-imagens" name="imagens[]" class="form-control" multiple
                     accept="image/jpeg,image/png,image/jpg,image/gif">

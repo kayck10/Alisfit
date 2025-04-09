@@ -158,7 +158,8 @@ class PrincipalController extends Controller
             },
             'imagens',
             'tipoProduto',
-            'medidas'
+            'medidas',
+            'relacionados'
         ])->findOrFail($id);
 
         $cor_map = [
@@ -254,50 +255,20 @@ class PrincipalController extends Controller
             ];
         });
 
-        $produtosRelacionados = $this->getProdutosComplementares($produto);
 
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
         return view('principal.produto_detalhes', [
             'produto' => $produto,
             'tamanhosAgrupados' => $tamanhosAgrupados,
-            'produtosRelacionados' => $produtosRelacionados,
+            'produtosRelacionados' => $produto->relacionados,
             'cor_map' => $cor_map,
             'carrinho' => $carrinho,
             'medidas' => $produto->medidas
         ]);
     }
 
-    private function getProdutosComplementares($produto)
-    {
-        $tipoProdutoAtual = $produto->tipoProduto->desc; // "Camisa", "Short", etc (exatamente como está no BD)
 
-        $query = Produtos::where('id', '!=', $produto->id)
-            ->where('genero_id', $produto->genero_id)
-            ->whereHas('tamanhos', function ($query) {
-                $query->where('quantidade', '>', 0);
-            })
-            ->whereHas('tipoProduto', function ($query) use ($tipoProdutoAtual) {
-                $tiposRelacionados = $this->getTiposRelacionados($tipoProdutoAtual);
-                $query->whereIn('desc', $tiposRelacionados);
-            });
-
-        return $query->inRandomOrder()->take(4)->get();
-    }
-
-    private function getTiposRelacionados($tipoProdutoAtual)
-    {
-        // Mapeamento usando os nomes EXATOS do banco de dados
-        $mapeamento = [
-            'Camisa' => ['Short', 'Calça Legging', 'Conjunto'],
-            'Short' => ['Camisa', 'Conjunto'],
-            'Calça Legging' => ['Camisa', 'Top'],
-            'Top' => ['Calça Legging'],
-            'Conjunto' => ['Camisa', 'Short']
-        ];
-
-        return $mapeamento[$tipoProdutoAtual] ?? ['Camisa', 'Short', 'Calça Legging', 'Top', 'Conjunto'];
-    }
 
     public function showCol(Colecoes $colecao)
     {

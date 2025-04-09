@@ -31,11 +31,13 @@
                                     <strong>{{ $produto->nome }}</strong> <br>
                                     <small>R$ {{ number_format($produto->preco, 2, ',', '.') }}</small> <br>
                                     <small><strong>Quantidade:</strong> {{ $produto->pivot->quantidade }}</small> <br>
-                                    <small><strong>Tamanho:</strong> {{ $produto->pivot->tamanho_id }}</small> <br>
+                                    <small><strong>Tamanho:</strong> {{ $produto->tamanhos->first()->desc }}</small> <br>
                                     <small><strong>Cor:</strong></small>
                                     <span
-                                        style="display: inline-block; width: 20px; height: 20px; background: {{ $produto->pivot->cor }}; border: 1px solid #000;"></span>
+                                        style="display: inline-block; width: 20px; height: 20px; background: {{ $cor_map[$produto->pivot->cor] ?? '#000' }}; border: 1px solid #000;"></span>
+                                    <small>{{ ucfirst($produto->pivot->cor) }}</small>
                                     <br>
+
                                     <small id="subtotal"><strong>Subtotal:</strong> R$
                                         {{ number_format($subtotal, 2, ',', '.') }}</small>
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\PedidosController;
 use App\Http\Controllers\PrincipalController;
 use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\TabelaMedidasController;
+use App\Http\Controllers\TiposProdutosController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -77,6 +78,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('financeiro')->group(function () {
         Route::get('/', [FinanceiroController::class, 'index'])->name('financeiro.index');
+    });
+
+    Route::prefix('tipos')->group(function () {
+        Route::get('/produtos', [TiposProdutosController::class, 'index'])->name('tipos-produtos.index');
+        Route::get('/produtos/create', [TiposProdutosController::class, 'create'])->name('tipos-produtos.create');
+        Route::post('/produtos', [TiposProdutosController::class, 'store'])->name('tipos-produtos.store');
+        Route::put('/produtos/{id}', [TiposProdutosController::class, 'update'])->name('tipos-produtos.update');
+        Route::delete('/rodutos/{id}', [TiposProdutosController::class, 'destroy'])->name('tipos-produtos.destroy');
     });
 
     Route::prefix('medidas')->group(function () {

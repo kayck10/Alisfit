@@ -130,6 +130,17 @@
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label">Produtos Relacionados:</label>
+                        <select name="relacionados[]" class="form-control" multiple>
+                            @foreach ($todosProdutos as $p)
+                                <option value="{{ $p->id }}">{{ $p->nome }}</option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Segure Ctrl (ou Cmd no Mac) para selecionar vários produtos.</small>
+                    </div>
+
+
+                    <div class="mb-3">
                         <label class="form-label">Imagens: <span class="text-danger">*</span></label>
                         <div id="grid-imagens" class="d-flex flex-wrap gap-2">
                             <!-- Slots de imagens adicionados via JS -->

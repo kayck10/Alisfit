@@ -131,7 +131,65 @@ class CarrinhosController extends Controller
 
     public function info()
     {
+        $produtos = Produtos::with([ 'tamanhos'])->get();
         $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
+
+        $cor_map = [
+            'preto' => '#000000',
+            'branco' => '#FFFFFF',
+            'branca' => '#F5F5F5',
+            'azul' => '#0000FF',
+            'vermelho' => '#FF0000',
+            'verde' => '#00FF00',
+            'amarelo' => '#FFFF00',
+            'roxo' => '#800080',
+            'verde militar' => '#5d5f3d',
+            'verde escuro' => '#006400',
+            'verde floresta' => '#228B22',
+            'verde lima' => '#32CD32',
+            'verde mar' => '#2E8B57',
+            'verde menta' => '#98FF98',
+            'azul marinho' => '#000080',
+            'azul claro' => '#ADD8E6',
+            'azul celeste' => '#87CEEB',
+            'azul aco' => '#4682B4',
+            'azul petroleo' => '#008080',
+            'azul real' => '#4169E1',
+            'vermelho escuro' => '#8B0000',
+            'rosa' => '#FFC0CB',
+            'rosa choque' => '#FF69B4',
+            'vinho' => '#722F37',
+            'carmim' => '#960018',
+            'salmao' => '#FA8072',
+            'laranja' => '#FFA500',
+            'laranja escuro' => '#FF8C00',
+            'dourado' => '#FFD700',
+            'amarelo_creme' => '#FFFDD0',
+            'ambar' => '#FFBF00',
+            'mostarda' => '#FFDB58',
+            'lilas' => '#C8A2C8',
+            'lavanda' => '#E6E6FA',
+            'roxo_escuro' => '#301934',
+            'ametista' => '#9966CC',
+            'magenta' => '#FF00FF',
+            'orquidea' => '#DA70D6',
+            'marrom' => '#A52A2A',
+            'bege' => '#F5F5DC',
+            'cinza' => '#808080',
+            'cinza_escuro' => '#A9A9A9',
+            'cinza_claro' => '#D3D3D3',
+            'terracota' => '#E2725B',
+            'caramelo' => '#AF6E4D',
+            'chocolate' => '#7B3F00',
+            'turquesa' => '#40E0D0',
+            'ciano' => '#00FFFF',
+            'indigo' => '#4B0082',
+            'prata' => '#C0C0C0',
+            'bronze' => '#CD7F32',
+            'oliva' => '#808000',
+            'verde_azulado' => '#008080',
+            'café' => '#6f4e37'
+        ];
 
         if (!$carrinho) {
             return view('carrinho.info')->with('mensagem', 'Seu carrinho está vazio.');
@@ -152,7 +210,7 @@ class CarrinhosController extends Controller
 
         $total = max($subtotal - $desconto, 0);
 
-        return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total'));
+        return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total', 'cor_map', 'produtos'));
     }
 
 
