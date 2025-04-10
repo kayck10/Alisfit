@@ -200,7 +200,7 @@
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="button" class="btn btn-danger" onclick="removerTamanho(this)">
-                                Remover
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>

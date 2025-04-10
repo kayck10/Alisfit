@@ -30,96 +30,63 @@ class ProdutosController extends Controller
         return view('produtos.create', compact('colecoes', 'tamanhos', 'generos', 'pecas', 'todosProdutos'));
     }
 
-
-
     public function store(Request $request)
     {
-        DB::beginTransaction();
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'preco' => 'required|numeric|min:0',
+            'colecao_id' => 'required|exists:colecoes,id',
+            'destaque' => 'nullable|boolean',
+            'imagens' => 'nullable|array',
+            'imagens.*' => 'image|mimes:jpeg,png,jpg,gif',
+            'informacoes' => 'sometimes|array',
+            'informacoes.*.tamanhos' => 'required|exists:tamanhos,id',
+            'informacoes.*.cor' => 'required|string',
+            'informacoes.*.quantidades' => 'required|integer|min:1',
+            'relacionados' => 'nullable|array',
+            'relacionados.*' => 'exists:produtos,id',
+        ]);
 
-        try {
-            // Validação ajustada (alguns campos como 'sometimes' para teste)
-            $validated = $request->validate([
-                'nome' => 'required|string|max:255',
-                'descricao' => 'nullable|string',
-                'preco' => 'required|numeric|min:0',
-                'colecao_id' => 'required|exists:colecoes,id',
-                'genero_id' => 'required|exists:generos,id',
-                'tipo_produto_id' => 'required|exists:tipos_produtos,id',
-                'destaque' => 'nullable|boolean',
-                'lancamento' => 'nullable|boolean',
-                'oferta' => 'nullable|boolean',
-                'imagens' => 'sometimes|array|max:15',
-                'imagens.*' => 'sometimes|image|mimes:jpeg,png,jpg,gif',
-                'informacoes' => 'sometimes|array',
-                'informacoes.*.cor' => 'required_with:informacoes|string',
-                'informacoes.*.tamanho_id' => 'required_with:informacoes|exists:tamanhos,id',
-                'informacoes.*.quantidades' => 'required_with:informacoes|integer|min:1',
-                'relacionados' => 'sometimes|array',
-                'relacionados.*' => 'exists:produtos,id',
-            ]);
+        $produto = Produtos::create([
+            'nome' => $request->nome,
+            'descricao' => $request->descricao,
+            'preco' => $request->preco,
+            'colecao_id' => $request->colecao_id,
+            'destaque' => $request->boolean('destaque'),
+            'lancamento' => $request->boolean('lancamento'),
+            'oferta' => $request->boolean('oferta'),
+        ]);
 
-            // Criação do produto
-            $produto = Produtos::create([
-                'nome' => $validated['nome'],
-                'descricao' => $validated['descricao'] ?? null,
-                'preco' => $validated['preco'],
-                'colecao_id' => $validated['colecao_id'],
-                'genero_id' => $validated['genero_id'],
-                'tipo_produto_id' => $validated['tipo_produto_id'],
-                'destaque' => $request->boolean('destaque'),
-                'lancamento' => $request->boolean('lancamento'),
-                'oferta' => $request->boolean('oferta'),
-            ]);
-
-            // Upload de imagens
-            if ($request->hasFile('imagens')) {
-                foreach ($request->file('imagens') as $imagem) {
-                    $imagePath = $imagem->store('produtos', 'public');
-
-                    ImagensProdutos::create([
-                        'produto_id' => $produto->id,
-                        'imagem' => $imagePath,
-                    ]);
-                }
-            }
-
-            // Informações de tamanhos/cores
-            if (!empty($validated['informacoes'])) {
-                foreach ($validated['informacoes'] as $info) {
-                    ProdutosTamanhos::create([
-                        'produto_id' => $produto->id,
-                        'cor' => $info['cor'],
-                        'tamanho_id' => $info['tamanho_id'],
-                        'quantidade' => $info['quantidades'],
-                    ]);
-                }
-            }
-
-            // Produtos relacionados
-            if ($request->has('relacionados')) {
-                $relacionados = array_filter($request->relacionados, function ($id) use ($produto) {
-                    return $id != $produto->id;
-                });
-
-                $produto->relacionados()->sync($relacionados);
-            }
-
-            DB::commit();
-
-            Toastr::success('Produto criado com sucesso!', 'Sucesso', ["positionClass" => "toast-top-center"]);
-            return redirect()->route('produtos.create')->with('success');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
-            return back()->withErrors($e->validator)->withInput();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Erro ao criar produto: ' . $e->getMessage());
-            Log::error($e->getTraceAsString());
-
-            Toastr::error('Ocorreu um erro ao criar o produto', 'Erro', ["positionClass" => "toast-top-center"]);
-            return back()->withInput()->with('error', 'Ocorreu um erro ao criar o produto');
+        if ($request->has('relacionados')) {
+            $produto->relacionados()->sync($request->relacionados);
         }
+
+        if ($request->hasFile('imagens')) {
+            foreach ($request->file('imagens') as $imagem) {
+                $imagePath = $imagem->store('produtos', 'public');
+                ImagensProdutos::create([
+                    'produto_id' => $produto->id,
+                    'imagem' => $imagePath,
+                ]);
+            }
+        }
+
+        if ($request->has('informacoes')) {
+            foreach ($request->informacoes as $info) {
+                if (!empty($info['tamanhos']) && !empty($info['quantidades'])) {
+                    $produto->tamanhos()->attach($info['tamanhos'], [
+                        'quantidade' => $info['quantidades'],
+                        'cor' => $info['cor'] ?? null
+                    ]);
+                }
+            }
+        }
+
+        Toastr::success('Produto criado com sucesso!', 'Sucesso', ["positionClass" => "toast-top-center"]);
+        return redirect()->route('produtos.index')->with('success');
     }
+
     public function index()
     {
         $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])->get();
