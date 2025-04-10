@@ -351,10 +351,7 @@
                 </div>
 
                 <!-- Container das cores (inicialmente escondido) -->
-                <div id="cores-container" style="display: none;">
-                    <label>Cores disponíveis:</label>
-                    <div class="mt-3" id="cores-opcoes"></div>
-                </div>
+
 
                 <hr>
                 <form action="{{ route('carrinho.adicionar', $produto->id) }}" method="POST"

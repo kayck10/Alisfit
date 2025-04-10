@@ -32,11 +32,7 @@
                                     <small>R$ {{ number_format($produto->preco, 2, ',', '.') }}</small> <br>
                                     <small><strong>Quantidade:</strong> {{ $produto->pivot->quantidade }}</small> <br>
                                     <small><strong>Tamanho:</strong> {{ $produto->tamanhos->first()->desc }}</small> <br>
-                                    <small><strong>Cor:</strong></small>
-                                    <span
-                                        style="display: inline-block; width: 20px; height: 20px; background: {{ $cor_map[$produto->pivot->cor] ?? '#000' }}; border: 1px solid #000;"></span>
-                                    <small>{{ ucfirst($produto->pivot->cor) }}</small>
-                                    <br>
+
 
                                     <small id="subtotal"><strong>Subtotal:</strong> R$
                                         {{ number_format($subtotal, 2, ',', '.') }}</small>
@@ -85,12 +81,12 @@
                             <input type="hidden" name="carrinhoId" value="{{ $carrinho->id }}">
                             <input type="text" name="codigoCupom" class="form-control"
                                 placeholder="Digite o código do cupom" required>
-                            <button type="submit" class="btn btn-dark ms-2">Aplicar Cupom</button>
+                            <button type="submit" class="btn btn-success ms-2">Aplicar Cupom</button>
                         </form>
                     </div>
 
                     <div class="mt-3 text-end">
-                        <a href="{{ route('carrinho.finalizar') }}" class="btn btn-dark">Finalizar Compra</a>
+                        <a href="{{ route('carrinho.finalizar') }}" class="btn btn-success">Finalizar Compra</a>
                     </div>
                 </div>
             </div>

@@ -50,10 +50,12 @@ class CarrinhosController extends Controller
             return redirect()->back()->with('error', 'Faça login para adicionar produtos à sacola.');
         }
 
+        // Validação sem obrigar a cor
         $request->validate([
             'tamanho_id' => 'required|exists:tamanhos,id',
-            'cor' => 'required|string',
             'quantidade' => 'required|integer|min:1'
+        ], [
+            'tamanho_id.required' => 'Por favor, selecione um tamanho antes de adicionar ao carrinho.',
         ]);
 
         $carrinho = Carrinhos::firstOrCreate(['user_id' => Auth::id()]);
@@ -65,10 +67,18 @@ class CarrinhosController extends Controller
 
         $quantidade = max(1, (int) $request->quantidade);
 
+        $cor = $request->has('cor') ? $request->cor : null;
+
         $carrinhoItem = CarrinhoIten::where('carrinho_id', $carrinho->id)
             ->where('produto_id', $produtoId)
             ->where('tamanho_id', $request->tamanho_id)
-            ->where('cor', $request->cor)
+            ->where(function ($query) use ($cor) {
+                if ($cor === null) {
+                    $query->whereNull('cor');
+                } else {
+                    $query->where('cor', $cor);
+                }
+            })
             ->first();
 
         if ($carrinhoItem) {
@@ -79,12 +89,14 @@ class CarrinhosController extends Controller
                 'produto_id' => $produtoId,
                 'quantidade' => $quantidade,
                 'tamanho_id' => $request->tamanho_id,
-                'cor' => $request->cor
+                'cor' => $cor
             ]);
         }
-        FacadesToastr::success('Produto adicionado a sacola.', 'Sucesso', ["positionClass" => "toast-top-center"]);
+
+        FacadesToastr::success('Produto adicionado à sacola.', 'Sucesso', ["positionClass" => "toast-top-center"]);
         return redirect()->back()->with('success', 'Produto adicionado ao carrinho!');
     }
+
 
     public function atualizarQuantidade(Request $request, $produtoId)
     {
@@ -113,8 +125,6 @@ class CarrinhosController extends Controller
 
         return response()->json(['error' => 'Carrinho não encontrado!'], 404);
     }
-
-
 
     public function removerProduto($produtoId)
     {

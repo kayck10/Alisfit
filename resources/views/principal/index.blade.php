@@ -342,21 +342,28 @@
 
         }
 
+        .carousel-inner {
+            height: 100vh;
+            /* Altura fixa */
+        }
 
-    .carousel-inner img {
-        width: 100%;
-        height: 100vh;
-        object-fit: cover;
-        object-position: center center; /* Garante centralização */
-    }
-
-    @media (max-width: 768px) {
         .carousel-inner img {
-            height: 60vh; /* Reduz um pouco no mobile */
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             object-position: center center;
         }
-    }
+
+        /* Telas menores */
+        @media (max-width: 768px) {
+            .carousel-inner {
+                height: 38vh;
+            }
+
+            .carousel-inner img {
+                object-position: top center;
+            }
+        }
     </style>
 
 
