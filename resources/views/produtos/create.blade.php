@@ -23,7 +23,7 @@
         position: absolute;
         top: 2px;
         right: 2px;
-        background: rgba(0,0,0,0.6);
+        background: rgba(0, 0, 0, 0.6);
         color: white;
         border: none;
         border-radius: 50%;
@@ -59,7 +59,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Preço: <span class="text-danger">*</span></label>
-                                <input type="number" name="preco" class="form-control" required min="0" step="0.01">
+                                <input type="number" name="preco" class="form-control" required min="0"
+                                    step="0.01">
                                 <div class="invalid-feedback">Por favor, insira um preço válido (maior que 0).</div>
                             </div>
                         </div>
@@ -115,14 +116,16 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-check">
-                                <input type="checkbox" name="lancamento" id="lancamento" class="form-check-input" value="1">
+                                <input type="checkbox" name="lancamento" id="lancamento" class="form-check-input"
+                                    value="1">
                                 <label class="form-check-label" for="lancamento">Produto Lançamento</label>
                                 <small class="text-muted d-block">Marcar para destacar como novo lançamento</small>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-check">
-                                <input type="checkbox" name="oferta" id="oferta" class="form-check-input" value="1">
+                                <input type="checkbox" name="oferta" id="oferta" class="form-check-input"
+                                    value="1">
                                 <label class="form-check-label" for="oferta">Produto em Oferta</label>
                                 <small class="text-muted d-block">Marcar para destacar como produto em promoção</small>
                             </div>
@@ -145,16 +148,21 @@
                         <div id="grid-imagens" class="d-flex flex-wrap gap-2">
                             <!-- Slots de imagens adicionados via JS -->
                         </div>
-                        <input type="file" id="input-hidden" name="imagens[]" class="d-none" accept="image/*" multiple>
-                        <small class="text-muted d-block mt-2">Clique em um quadrado para adicionar imagem. Máximo 10 imagens.</small>
-                        <div id="imagens-error" class="text-danger d-none mt-2">É necessário adicionar pelo menos uma imagem.</div>
+                        <input type="file" id="input-hidden" name="imagens[]" class="d-none" accept="image/*"
+                            multiple>
+                        <small class="text-muted d-block mt-2">Clique em um quadrado para adicionar imagem. Máximo 10
+                            imagens.</small>
+                        <div id="imagens-error" class="text-danger d-none mt-2">É necessário adicionar pelo menos uma
+                            imagem.</div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Tamanhos e Cores: <span class="text-danger">*</span></label>
                         <div id="tamanhos-container"></div>
-                        <div id="tamanhos-error" class="text-danger d-none">É necessário adicionar pelo menos um tamanho com cor e quantidade.</div>
-                        <button type="button" class="btn btn-primary mt-2" onclick="adicionarTamanho()">Adicionar Tamanho</button>
+                        <div id="tamanhos-error" class="text-danger d-none">É necessário adicionar pelo menos um tamanho
+                            com cor e quantidade.</div>
+                        <button type="button" class="btn btn-primary mt-2" onclick="adicionarTamanho()">Adicionar
+                            Tamanho</button>
                     </div>
 
                     <button type="submit" class="btn btn-success">Salvar</button>
@@ -187,7 +195,7 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Cor: <span class="text-danger">*</span></label>
-                                <input type="text" name="informacoes[${contador}][cor]" class="form-control" placeholder="Digite a cor" required>
+                                <input type="text" name="informacoes[${contador}][cor]" class="form-control" placeholder="Digite a cor">
                                 <div class="invalid-feedback">Informe a cor</div>
                             </div>
                         </div>
@@ -200,7 +208,7 @@
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="button" class="btn btn-danger" onclick="removerTamanho(this)">
-                                <i class="fas fa-trash"></i>
+                                <i class="fas fa-trash">Remover</i>
                             </button>
                         </div>
                     </div>
@@ -237,7 +245,7 @@
                     const removeBtn = document.createElement('button');
                     removeBtn.classList.add('remove-btn');
                     removeBtn.innerHTML = '&times;';
-                    removeBtn.onclick = function () {
+                    removeBtn.onclick = function() {
                         imagens.splice(i, 1);
                         atualizarSlots();
                     };
@@ -260,7 +268,7 @@
             document.getElementById('input-hidden').files = dataTransfer.files;
         }
 
-        document.getElementById('input-hidden').addEventListener('change', function (e) {
+        document.getElementById('input-hidden').addEventListener('change', function(e) {
             const newFiles = Array.from(e.target.files);
             const total = imagens.length + newFiles.length;
 
@@ -275,5 +283,4 @@
 
         document.addEventListener('DOMContentLoaded', atualizarSlots);
     </script>
-
 @endsection

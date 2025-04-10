@@ -143,7 +143,7 @@
                                 <label for="cor_{{ $index }}" class="form-label">Cor</label>
                                 <input type="text" name="informacoes[{{ $index }}][cor]"
                                     id="cor_{{ $index }}" class="form-control"
-                                    value="{{ $tamanho->pivot->cor }}" required>
+                                    value="{{ $tamanho->pivot->cor }}">
                             </div>
                             <div class="col-md-3">
                                 <label for="quantidade_{{ $index }}" class="form-label">Quantidade</label>
@@ -309,7 +309,7 @@
         </div>
         <div class="col-md-3">
             <label for="cor_${tamanhoIndex}" class="form-label">Cor</label>
-            <input type="text" name="informacoes[${tamanhoIndex}][cor]" id="cor_${tamanhoIndex}" class="form-control" required>
+            <input type="text" name="informacoes[${tamanhoIndex}][cor]" id="cor_${tamanhoIndex}" class="form-control" >
         </div>
         <div class="col-md-3">
             <label for="quantidade_${tamanhoIndex}" class="form-label">Quantidade</label>
