@@ -98,10 +98,40 @@ class CarrinhosController extends Controller
     }
 
 
-    public function atualizarQuantidade(Request $request, $produtoId)
+    public function atualizarQuantidade($produtoId, Request $request)
     {
+        // Verifique se o usuário está autenticado
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Não autenticado'], 401);
+        }
 
-     
+        $userId = auth()->id();
+
+        // Primeiro encontre o carrinho do usuário
+        $carrinho = Carrinhos::where('user_id', $userId)->first();
+
+        if (!$carrinho) {
+            return response()->json(['error' => 'Carrinho não encontrado'], 404);
+        }
+
+        // Depois o item no carrinho
+        $carrinhoItem = CarrinhoIten::where('produto_id', $produtoId)
+                            ->where('carrinho_id', $carrinho->id)
+                            ->first();
+
+        if (!$carrinhoItem) {
+            return response()->json(['error' => 'Item não encontrado no carrinho'], 404);
+        }
+
+        $novaQuantidade = max(1, (int)$request->input('quantidade'));
+        $carrinhoItem->quantidade = $novaQuantidade;
+        $carrinhoItem->save();
+
+        return response()->json([
+            'success' => true,
+            'nova_quantidade' => $novaQuantidade,
+            'mensagem' => 'Quantidade atualizada com sucesso.'
+        ]);
     }
 
     public function removerProduto($produtoId)
@@ -119,7 +149,7 @@ class CarrinhosController extends Controller
 
     public function info()
     {
-        $produtos = Produtos::with([ 'tamanhos'])->get();
+        $produtos = Produtos::with(['tamanhos'])->get();
         $carrinho = Carrinhos::where('user_id', Auth::id())->with('produtos.imagens', 'cupons')->first();
 
         $cor_map = [

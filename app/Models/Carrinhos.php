@@ -67,4 +67,6 @@ class Carrinhos extends Model
 
         return max($total - $descontoTotal, 0);
     }
+
+
 }

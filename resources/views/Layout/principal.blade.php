@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Alis')</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -13,94 +14,88 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
-    <style>
-        .hide {
-            display: none;
-        }
-
-        /* Ajuste a posição do offcanvas */
-        .offcanvas-carrinho.offcanvas-end {
-            top: 0;
-            height: auto;
-            background-color: #1c1c1c;
-            /* Fundo preto */
-            color: white;
-            /* Texto branco */
-        }
-
-        /* Header do offcanvas */
-        .offcanvas-header-carrinho {
-            background-color: #2c2c2c;
-            /* Cinza escuro */
-            color: white;
-            border-bottom: 2px solid #444;
-        }
-
-        /* Linha divisória */
-        .hr {
-            border-color: #444;
-        }
-
-        /* Corpo do offcanvas */
-        .offcanvas-body-carrinho {
-            background-color: #1c1c1c;
-        }
-
-        /* Estilização da lista de produtos */
-        .list-group-item-carrinho {
-            background-color: #2c2c2c;
-            /* Cinza escuro */
-            color: white;
-            border: 1px solid #444;
-            /* Bordas sutis */
-        }
-
-        /* Inputs de quantidade */
-        .update-quantity-carrinho {
-            background-color: #333;
-            color: white;
-            border: 1px solid #555;
-        }
-
-        /* Botões de adicionar e remover quantidade */
-        .update-quantity-btn-carrinho {
-            background-color: #444;
-            color: white;
-            border: none;
-        }
-
-        .update-quantity-btn:hover {
-            background-color: #555;
-        }
-
-        /* Botão de excluir */
-        .btn-transparent {
-            color: white;
-        }
-
-        .btn-transparent:hover {
-            color: #ff4d4d;
-        }
-
-        /* Barra de progresso */
-        .progress {
-            background-color: #444;
-        }
-
-        .progress-bar {
-            background-color: #28a745;
-        }
-
-        /* Rodapé */
-    </style>
 </head>
 
 <style>
+    .hide {
+        display: none;
+    }
 
+    /* Ajuste a posição do offcanvas */
+    .offcanvas-carrinho.offcanvas-end {
+        top: 0;
+        height: auto;
+        background-color: #1c1c1c;
+        /* Fundo preto */
+        color: white;
+        /* Texto branco */
+    }
+
+    /* Header do offcanvas */
+    .offcanvas-header-carrinho {
+        background-color: #2c2c2c;
+        /* Cinza escuro */
+        color: white;
+        border-bottom: 2px solid #444;
+    }
+
+    /* Linha divisória */
+    .hr {
+        border-color: #444;
+    }
+
+    /* Corpo do offcanvas */
+    .offcanvas-body-carrinho {
+        background-color: #1c1c1c;
+    }
+
+    /* Estilização da lista de produtos */
+    .list-group-item-carrinho {
+        background-color: #2c2c2c;
+        /* Cinza escuro */
+        color: white;
+        border: 1px solid #444;
+        /* Bordas sutis */
+    }
+
+    /* Inputs de quantidade */
+    .update-quantity-carrinho {
+        background-color: #333;
+        color: white;
+        border: 1px solid #555;
+    }
+
+    /* Botões de adicionar e remover quantidade */
+    .update-quantity-btn-carrinho {
+        background-color: #444;
+        color: white;
+        border: none;
+    }
+
+    .update-quantity-btn:hover {
+        background-color: #555;
+    }
+
+    /* Botão de excluir */
+    .btn-transparent {
+        color: white;
+    }
+
+    .btn-transparent:hover {
+        color: #ff4d4d;
+    }
+
+    /* Barra de progresso */
+    .progress {
+        background-color: #444;
+    }
+
+    .progress-bar {
+        background-color: #28a745;
+    }
+
+    /* Rodapé */
 </style>
 
 <body>
@@ -231,9 +226,10 @@
                             @endphp
                             <li class="list-group-item d-flex align-items-center">
                                 @if ($produto->imagens->isNotEmpty())
-                                    <img  src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                    <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
                                         alt="{{ $produto->nome }}" class="miniatura img-custom"
-                                        onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}')" class="img-fluid rounded"
+                                        onclick="trocarImagemPrincipal('{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}')"
+                                        class="img-fluid rounded"
                                         style="width: 70px; height: 70px; object-fit: cover; margin-right: 10px;">
                                 @else
                                     <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão"
@@ -364,8 +360,10 @@
                         <a href="#ofertasMenu" class="d-block text-decoration-none" data-bs-toggle="collapse">OFERTAS
                             ▼</a>
                         <ul id="ofertasMenu" class="collapse ps-3">
-                            <li><a href="{{route('produtos.ofertasM')}}" class="d-block text-decoration-none">Ofertas Masculinas</a></li>
-                            <li><a href="{{route('produtos.ofertasF')}}" class="d-block text-decoration-none">Ofertas Femininas</a></li>
+                            <li><a href="{{ route('produtos.ofertasM') }}"
+                                    class="d-block text-decoration-none">Ofertas Masculinas</a></li>
+                            <li><a href="{{ route('produtos.ofertasF') }}"
+                                    class="d-block text-decoration-none">Ofertas Femininas</a></li>
                         </ul>
                     </li>
 
@@ -550,7 +548,6 @@
             });
         }
 
-        // Abrir modal de login
         $('#open-login-modal').click(function(event) {
             event.preventDefault();
             let loginModal = new bootstrap.Modal($('#loginModal'));
@@ -577,62 +574,56 @@
             $('#inputCupom, #applyCupom').removeClass('d-none');
         });
 
+        document.querySelectorAll('.update-quantity-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const form = this.closest('.update-quantity-form');
+                const input = form.querySelector('.update-quantity');
+                let quantidade = parseInt(input.value);
+                const action = this.dataset.action;
+                const produtoId = form.dataset.produtoId;
 
-        // Atualizar quantidade no carrinho
-        $('.update-quantity').change(function() {
-            atualizarQuantidade($(this));
-        });
-
-        $('.update-quantity-btn').click(function() {
-            let input = $(this).closest('.update-quantity-form').find('.update-quantity');
-            let currentValue = parseInt(input.val()) || 1;
-            let action = $(this).data('action');
-
-            if (action === "increase") {
-                input.val(currentValue + 1);
-            } else if (action === "decrease" && currentValue > 1) {
-                input.val(currentValue - 1);
-            }
-
-            atualizarQuantidade(input);
-        });
-
-        function atualizarQuantidade(input) {
-            let form = input.closest(".update-quantity-form");
-            let produtoId = form.data("produto-id");
-            let quantidade = input.val();
-
-            $.ajax({
-                url: `/carrinho/atualizar/${produtoId}`,
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: new FormData(form[0]),
-                processData: false,
-                contentType: false,
-                dataType: 'json',
-                success: function(data) {
-                    if (data.success) {
-                        let produtoElement = form.closest('li');
-                        let produtoData = data.produtos.find(produto => produto.pivot.produto_id ==
-                            produtoId);
-                        let subtotal = produtoData.pivot.quantidade * produtoData.preco;
-
-                        produtoElement.find('.me-auto small:last-child').text(
-                            `Total: R$ ${subtotal.toFixed(2).replace('.', ',')}`);
-                        $(".offcanvas-body h5 strong").text(`Total: R$ ${data.total}`);
-                    } else {
-                        alert(data.error);
-                    }
-                },
-                error: function(error) {
-                    console.error('Erro ao atualizar o carrinho:', error);
+                if (action === 'increase') {
+                    quantidade += 1;
+                } else if (action === 'decrease' && quantidade > 1) {
+                    quantidade -= 1;
                 }
-            });
-        }
 
-        // Remover produto do carrinho
+                input.value = quantidade;
+
+                // Adicione um tratamento de erro mais robusto
+                fetch(`/loja/carrinho/atualizar/${produtoId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector(
+                                'meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            quantidade: quantidade
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro na rede');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            console.log(data.mensagem);
+                            // Atualize a UI conforme necessário
+                        } else {
+                            alert(data.error || 'Erro ao atualizar quantidade.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                        alert('Falha na comunicação com o servidor.');
+                    });
+            });
+        });
+
         $(".remover-produto").click(function(e) {
             e.preventDefault();
             $(this).closest("form").submit();
@@ -652,45 +643,6 @@
         } else {
             $(".progress").prev("p").html("🎉 Parabéns! Você tem frete grátis!");
         }
-    }
-
-    // Chamar a função sempre que atualizar o carrinho
-    function atualizarQuantidade(input) {
-        let form = input.closest(".update-quantity-form");
-        let produtoId = form.data("produto-id");
-        let quantidade = input.val();
-
-        $.ajax({
-            url: `/carrinho/atualizar/${produtoId}`,
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: new FormData(form[0]),
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(data) {
-                if (data.success) {
-                    let produtoElement = form.closest('li');
-                    let produtoData = data.produtos.find(produto => produto.pivot.produto_id == produtoId);
-                    let subtotal = produtoData.pivot.quantidade * produtoData.preco;
-
-                    produtoElement.find('.me-auto small:last-child').text(
-                        `Total: R$ ${subtotal.toFixed(2).replace('.', ',')}`
-                    );
-
-                    $(".offcanvas-body h5 strong").text(`Total: R$ ${data.total}`);
-
-                    atualizarBarraFreteGratis(data.total);
-                } else {
-                    alert(data.error);
-                }
-            },
-            error: function(error) {
-                console.error('Erro ao atualizar o carrinho:', error);
-            }
-        });
     }
 </script>
 
