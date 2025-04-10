@@ -101,29 +101,7 @@ class CarrinhosController extends Controller
     public function atualizarQuantidade(Request $request, $produtoId)
     {
 
-        Log::info('Requisição para atualizar carrinho', [
-            'user_id' => Auth::id(),
-            'produtoId' => $produtoId,
-            'quantidade' => $request->quantidade
-        ]);
-        $carrinho = Carrinhos::where('user_id', Auth::id())->first();
-
-        if ($carrinho) {
-            $quantidade = max(1, (int) $request->quantidade); // Garante que a quantidade seja no mínimo 1
-            $carrinho->produtos()->updateExistingPivot($produtoId, ['quantidade' => $quantidade]);
-
-            $novoCarrinho = $carrinho->fresh();
-
-            return response()->json([
-                'success' => true,
-                'produtos' => $novoCarrinho->produtos,
-                'total' => number_format($novoCarrinho->produtos->sum(function ($produto) {
-                    return $produto->preco * $produto->pivot->quantidade;
-                }), 2, ',', '.')
-            ]);
-        }
-
-        return response()->json(['error' => 'Carrinho não encontrado!'], 404);
+     
     }
 
     public function removerProduto($produtoId)

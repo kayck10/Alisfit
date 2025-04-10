@@ -179,7 +179,7 @@
         #promo-ticker {
             background-color: black;
             color: white;
-            padding: 10px 0;
+            padding: 1px 0;
             overflow: hidden;
             white-space: nowrap;
             position: relative;
@@ -353,7 +353,7 @@
         /* Telas menores */
         @media (max-width: 768px) {
             .carousel-inner {
-                height: 38vh;
+                height: 31vh;
             }
 
             .carousel-inner img {
