@@ -342,10 +342,6 @@
 
         }
 
-        .carousel-inner {
-            height: 100vh;
-            /* Altura fixa */
-        }
 
         .carousel-inner img {
             width: 100%;
