@@ -45,7 +45,7 @@ Route::prefix('loja')->group(function () {
     Route::get('/conta/{page}', [PrincipalController::class, 'carregarPagina'])->name('conta.pagina');
 
 
-    // Route::group(['middleware' => 'cliente.auth'], function () {
+    Route::group(['middleware' => 'cliente.auth'], function () {
         Route::prefix('carrinho')->group(function () {
             Route::get('/', [CarrinhosController::class, 'carrinho'])->name('carrinho');
             Route::post('/adicionar/{produtoId}', [CarrinhosController::class, 'adicionarProduto'])->name('carrinho.adicionar');
@@ -57,6 +57,7 @@ Route::prefix('loja')->group(function () {
             Route::post('/finalizar-pedido', [CarrinhosController::class, 'finalizarPedido'])->name('carrinho.finalizarPedido');
         });
     });
+});
 
 Route::prefix('produtos')->group(function () {
     Route::get('/masculinos', [ProdutosController::class, 'masculinos'])->name('produtos.masculinos');

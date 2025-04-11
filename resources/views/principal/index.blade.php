@@ -232,7 +232,7 @@
 
         .mais-vendidos-item img {
             width: 100%;
-            height: 600px;
+            height: 700px;
             object-fit: cover;
             border-radius: 10px;
             transition: transform 0.3s ease, opacity 0.3s ease;
@@ -269,11 +269,12 @@
 
         @media (max-width: 768px) {
             .mais-vendidos-item img {
-                height: 200px;
+                height: 400px;
+                object-fit: cover;
                 transition: transform 0.3s ease, opacity 0.3s ease;
-
             }
         }
+
 
 
         @media (max-width: 768px) {
@@ -342,6 +343,9 @@
 
         }
 
+        .carousel-item:nth-child(2) img {
+            object-position: top center;
+        }
 
         .carousel-inner img {
             width: 100%;
@@ -358,6 +362,11 @@
 
             .carousel-inner img {
                 object-position: top center;
+            }
+
+            .carousel-item:nth-child(2) img {
+                object-position: 20% center;
+                /* ou outro valor que funcione melhor pra você */
             }
         }
     </style>
