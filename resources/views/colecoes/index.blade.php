@@ -9,13 +9,13 @@
             <a href="{{ route('colecoes.create') }}" class="btn btn-success">Criar Coleção</a>
         </div>
 
-        <div  class="row">
+        <div class="row">
             @foreach ($colecoes as $colecao)
                 <div style="margin-bottom: 250px;" class="col-md-4 col-sm-6 mb-4">
                     <div class="card shadow-sm">
-                        <img src="{{ \App\Helpers\ColecaoHelper::getImageUrl($colecao) }}"
-                        alt="{{ $colecao->nome }}"
-                        class="img-fluid">                        <div class="card-body">
+                        <img src="{{ \App\Helpers\ColecaoHelper::getImageUrl($colecao) }}" alt="{{ $colecao->nome }}"
+                            class="img-fluid">
+                        <div class="card-body">
                             <h5 class="card-title">{{ $colecao->nome }}</h5>
                             <p class="card-text">{{ $colecao->descricao ?? 'Sem descrição' }}</p>
                             <button class="btn btn-primary btn-sm ver-detalhes" data-id="{{ $colecao->id }}">
@@ -37,7 +37,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <img id="modal-imagem" src="" class="img-fluid mb-3" style="max-height: 300px; object-fit: cover;">
+                    <img id="modal-imagem" src="" class="img-fluid mb-3"
+                        style="max-height: 300px; object-fit: cover;">
                     <h4 id="modal-nome"></h4>
                     <p id="modal-descricao"></p>
 
@@ -71,11 +72,14 @@
                         })
                         .then(data => {
                             document.getElementById("modal-nome").textContent = data.nome;
-                            document.getElementById("modal-descricao").textContent = data.descricao;
+                            document.getElementById("modal-descricao").textContent = data
+                                .descricao;
                             document.getElementById("modal-imagem").src = data.imagem_url;
 
-                            document.getElementById("modal-editar").href = `/colecao/edit/${colecaoId}`;
-                            document.getElementById("modal-excluir").setAttribute("data-id", colecaoId);
+                            document.getElementById("modal-editar").href =
+                                `/colecao/edit/${colecaoId}`;
+                            document.getElementById("modal-excluir").setAttribute("data-id",
+                                colecaoId);
 
                             $("#detalhesModal").modal("show");
                         })
@@ -100,27 +104,29 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         fetch(`/colecao/destroy/${colecaoId}`, {
-                            method: "DELETE",
-                            headers: {
-                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                                "Content-Type": "application/json"
-                            }
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error("Erro ao excluir.");
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            Swal.fire("Excluído!", "A coleção foi removida com sucesso.", "success");
-                            $("#detalhesModal").modal("hide");
-                            location.reload();
-                        })
-                        .catch(error => {
-                            console.error("Erro ao excluir:", error);
-                            Swal.fire("Erro!", "Não foi possível excluir.", "error");
-                        });
+                                method: "DELETE",
+                                headers: {
+                                    "X-CSRF-TOKEN": document.querySelector(
+                                        'meta[name="csrf-token"]').getAttribute("content"),
+                                    "Content-Type": "application/json"
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error("Erro ao excluir.");
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                Swal.fire("Excluído!", "A coleção foi removida com sucesso.",
+                                    "success");
+                                $("#detalhesModal").modal("hide");
+                                location.reload();
+                            })
+                            .catch(error => {
+                                console.error("Erro ao excluir:", error);
+                                Swal.fire("Erro!", "Não foi possível excluir.", "error");
+                            });
                     }
                 });
             });
