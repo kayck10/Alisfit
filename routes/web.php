@@ -165,6 +165,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::get('/imagem/{caminho}/{filename}', [ImagensProdutoController::class, 'getImage'])->name('produtos.imagem');
+Route::get('/colecoes/imagem/{caminho}/{filename}', [ImagensProdutoController::class, 'getImageC'])->name('colecoes.imagem');
 
 
 

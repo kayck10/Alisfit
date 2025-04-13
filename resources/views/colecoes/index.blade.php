@@ -13,9 +13,9 @@
             @foreach ($colecoes as $colecao)
                 <div style="margin-bottom: 250px;" class="col-md-4 col-sm-6 mb-4">
                     <div class="card shadow-sm">
-                        <img src="{{ \App\Helpers\ImageHelper::getColecaoImagemUrl($colecao) }}" alt="{{ $colecao->nome }}" class="card-img-top">
-
-                        <div class="card-body">
+                        <img src="{{ \App\Helpers\ColecaoHelper::getImageUrl($colecao) }}"
+                        alt="{{ $colecao->nome }}"
+                        class="img-fluid">                        <div class="card-body">
                             <h5 class="card-title">{{ $colecao->nome }}</h5>
                             <p class="card-text">{{ $colecao->descricao ?? 'Sem descrição' }}</p>
                             <button class="btn btn-primary btn-sm ver-detalhes" data-id="{{ $colecao->id }}">

@@ -17,4 +17,15 @@ class ImagensProdutoController extends Controller
 
         return Response::file($path);
     }
+
+    public function getImageC($caminho, $filename)
+    {
+        $path = storage_path('app/public/' . $caminho . '/' . $filename);
+
+        if (!file_exists($path)) {
+            abort(404, "Arquivo não encontrado");
+        }
+
+        return Response::file($path);
+    }
 }
