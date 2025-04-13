@@ -9,7 +9,7 @@
             <a href="{{ route('colecoes.create') }}" class="btn btn-success">Criar Coleção</a>
         </div>
 
-        <div class="row">
+        <div style="margin-bottom: 150px;" class="row">
             @foreach ($colecoes as $colecao)
                 <div style="margin-bottom: 250px;" class="col-md-4 col-sm-6 mb-4">
                     <div class="card shadow-sm">
