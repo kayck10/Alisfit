@@ -100,6 +100,7 @@ class CheckoutController extends Controller
 
     public function webhook(Request $request)
     {
+        Log::info($request->all());
         // Resposta para teste de conexão
         if ($request->isMethod('get')) {
             return response()->json(['status' => 'webhook ready'], 200);
