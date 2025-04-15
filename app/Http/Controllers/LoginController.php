@@ -86,6 +86,7 @@ class LoginController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('login')->with('success', 'Logout realizado com sucesso!');
+        Toastr::success('Logout realizado com sucesso!', 'Sucesso', ["positionClass" => "toast-top-center"]);
+        return redirect()->route('loja.create')->with('success', 'Logout realizado com sucesso!');
     }
 }

@@ -124,11 +124,11 @@
                             </a>
 
                             <!-- Ícone de logout -->
-                            <form action="{{ route('logout') }}" method="POST">
+                            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                 <i class="fa-solid fa-right-from-bracket"></i>
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                 @csrf
-                                <button type="submit" class="btn">
-                                    <i style="font-size: 1.4rem;" class="bi bi-box-arrow-right text-dark"></i>
-                                </button>
                             </form>
 
 

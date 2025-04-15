@@ -186,8 +186,14 @@
                                 <ul>
                                     <li><a href="{{ route('conta') }}">Minha Conta</a></li>
                                     <li><a href="#">Meus Pedidos</a></li>
-                                    <li><a href="#" id="logout-btn">Sair <i
-                                                class="fa-solid fa-right-from-bracket"></i></a></li>
+                                    <li>
+                                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            Sair <i class="fa-solid fa-right-from-bracket"></i>
+                                        </a>
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                            @csrf
+                                        </form>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -260,7 +266,7 @@
                                     method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-transparent btn-sm">
-                                        <i class="bi bi-trash3"></i>
+                                        <i class="bi bi-trash3 text-danger"></i>
                                     </button>
                                 </form>
                             </li>
@@ -727,7 +733,6 @@
             });
         });
 
-        // Função para calcular frete (se necessário)
         function calcularFrete(cep) {
             $.get("{{ route('frete.calcular') }}", {
                 cep: cep

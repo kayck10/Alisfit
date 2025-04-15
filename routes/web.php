@@ -151,12 +151,13 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::prefix('checkout')->group(function () {
-        Route::get('/success', [CheckoutController::class, 'success'])->name('checkout.success');
-        Route::get('/failure', [CheckoutController::class, 'failure'])->name('checkout.failure');
-        Route::get('/pending', [CheckoutController::class, 'pending'])->name('checkout.pending');
+        Route::get('/success/{pedido_id}', [CheckoutController::class, 'success'])->name('checkout.success');
+        Route::get('/failure/{pedido_id}', [CheckoutController::class, 'failure'])->name('checkout.failure');
+        Route::get('/pending/{pedido_id}', [CheckoutController::class, 'pending'])->name('checkout.pending');
         Route::get('/{id}', [CheckoutController::class, 'checkout'])->name('checkout');
         Route::post('/processar', [CheckoutController::class, 'processarCheckout'])->name('checkout.processar');
-        Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook']);
+        Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook'])
+            ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
     });
 
 

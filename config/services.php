@@ -35,8 +35,9 @@ return [
     ],
 
     'mercadopago' => [
-        'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
-        'public_key' => env('MERCADOPAGO_PUBLIC_KEY'),
+        'access_token' => env('MP_SANDBOX_MODE') ? env('MP_TEST_ACCESS_TOKEN') : env('MP_PROD_ACCESS_TOKEN'),
+        'public_key' => env('MP_SANDBOX_MODE') ? env('MP_TEST_PUBLIC_KEY') : env('MP_PROD_PUBLIC_KEY'),
+        'sandbox_mode' => env('MP_SANDBOX_MODE', true),
     ],
 
 ];
