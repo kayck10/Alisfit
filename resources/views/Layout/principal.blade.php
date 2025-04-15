@@ -187,10 +187,12 @@
                                     <li><a href="{{ route('conta') }}">Minha Conta</a></li>
                                     <li><a href="#">Meus Pedidos</a></li>
                                     <li>
-                                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <a href="#"
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             Sair <i class="fa-solid fa-right-from-bracket"></i>
                                         </a>
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                            style="display: none;">
                                             @csrf
                                         </form>
                                     </li>
@@ -742,9 +744,13 @@
                 } else {
                     var valorFrete = parseFloat(data.valor);
                     var prazo = data.prazo;
+                    var gratis = data.grátis;
+
+                    let textoFrete = gratis ? 'Frete: <strong class="text-success">Grátis</strong>' :
+                        `Frete: <strong>R$ ${valorFrete.toFixed(2).replace(".", ",")}</strong>`;
 
                     $("#infoFrete").html(`
-                <li class="list-group-item">Frete: <strong>R$ ${valorFrete.toFixed(2).replace(".", ",")}</strong></li>
+                <li class="list-group-item">${textoFrete}</li>
                 <li class="list-group-item">Prazo: <strong>${prazo} dias úteis</strong></li>
             `);
 

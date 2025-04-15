@@ -26,6 +26,11 @@ Route::post('/login/cliente', [LoginController::class, 'Clistore'])->name('clien
 Route::post('/cadastro/cliente', [LoginController::class, 'cadastro'])->name('cliente.cadastro');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+Route::prefix('checkout')->group(function () {
+    Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook'])
+        ->withoutMiddleware(['web', 'verifyCsrfToken'])
+        ->name('checkout.webhook');
+});
 
 Route::get('/', [PrincipalController::class, 'index'])->name('loja.create');
 
@@ -106,6 +111,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{id}', [ColecoesController::class, 'update'])->name('colecoes.update');
         Route::delete('/destroy/{id}', [ColecoesController::class, 'destroy'])->name('colecoes.delete');
         Route::get('/{id}/produtos', [ColecoesController::class, 'produtosPorColecao'])->name('colecao.produtos');
+        Route::post('/{id}/toggle-status', [ColecoesController::class, 'toggleStatus'])->name('colecoes.toggle-status');
     });
 
     // Produtos
@@ -140,8 +146,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{cupom}', [CuponsController::class, 'destroy'])->name('cupons.destroy');
     });
 
-
-
     Route::prefix('pedidos')->group(function () {
         Route::get('/', [PedidosController::class, 'index'])->name('pedidos.index');
         Route::post('/aplicar-cupom-carrinho', [PedidosController::class, 'aplicarCupomCarrinho'])->name('carrinho.aplicar-cupom');
@@ -149,15 +153,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}', [PedidosController::class, 'show'])->name('pedidos.show');
     });
 
-
     Route::prefix('checkout')->group(function () {
         Route::get('/success', [CheckoutController::class, 'success'])->name('checkout.success');
         Route::get('/failure', [CheckoutController::class, 'failure'])->name('checkout.failure');
         Route::get('/pending', [CheckoutController::class, 'pending'])->name('checkout.pending');
         Route::get('/{id}', [CheckoutController::class, 'checkout'])->name('checkout');
-        Route::post('/processar', [CheckoutController::class, 'processarCheckout'])->name('checkout.processar');
-        Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook']);
+
     });
+
 
 
     Route::get('/calcular-frete', [FreteController::class, 'calcular'])->name('frete.calcular');

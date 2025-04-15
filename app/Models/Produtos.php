@@ -16,6 +16,12 @@ class Produtos extends Model
         return $this->belongsTo(Colecoes::class);
     }
 
+    public function scopeDaColecaoPublicada($query)
+    {
+        return $query->whereHas('colecao', function ($query) {
+            $query->where('status', 'publicado');
+        });
+    }
     public function medidas()
     {
         return $this->hasMany(TabelaMedidas::class, 'produto_id');

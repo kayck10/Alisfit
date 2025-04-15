@@ -24,9 +24,12 @@ class FreteController extends Controller
         $frete = $this->freteService->calcularFrete($cepDestino);
 
         if (isset($frete['error'])) {
-            return redirect()->back()->with('error', $frete['error']);
+            return response()->json(['erro' => $frete['error']], 400);
         }
+
+        // Salvar na sessão (opcional)
+        session(['valorFrete' => $frete['valor']]);
+
         return response()->json($frete);
     }
-
 }

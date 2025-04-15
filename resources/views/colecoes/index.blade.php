@@ -8,7 +8,6 @@
         <div class="text-center mb-4">
             <a href="{{ route('colecoes.create') }}" class="btn btn-success">Criar Coleção</a>
         </div>
-
         <div style="margin-bottom: 150px;" class="row">
             @foreach ($colecoes as $colecao)
                 <div style="margin-bottom: 250px;" class="col-md-4 col-sm-6 mb-4">
@@ -17,10 +16,23 @@
                             class="img-fluid">
                         <div class="card-body">
                             <h5 class="card-title">{{ $colecao->nome }}</h5>
+                            <span class="badge bg-{{ $colecao->status == 'publicado' ? 'success' : 'warning' }}">
+                                {{ $colecao->status == 'publicado' ? 'Publicado' : 'Rascunho' }}
+                            </span>
                             <p class="card-text">{{ $colecao->descricao ?? 'Sem descrição' }}</p>
                             <button class="btn btn-primary btn-sm ver-detalhes" data-id="{{ $colecao->id }}">
                                 Ver Detalhes
                             </button>
+
+                            <!-- Botão para alternar status -->
+                            <form action="{{ route('colecoes.toggle-status', $colecao->id) }}" method="POST"
+                                class="d-inline">
+                                @csrf
+                                <button type="submit"
+                                    class="btn btn-sm btn-{{ $colecao->status == 'publicado' ? 'warning' : 'success' }}">
+                                    {{ $colecao->status == 'publicado' ? 'Colocar como Rascunho' : 'Publicar' }}
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -40,17 +52,12 @@
                     <img id="modal-imagem" src="" class="img-fluid mb-3"
                         style="max-height: 300px; object-fit: cover;">
                     <h4 id="modal-nome"></h4>
+                    <div id="modal-status-container" class="mb-2"></div>
                     <p id="modal-descricao"></p>
-
                 </div>
                 <div class="modal-footer">
-                    <!-- Botão Editar -->
                     <a id="modal-editar" class="btn btn-warning">Editar <i class="bi bi-pencil-square"></i></a>
-
-                    <!-- Botão Excluir -->
                     <button id="modal-excluir" class="btn btn-danger">Excluir <i class="bi bi-trash-fill"></i></button>
-
-
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
@@ -75,6 +82,14 @@
                             document.getElementById("modal-descricao").textContent = data
                                 .descricao;
                             document.getElementById("modal-imagem").src = data.imagem_url;
+
+                            // Adicione um elemento para mostrar o status
+                            let statusElement = document.createElement('span');
+                            statusElement.className =
+                                `badge bg-${data.status == 'publicado' ? 'success' : 'warning'}`;
+                            statusElement.textContent = data.status == 'publicado' ?
+                                'Publicado' : 'Rascunho';
+                            document.querySelector(".modal-body").appendChild(statusElement);
 
                             document.getElementById("modal-editar").href =
                                 `/colecao/edit/${colecaoId}`;

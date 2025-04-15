@@ -16,7 +16,7 @@ class PrincipalController extends Controller
 {
     public function index()
     {
-        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens'])
+        $produtos = Produtos::daColecaoPublicada()->with(['colecao', 'tamanhos', 'imagens'])
             ->where('destaque', true)
             ->take(6)
             ->get();
@@ -55,14 +55,14 @@ class PrincipalController extends Controller
     public function drops(Request $request)
     {
         $tamanhos = Tamanhos::all();
-        $colecoes = Colecoes::all();
+        $colecoes = Colecoes::where('status', 'publicado')->get();
         $generos = Generos::all();
 
         $cores = ProdutosTamanhos::distinct()->pluck('cor')->filter()->values();
 
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
-        $produtos = Produtos::with(['colecao', 'tamanhos', 'imagens', 'genero'])
+        $produtos = Produtos::daColecaoPublicada()->with(['colecao', 'tamanhos', 'imagens', 'genero'])
             ->where('lancamento', 1);
 
         if ($request->has('colecao_id')) {
@@ -107,7 +107,7 @@ class PrincipalController extends Controller
             'cor.*' => 'string'
         ]);
 
-        $query = Produtos::with(['colecao', 'tamanhos', 'imagens', 'genero']);
+        $query = Produtos::daColecaoPublicada()->with(['colecao', 'tamanhos', 'imagens', 'genero']);
 
         // Aplicar filtros
         if (!empty($filtros['colecao_id'])) {

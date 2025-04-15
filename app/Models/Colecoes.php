@@ -13,6 +13,12 @@ class Colecoes extends Model
         'descricao',
         'nome',
         'imagem',
+        'status',
+        'publicado_em'
+    ];
+
+    protected $casts = [
+        'publicado_em' => 'datetime'
     ];
 
     public function produtos()
@@ -23,5 +29,11 @@ class Colecoes extends Model
     public function getImagemUrlAttribute()
     {
         return $this->imagem ? asset('storage/' . $this->imagem) : asset('images/default.jpg');
+    }
+
+    // Escopo para pegar apenas coleções publicadas
+    public function scopePublicadas($query)
+    {
+        return $query->where('status', 'publicado');
     }
 }

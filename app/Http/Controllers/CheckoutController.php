@@ -11,6 +11,7 @@ use Exception;
 use Faker\Provider\pt_BR\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use MercadoPago\SDK;
 use MercadoPago\Preference;
@@ -20,58 +21,6 @@ use MercadoPago\Item;
 class CheckoutController extends Controller
 {
 
-    public function processarCheckout(Request $request)
-    {
-        try {
-
-            $desconto = 0;
-
-            if ($request->codigoCupom) {
-                $this->aplicarCupomAoPedido($request->pedidoId, $request->codigoCupom, $request->valor_total);
-                $desconto = Cupons::whereCodigo($request->codigoCupom)->first()->valor;
-            }
-            SDK::setAccessToken(config('services.mercadopago.access_token'));
-
-            $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
-
-            if (!$carrinho || $carrinho->produtos->isEmpty()) {
-                return redirect()->back()->with('error', 'Seu carrinho está vazio!');
-            }
-
-            $preference = new Preference();
-            $items = [];
-
-            $teste = 0;
-            foreach ($carrinho->produtos as $produto) {
-                $item = new Item();
-                $item->title = $produto->nome;
-                $item->quantity = $produto->pivot->quantidade;
-                $aplicarDesconto = ($produto->preco * $desconto) / 100;
-                $teste += ($produto->preco - $aplicarDesconto);
-                $item->unit_price = ((float) $produto->preco - $aplicarDesconto);
-                $item->currency_id = "BRL";
-                $items[] = $item;
-            }
-
-            $preference->items = $items;
-            $preference->back_urls = [
-                "success" => route('checkout.success', ['pedido_id' => $request->pedidoId]),
-                "failure" => route('checkout.failure', ['pedido_id' => $request->pedidoId]),
-                "pending" => route('checkout.pending', ['pedido_id' => $request->pedidoId]),
-            ];
-            $preference->auto_return = "approved";
-
-            $preference->save();
-
-            if (!empty($preference->init_point)) {
-                return redirect()->away($preference->init_point);
-            } else {
-                return redirect()->route('carrinho')->with('error', 'Ocorreu um erro ao processar o pagamento.');
-            }
-        } catch (Exception $e) {
-            return "aconteceu um erro: $e";
-        }
-    }
 
     public function aplicarCupom(Request $request)
     {
@@ -151,52 +100,57 @@ class CheckoutController extends Controller
 
     public function webhook(Request $request)
     {
-        SDK::setAccessToken(config('services.mercadopago.access_token'));
-
-        $paymentId = $request->input('data.id');
-
-        $pedido = Pedidos::where('payment_id', $paymentId)->first();
-
-        if (!$pedido) {
-            return response()->json(['status' => 'error', 'message' => 'Pedido não encontrado.'], 404);
+        // Resposta para teste de conexão
+        if ($request->isMethod('get')) {
+            return response()->json(['status' => 'webhook ready'], 200);
         }
 
-        $statusPedido = $pedido->status;
-
-        if (!$statusPedido) {
-            return response()->json(['status' => 'error', 'message' => 'Status do pagamento não encontrado.'], 404);
-        }
-
-        switch ($request->input('data.status')) {
-            case 'approved':
-                $statusPedido = StatusPedidos::where('desc', 'Pagamento Aprovado')->first();
-                break;
-            case 'pending':
-                $statusPedido = StatusPedidos::where('desc', 'Pagamento Pendente')->first();
-                break;
-            case 'rejected':
-                $statusPedido = StatusPedidos::where('desc', 'Pagamento Recusado')->first();
-                break;
-            default:
-                $statusPedido = StatusPedidos::where('desc', 'Pagamento Pendente')->first();
-                break;
-        }
-
-        if ($statusPedido) {
-            $pedido->update([
-                'status_pedido_id' => $statusPedido->id,
-            ]);
-
-            if ($statusPedido->desc == 'Pagamento Aprovado' && $pedido->user) {
-                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
-            } elseif ($statusPedido->desc == 'Pagamento Pendente' && $pedido->user) {
-                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
-            } elseif ($statusPedido->desc == 'Pagamento Recusado' && $pedido->user) {
-                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+        $signature = $request->header('x-signature');
+        if ($signature) {
+            $generated = hash_hmac('sha256', $request->getContent(), config('services.mercadopago.webhook_secret'));
+            if ($signature !== 'sha256='.$generated) {
+                return response()->json(['error' => 'Invalid signature'], 401);
             }
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Status do pedido atualizado com sucesso!']);
+        try {
+            $paymentId = $request->input('data.id');
+
+            if (!$paymentId) {
+                throw new Exception('Payment ID not found');
+            }
+
+            $payment = \MercadoPago\Payment::find_by_id($paymentId);
+            $pedido = Pedidos::where('payment_id', $paymentId)->first();
+
+            if (!$pedido) {
+                return response()->json(['error' => 'Order not found'], 404);
+            }
+
+            $statusMap = [
+                'approved' => 'Pagamento Aprovado',
+                'pending' => 'Pagamento Pendente',
+                'rejected' => 'Pagamento Recusado'
+            ];
+
+            $statusDesc = $statusMap[$payment->status] ?? 'Pagamento Pendente';
+            $statusPedido = StatusPedidos::where('desc', $statusDesc)->first();
+
+            if ($statusPedido) {
+                $pedido->update(['status_pedido_id' => $statusPedido->id]);
+
+                if ($pedido->user) {
+                    Mail::to($pedido->user->email)
+                       ->send(new StatusUpdatedMail($pedido, $statusDesc));
+                }
+            }
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            Log::error('Webhook error: '.$e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 

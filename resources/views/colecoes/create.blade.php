@@ -33,6 +33,14 @@
                             <textarea class="form-control" id="descricao" name="descricao" rows="3">{{ old('descricao') }}</textarea>
                         </div>
 
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control">
+                                <option value="rascunho" selected>Rascunho</option>
+                                <option value="publicado">Publicado</option>
+                            </select>
+                        </div>
+
                         <!-- Upload da Imagem -->
                         <div class="mb-3">
                             <label for="imagem" class="form-label">Imagem da Coleção</label>
