@@ -100,11 +100,11 @@ class CheckoutController extends Controller
 
     public function webhook(Request $request)
     {
-        Log::info($request->all());
         // Resposta para teste de conexão
         if ($request->isMethod('get')) {
             return response()->json(['status' => 'webhook ready'], 200);
         }
+        Log::info('teste1');
 
         $signature = $request->header('x-signature');
         if ($signature) {
@@ -113,6 +113,7 @@ class CheckoutController extends Controller
                 return response()->json(['error' => 'Invalid signature'], 401);
             }
         }
+        Log::info('teste2');
 
         try {
             $paymentId = $request->input('data.id');
@@ -122,11 +123,14 @@ class CheckoutController extends Controller
             }
 
             $payment = \MercadoPago\Payment::find_by_id($paymentId);
+            Log::info('teste3');
             $pedido = Pedidos::where('payment_id', $paymentId)->first();
+            Log::info('teste4');
 
             if (!$pedido) {
                 return response()->json(['error' => 'Order not found'], 404);
             }
+            Log::info('teste5');
 
             $statusMap = [
                 'approved' => 'Pagamento Aprovado',
@@ -135,7 +139,9 @@ class CheckoutController extends Controller
             ];
 
             $statusDesc = $statusMap[$payment->status] ?? 'Pagamento Pendente';
+            Log::info('teste6');
             $statusPedido = StatusPedidos::where('desc', $statusDesc)->first();
+            Log::info('teste7');
 
             if ($statusPedido) {
                 $pedido->update(['status_pedido_id' => $statusPedido->id]);
