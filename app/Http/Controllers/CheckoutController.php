@@ -104,9 +104,10 @@ class CheckoutController extends Controller
         if ($request->isMethod('get')) {
             return response()->json(['status' => 'webhook ready'], 200);
         }
-        Log::info('teste1');
+        Log::info(config('services.mercadopago.webhook_secret'));
 
         $signature = $request->header('x-signature');
+        Log::info("signature: {$signature}");
         if ($signature) {
             $generated = hash_hmac('sha256', $request->getContent(), config('services.mercadopago.webhook_secret'));
             if ($signature !== 'sha256='.$generated) {
