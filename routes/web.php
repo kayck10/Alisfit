@@ -27,9 +27,7 @@ Route::post('/cadastro/cliente', [LoginController::class, 'cadastro'])->name('cl
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('checkout')->group(function () {
-    Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook'])
-        ->withoutMiddleware(['web', 'verifyCsrfToken'])
-        ->name('checkout.webhook');
+    Route::post('/mercadopago/webhook', [CheckoutController::class, 'webhook']);
 });
 
 Route::get('/', [PrincipalController::class, 'index'])->name('loja.create');
