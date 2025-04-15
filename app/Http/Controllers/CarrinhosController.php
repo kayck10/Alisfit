@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\StatusUpdatedMail;
 use App\Models\CarrinhoIten;
 use App\Models\Carrinhos;
 use App\Models\Cupons;
 use App\Models\Pedidos;
 use App\Models\Produtos;
-use App\Models\StatusPedidos;
 use Brian2694\Toastr\Facades\Toastr as FacadesToastr;
 use Exception;
 use Illuminate\Http\Request;
@@ -19,7 +17,6 @@ use MercadoPago\Item;
 use MercadoPago\Preference;
 use MercadoPago\SDK;
 use App\Services\FreteService;
-use Illuminate\Support\Facades\Mail;
 
 class CarrinhosController extends Controller
 {
@@ -258,17 +255,11 @@ class CarrinhosController extends Controller
 
     public function finalizarPedido(Request $request)
     {
-        if (config('services.mercadopago.sandbox_mode')) {
-            Log::info('Modo Sandbox ativado - Usando Checkout Transparente');
-        } else {
-            Log::info('Modo Produção ativado - Usando Checkout Pro');
-        }
         DB::beginTransaction();
         try {
-            // Configura SDK do Mercado Pago
-            SDK::setAccessToken(config('services.mercadopago.access_token'));
 
             $frete = $this->calcularFrete($request->cep)['valor'];
+
             $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();
 
             if (!$carrinho) {
@@ -301,17 +292,31 @@ class CarrinhosController extends Controller
                 'complemento' => $request->complemento,
             ]);
 
-            // Vincular produtos ao pedido
             foreach ($carrinho->produtos as $produto) {
-                CarrinhoIten::where('carrinho_id', $carrinho->id)
-                    ->where('produto_id', $produto->id)
-                    ->update(['pedido_id' => $pedido->id]);
+                if ($pedido && $pedido->exists) {
+                    $itemCarrinho = CarrinhoIten::where('carrinho_id', $carrinho->id)
+                        ->where('produto_id', $produto->id)
+                        ->first();
+
+                    if ($itemCarrinho) {
+                        $itemCarrinho->update(['pedido_id' => $pedido->id]);
+                    } else {
+                        Log::warning("Item do carrinho não encontrado", [
+                            'carrinho_id' => $carrinho->id,
+                            'produto_id' => $produto->id
+                        ]);
+                    }
+                } else {
+                    Log::error("Pedido não encontrado no banco de dados.", [
+                        'pedido_id' => $pedido->id ?? 'null'
+                    ]);
+                }
             }
 
-            // Configuração da preferência de pagamento
+
+            SDK::setAccessToken(config('services.mercadopago.access_token'));
             $preference = new Preference();
 
-            // Itens do pedido
             $items = [];
             foreach ($carrinho->produtos as $produto) {
                 $item = new Item();
@@ -322,7 +327,6 @@ class CarrinhosController extends Controller
                 $items[] = $item;
             }
 
-            // Adiciona frete como item separado
             if ($valorFrete > 0) {
                 $freteItem = new Item();
                 $freteItem->title = "Frete";
@@ -334,7 +338,6 @@ class CarrinhosController extends Controller
 
             $preference->items = $items;
 
-            // Aplica desconto se houver
             if ($desconto > 0) {
                 $preference->deductions = [
                     [
@@ -344,50 +347,24 @@ class CarrinhosController extends Controller
                 ];
             }
 
-            // URLs de retorno
             $preference->back_urls = [
                 "success" => route('checkout.success', ['pedido_id' => $pedido->id]),
                 "failure" => route('checkout.failure', ['pedido_id' => $pedido->id]),
                 "pending" => route('checkout.pending', ['pedido_id' => $pedido->id]),
             ];
-
             $preference->auto_return = "approved";
             $preference->external_reference = $pedido->id;
-
-            $preference->payment_methods = [
-                "excluded_payment_types" => [
-                    ["id" => "atm"]
-                ],
-                "installments" => 12
-            ];
-
-            // Webhook notification
-            if (!config('services.mercadopago.sandbox_mode')) {
-                $preference->notification_url = route('checkout.mercadopago.webhook');
-            }
-
             $preference->save();
 
-            $pedido->update([
-                'payment_id' => $preference->id,
-                'preference_id' => $preference->id
-            ]);
-
             DB::commit();
-
             return response()->json([
-                'redirect' => config('services.mercadopago.sandbox_mode')
-                    ? $preference->sandbox_init_point
-                    : $preference->init_point
+                'redirect' => $preference->init_point
             ]);
-
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Erro ao finalizar pedido: ' . $e->getMessage());
             return response()->json(['message' => 'Erro ao processar pedido: ' . $e->getMessage()], 500);
         }
     }
-
 
     public function calcularFrete($cep)
     {

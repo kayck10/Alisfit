@@ -11,7 +11,6 @@ use Exception;
 use Faker\Provider\pt_BR\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use MercadoPago\SDK;
 use MercadoPago\Preference;
@@ -152,75 +151,52 @@ class CheckoutController extends Controller
 
     public function webhook(Request $request)
     {
-        try {
-            Log::info('Webhook recebido', ['data' => $request->all()]);
+        SDK::setAccessToken(config('services.mercadopago.access_token'));
 
-            SDK::setAccessToken(config('services.mercadopago.access_token'));
+        $paymentId = $request->input('data.id');
 
-            if (!config('services.mercadopago.sandbox_mode')) {
-                $signature = $request->header('x-signature');
-                $payload = $request->getContent();
-                $publicKey = config('services.mercadopago.public_key');
+        $pedido = Pedidos::where('payment_id', $paymentId)->first();
 
-                if (!openssl_verify($payload, base64_decode($signature), $publicKey, 'sha256WithRSAEncryption')) {
-                    Log::error('Assinatura do webhook inválida');
-                    return response()->json(['status' => 'error', 'message' => 'Assinatura inválida'], 403);
-                }
-            }
-
-            $paymentId = $request->input('data.id');
-            $payment = \MercadoPago\Payment::find_by_id($paymentId);
-
-            if (!$payment) {
-                Log::error('Pagamento não encontrado no webhook', ['payment_id' => $paymentId]);
-                return response()->json(['status' => 'error', 'message' => 'Pagamento não encontrado'], 404);
-            }
-
-            $pedido = Pedidos::where('id', $payment->external_reference)->first();
-
-            if (!$pedido) {
-                Log::error('Pedido não encontrado no webhook', ['external_reference' => $payment->external_reference]);
-                return response()->json(['status' => 'error', 'message' => 'Pedido não encontrado'], 404);
-            }
-
-            // Atualizar status do pedido
-            $statusMap = [
-                'approved' => 'Pagamento Aprovado',
-                'pending' => 'Pagamento Pendente',
-                'rejected' => 'Pagamento Recusado',
-                'refunded' => 'Reembolsado',
-                'cancelled' => 'Cancelado',
-                'in_process' => 'Em Processamento',
-                'charged_back' => 'Estornado'
-            ];
-
-            $statusDesc = $statusMap[$payment->status] ?? 'Pagamento Pendente';
-            $statusPedido = StatusPedidos::where('desc', $statusDesc)->first();
-
-            if ($statusPedido) {
-                $pedido->update([
-                    'status_pedido_id' => $statusPedido->id,
-                    'payment_status' => $payment->status,
-                    'payment_details' => json_encode($payment)
-                ]);
-
-                // Enviar e-mail de notificação
-                if ($pedido->user) {
-                    Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusDesc));
-                }
-
-                Log::info('Status do pedido atualizado', [
-                    'pedido_id' => $pedido->id,
-                    'status' => $statusDesc
-                ]);
-            }
-
-            return response()->json(['status' => 'success']);
-
-        } catch (\Exception $e) {
-            Log::error('Erro no webhook: ' . $e->getMessage());
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        if (!$pedido) {
+            return response()->json(['status' => 'error', 'message' => 'Pedido não encontrado.'], 404);
         }
+
+        $statusPedido = $pedido->status;
+
+        if (!$statusPedido) {
+            return response()->json(['status' => 'error', 'message' => 'Status do pagamento não encontrado.'], 404);
+        }
+
+        switch ($request->input('data.status')) {
+            case 'approved':
+                $statusPedido = StatusPedidos::where('desc', 'Pagamento Aprovado')->first();
+                break;
+            case 'pending':
+                $statusPedido = StatusPedidos::where('desc', 'Pagamento Pendente')->first();
+                break;
+            case 'rejected':
+                $statusPedido = StatusPedidos::where('desc', 'Pagamento Recusado')->first();
+                break;
+            default:
+                $statusPedido = StatusPedidos::where('desc', 'Pagamento Pendente')->first();
+                break;
+        }
+
+        if ($statusPedido) {
+            $pedido->update([
+                'status_pedido_id' => $statusPedido->id,
+            ]);
+
+            if ($statusPedido->desc == 'Pagamento Aprovado' && $pedido->user) {
+                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+            } elseif ($statusPedido->desc == 'Pagamento Pendente' && $pedido->user) {
+                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+            } elseif ($statusPedido->desc == 'Pagamento Recusado' && $pedido->user) {
+                Mail::to($pedido->user->email)->send(new StatusUpdatedMail($pedido, $statusPedido->desc));
+            }
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Status do pedido atualizado com sucesso!']);
     }
 
 
