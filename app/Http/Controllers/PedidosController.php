@@ -17,14 +17,16 @@ class PedidosController extends Controller
 {
 
     public function index()
-    {
-        $pedidos = Pedidos::with(['user', 'status', 'carrinho'])
-            ->where('status_pedido_id', 2)
-            ->paginate(10); // ou qualquer quantidade por página que quiser
-        $status = StatusPedidos::all();
+{
+    $pedidos = Pedidos::with(['user', 'status', 'carrinho'])
+        ->whereIn('status_pedido_id', [2, 4, 5, 6])
+        ->paginate(10);
 
-        return view('pedidos.index', compact('pedidos', 'status'));
-    }
+    $status = StatusPedidos::all();
+
+    return view('pedidos.index', compact('pedidos', 'status'));
+}
+
 
 
     public function show($id)
