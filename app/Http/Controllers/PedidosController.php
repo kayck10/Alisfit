@@ -18,8 +18,10 @@ class PedidosController extends Controller
 
     public function index()
     {
-        $pedidos = Pedidos::with(['user', 'status', 'carrinho'])->where('status_pedido_id', 2)->get();
-        $status = StatusPedidos::all(); // Carrega todos os status
+        $pedidos = Pedidos::with(['user', 'status', 'carrinho'])
+            ->where('status_pedido_id', 2)
+            ->paginate(10); // ou qualquer quantidade por página que quiser
+        $status = StatusPedidos::all();
 
         return view('pedidos.index', compact('pedidos', 'status'));
     }

@@ -18,6 +18,15 @@
 </head>
 
 <style>
+    .form-transition {
+        transition: all 0.3s ease-in-out;
+    }
+
+    input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+    }
+
     .hide {
         display: none;
     }
@@ -446,74 +455,107 @@
 
         <div id="copyright">
             <p>{{ __('CNPJ "XXXXXXXX" - © 2024 Alis - Todos os direitos reservados.') }}</p>
-            <p>{{ __('Desenvolvido por Tarcísio Kayck') }}</p>
+            <!-- Créditos -->
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    Desenvolvido por
+                    <a href="https://www.instagram.com/novi.agency?igsh=YzFkeno0NXIwdmg1&utm_source=qr"
+                        class="text-decoration-none fw-semibold" target="_blank" rel="noopener noreferrer">
+                        Novi Agency
+                    </a>
+                </small>
+            </div>
         </div>
 
     </footer>
 
-    <!-- Modal de Login -->
     <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body">
+            <div class="modal-content shadow-lg rounded-4 border-0 animate__animated animate__fadeIn">
+                <div class="modal-body p-4">
+
+                    <!-- Logo -->
+                    <div class="text-center mb-4">
+                        <img src="{{ asset('images/ALis - nova logo-03.png') }}" alt="Logo"
+                            style="max-height: 60px;">
+                    </div>
+
+                    <!-- Título -->
+                    <h4 class="text-center mb-4 fw-bold" id="loginModalLabel">Acesso à Plataforma</h4>
+
                     <!-- Formulário de Login -->
-                    <form id="loginForm" action="{{ route('cliente.store') }}" method="POST">
+                    <form id="loginForm" action="{{ route('cliente.store') }}" method="POST"
+                        class="form-transition">
                         @csrf
                         <input type="hidden" name="id_tipos_usuarios" value="3">
                         <div class="mb-3">
                             <label for="email" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control form-control-lg rounded-3 shadow-sm"
+                                id="email" name="email" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control form-control-lg rounded-3 shadow-sm"
+                                id="password" name="password" required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                        <button type="submit" class="btn btn-primary w-100 rounded-3 fw-semibold">Entrar</button>
                     </form>
 
-                    <div class="text-center mt-3">
-                        <small>Não tem uma conta? <a href="#" id="showRegister">Crie uma agora</a></small>
+                    <!-- Alternar para Cadastro -->
+                    <div class="text-center mt-3" id="registerLinkWrapper">
+                        <small>Não tem uma conta? <a href="#" id="showRegister"
+                                class="text-decoration-none fw-medium">Crie uma agora</a></small>
                     </div>
+
+
+                    <!-- Separador -->
+                    <hr class="my-4" id="separator" style="display: none;">
 
                     <!-- Formulário de Cadastro -->
                     <form id="registerForm" action="{{ route('cliente.cadastro') }}" method="POST"
-                        style="display: none;">
+                        style="display: none;" class="form-transition">
                         @csrf
+                        <h5 class="text-center mb-3 fw-semibold">Criar Conta</h5>
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome</label>
-                            <input type="text" class="form-control" id="nome" name="nome" required
-                                autocomplete="off">
+                            <input type="text" class="form-control form-control-lg rounded-3 shadow-sm"
+                                id="nome" name="nome" required autocomplete="off">
                         </div>
                         <div class="mb-3">
                             <label for="emailCadastro" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="emailCadastro" name="email" required
-                                autocomplete="off">
+                            <input type="email" class="form-control form-control-lg rounded-3 shadow-sm"
+                                id="emailCadastro" name="email" required autocomplete="off">
                         </div>
                         <div class="mb-3">
                             <label for="senhaCadastro" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="senhaCadastro" name="senha" required
-                                autocomplete="new-password">
+                            <input type="password" class="form-control form-control-lg rounded-3 shadow-sm"
+                                id="senhaCadastro" name="senha" required autocomplete="new-password">
                         </div>
                         <div class="mb-3">
                             <label for="senhaConfirm" class="form-label">Confirmar Senha</label>
-                            <input type="password" class="form-control" id="senhaConfirm" name="senha_confirmation"
-                                required autocomplete="new-password">
+                            <input type="password" class="form-control form-control-lg rounded-3 shadow-sm"
+                                id="senhaConfirm" name="senha_confirmation" required autocomplete="new-password">
                         </div>
-                        <button type="submit" class="btn btn-success w-100">Criar Conta</button>
-                    </form>
+                        <button type="submit" class="btn btn-success w-100 rounded-3 fw-semibold">Criar
+                            Conta</button>
+                        <div class="text-center mt-3">
+                            <small>Já tem uma conta? <a href="#" id="showLogin"
+                                    class="text-decoration-none fw-medium">Voltar para o login</a></small>
+                        </div>
 
+                    </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary rounded-3"
+                        data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
     </div>
+
+
 
 </body>
 <script src="http://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
@@ -561,6 +603,24 @@
             let loginModal = new bootstrap.Modal($('#loginModal'));
             loginModal.show();
         });
+
+        $('#showRegister').on('click', function(e) {
+            e.preventDefault();
+            $('#loginForm').hide();
+            $('#registerLinkWrapper').hide(); // esconder o link "Crie uma agora"
+            $('#separator').show();
+            $('#registerForm').fadeIn();
+        });
+
+        $('#showLogin').on('click', function(e) {
+            e.preventDefault();
+            $('#registerForm').hide();
+            $('#separator').hide();
+            $('#loginForm').fadeIn();
+            $('#registerLinkWrapper').show(); // mostrar de volta o link "Crie uma agora"
+        });
+
+
 
         // Navbar - alterar fundo ao rolar a página
         const header = $("#header");

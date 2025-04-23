@@ -203,8 +203,13 @@
                         </div>
                     </div>
                 </div>
+
             @endforeach
         </div>
+    </div>
+
+    <div class="pagination-container">
+        {{ $pedidos->links('pagination::bootstrap-5') }}
     </div>
 @endsection
 

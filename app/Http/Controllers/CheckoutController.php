@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\StatusUpdatedMail;
 use App\Models\Carrinhos;
 use App\Models\Cupons;
+use App\Models\Log as ModelsLog;
 use App\Models\Pedidos;
 use App\Models\StatusPedidos;
 use Exception;
@@ -69,6 +70,8 @@ class CheckoutController extends Controller
             'payment_id' => $paymentId,
         ]);
 
+        $this->createLog($paymentId);
+
         if ($pedido->carrinho) {
 
             $pedido->carrinho->produtos()->detach();
@@ -100,6 +103,18 @@ class CheckoutController extends Controller
 
     public function webhook(Request $request)
     {
+        SDK::setAccessToken(config('services.mercadopago.access_token'));
+
+        Log::info($request->all());
+        $headers = $request->headers->all();
+
+        // Cria o log com os headers da requisição
+        ModelsLog::create([
+            'log' => json_encode([
+                'headers' => $headers,
+                'body' => $request->all(),
+            ]),
+        ]);
         // Resposta para teste de conexão
         if ($request->isMethod('get')) {
             return response()->json(['status' => 'webhook ready'], 200);
@@ -124,6 +139,7 @@ class CheckoutController extends Controller
             }
 
             $payment = \MercadoPago\Payment::find_by_id($paymentId);
+
             Log::info('teste3');
             $pedido = Pedidos::where('payment_id', $paymentId)->first();
             Log::info('teste4');
@@ -157,6 +173,7 @@ class CheckoutController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Webhook error: '.$e->getMessage());
+            dd($e);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
