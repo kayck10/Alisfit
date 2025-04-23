@@ -93,6 +93,13 @@ class CarrinhosController extends Controller
             ]);
         }
 
+        // Remover cupom se existir
+        if ($carrinho->cupons()->exists()) {
+            $carrinho->cupons()->detach();
+            FacadesToastr::info('Cupom removido. O carrinho foi modificado.', 'Aviso', ["positionClass" => "toast-top-center"]);
+        }
+
+
         FacadesToastr::success('Produto adicionado à sacola.', 'Sucesso', ["positionClass" => "toast-top-center"]);
         return redirect()->back()->with('success', 'Produto adicionado ao carrinho!');
     }
@@ -116,8 +123,8 @@ class CarrinhosController extends Controller
 
         // Depois o item no carrinho
         $carrinhoItem = CarrinhoIten::where('produto_id', $produtoId)
-                            ->where('carrinho_id', $carrinho->id)
-                            ->first();
+            ->where('carrinho_id', $carrinho->id)
+            ->first();
 
         if (!$carrinhoItem) {
             return response()->json(['error' => 'Item não encontrado no carrinho'], 404);
@@ -126,6 +133,10 @@ class CarrinhosController extends Controller
         $novaQuantidade = max(1, (int)$request->input('quantidade'));
         $carrinhoItem->quantidade = $novaQuantidade;
         $carrinhoItem->save();
+
+        if ($carrinho->cupons()->exists()) {
+            $carrinho->cupons()->detach();
+        }
 
         return response()->json([
             'success' => true,
@@ -140,6 +151,11 @@ class CarrinhosController extends Controller
 
         if ($carrinho) {
             $carrinho->produtos()->detach($produtoId);
+            if ($carrinho->cupons()->exists()) {
+                $carrinho->cupons()->detach();
+                FacadesToastr::info('Cupom removido. O carrinho foi modificado.', 'Aviso', ["positionClass" => "toast-top-center"]);
+            }
+
             FacadesToastr::success('Produto removido da sacola', 'Sucesso', ["positionClass" => "toast-top-center"]);
             return redirect()->back()->with('success', 'Produto removido do carrinho!');
         }
@@ -216,9 +232,6 @@ class CarrinhosController extends Controller
         $quantidadeProdutos = $carrinho->produtos()->count();
         $cupomAplicado = $carrinho->cupons()->exists();
 
-        if ($cupomAplicado) {
-            $carrinho->cupons()->detach();
-        }
 
         $subtotal = $carrinho->produtos->sum(function ($produto) {
             return $produto->pivot->quantidade * $produto->preco;
