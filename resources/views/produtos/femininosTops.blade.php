@@ -31,101 +31,74 @@
                 </div>
             @endforeach
         </div>
-        @endif
-    </div>
+    @endif
+</div>
 </main>
 
 <style>
-    .container {
-        margin-top: 100px;
-    }
+.container {
+    margin-top: 100px;
+}
 
-    .btn-primary {
-        background: black !important;
-        border: none;
-        padding: 6px 12px;
-        font-size: 13px;
-        margin-top: 5px;
-        color: white;
-        width: 75%;
-        transition: background 0.3s ease, transform 0.2s ease;
-        border-radius: 4px;
-    }
+.btn-primary {
+    background: black !important;
+    border: none;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: white;
+    width: 90%;
+    transition: background 0.3s ease, transform 0.2s ease;
+    border-radius: 4px;
+}
 
-    .btn-primary:hover {
-        background: #333 !important;
-        transform: scale(1.05);
-    }
+.btn-primary:hover {
+    background: #333 !important;
+    transform: scale(1.05);
+}
 
-    .col-md-3 {
-        padding: 8px;
-    }
+.product-card {
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+    margin: auto;
+}
 
-    .product-card {
-        text-align: center;
-        padding: 12px;
-        border-radius: 8px;
-        transition: box-shadow 0.3s ease, transform 0.3s ease;
-        width: 100%;
-        max-width: 300px;
-        min-width: 260px;
-        margin: auto;
-    }
+.product-card img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 6px;
+    transition: transform 0.3s ease;
+}
 
+@media (max-width: 768px) {
     .product-card img {
-        width: 100%;
-        height: 320px;
-        object-fit: cover;
-        transition: transform 0.3s ease;
+        height: auto;
+        aspect-ratio: 3/4;
     }
+}
 
-    @media (max-width: 768px) {
-        .product-card img {
-            height: auto;
-            aspect-ratio: 3/4;
-        }
-    }
+.product-card img:hover {
+    transform: scale(1.05);
+}
 
-    .product-card img:hover {
-        transform: scale(1.05);
-    }
+.product-card:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+}
 
-    .product-card:hover {
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-        transform: translateY(-5px);
-    }
+.product-name, .product-price, .btn-primary {
+    margin-top: 6px;
+}
 
-    .product-name,
-    .product-price,
-    .btn-primary {
-        margin-top: 6px;
+@media (max-width: 576px) {
+    .col-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
     }
-
-    .btn-primary {
-        width: 90%;
-        padding: 10px 14px;
-        font-size: 15px;
-    }
-
-    @media (max-width: 992px) {
-        .col-md-4 {
-            flex: 0 0 50%;
-            max-width: 50%;
-        }
-    }
-
-    @media (min-width: 1200px) {
-        .col-md-3 {
-            flex: 0 0 25%;
-            max-width: 25%;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .col-md-4 {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-    }
+}
 </style>
 @endsection

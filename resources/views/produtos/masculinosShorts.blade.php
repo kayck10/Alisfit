@@ -31,74 +31,74 @@
                     </div>
                 @endforeach
             </div>
-            @endif
-        </div>
-    </main>
+        @endif
+    </div>
+</main>
 
-    <style>
-        .container {
-            margin-top: 100px;
-        }
+<style>
+    .container {
+        margin-top: 100px;
+    }
 
-        .btn-primary {
-            background: black !important;
-            border: none;
-            padding: 8px 14px;
-            font-size: 14px;
-            color: white;
-            width: 90%;
-            transition: background 0.3s ease, transform 0.2s ease;
-            border-radius: 4px;
-        }
+    .btn-primary {
+        background: black !important;
+        border: none;
+        padding: 8px 14px;
+        font-size: 14px;
+        color: white;
+        width: 90%;
+        transition: background 0.3s ease, transform 0.2s ease;
+        border-radius: 4px;
+    }
 
-        .btn-primary:hover {
-            background: #333 !important;
-            transform: scale(1.05);
-        }
+    .btn-primary:hover {
+        background: #333 !important;
+        transform: scale(1.05);
+    }
 
-        .product-card {
-            text-align: center;
-            padding: 12px;
-            border-radius: 8px;
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-            width: 100%;
-            max-width: 300px;
-            margin: auto;
-        }
+    .product-card {
+        text-align: center;
+        padding: 12px;
+        border-radius: 8px;
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+        width: 100%;
+        max-width: 300px;
+        margin: auto;
+    }
 
+    .product-card img {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 6px;
+        transition: transform 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
         .product-card img {
-            width: 100%;
-            height: 320px;
-            object-fit: cover;
-            border-radius: 6px;
-            transition: transform 0.3s ease;
+            height: auto;
+            aspect-ratio: 3/4;
         }
+    }
 
-        @media (max-width: 768px) {
-            .product-card img {
-                height: auto;
-                aspect-ratio: 3/4;
-            }
-        }
+    .product-card img:hover {
+        transform: scale(1.05);
+    }
 
-        .product-card img:hover {
-            transform: scale(1.05);
-        }
+    .product-card:hover {
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        transform: translateY(-5px);
+    }
 
-        .product-card:hover {
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-            transform: translateY(-5px);
-        }
+    .product-name, .product-price, .btn-primary {
+        margin-top: 6px;
+    }
 
-        .product-name, .product-price, .btn-primary {
-            margin-top: 6px;
+    @media (max-width: 576px) {
+        .col-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
         }
-
-        @media (max-width: 576px) {
-            .col-6 {
-                flex: 0 0 50%;
-                max-width: 50%;
-            }
-        }
-    </style>
+    }
+</style>
 @endsection
