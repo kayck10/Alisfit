@@ -3,7 +3,7 @@
 @section('content')
     <main class="col-md-9 offset-md-1">
         <div class="container">
-            <h3 class="mb-4 text-center">Leggings Femininas</h3>
+            <h3 class="mb-4">Leggings Femininas</h3>
 
             @if ($produtos->isEmpty())
                 <div class="alert alert-warning text-center">

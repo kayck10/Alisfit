@@ -31,10 +31,9 @@
                     </div>
                 @endforeach
             </div>
-            @endif
-        </div>
-    </main>
-@endsection
+        @endif
+    </div>
+</main>
 
 <style>
     .container {
@@ -44,11 +43,10 @@
     .btn-primary {
         background: black !important;
         border: none;
-        padding: 6px 12px;
-        font-size: 13px;
-        margin-top: 5px;
+        padding: 8px 14px;
+        font-size: 14px;
         color: white;
-        width: 75%;
+        width: 90%;
         transition: background 0.3s ease, transform 0.2s ease;
         border-radius: 4px;
     }
@@ -58,10 +56,6 @@
         transform: scale(1.05);
     }
 
-    .col-md-3 {
-        padding: 8px;
-    }
-
     .product-card {
         text-align: center;
         padding: 12px;
@@ -69,7 +63,6 @@
         transition: box-shadow 0.3s ease, transform 0.3s ease;
         width: 100%;
         max-width: 300px;
-        min-width: 260px;
         margin: auto;
     }
 
@@ -77,6 +70,7 @@
         width: 100%;
         height: 320px;
         object-fit: cover;
+        border-radius: 6px;
         transition: transform 0.3s ease;
     }
 
@@ -96,36 +90,15 @@
         transform: translateY(-5px);
     }
 
-    .product-name,
-    .product-price,
-    .btn-primary {
+    .product-name, .product-price, .btn-primary {
         margin-top: 6px;
     }
 
-    .btn-primary {
-        width: 90%;
-        padding: 10px 14px;
-        font-size: 15px;
-    }
-
-    @media (max-width: 992px) {
-        .col-md-4 {
+    @media (max-width: 576px) {
+        .col-6 {
             flex: 0 0 50%;
             max-width: 50%;
         }
     }
-
-    @media (min-width: 1200px) {
-        .col-md-3 {
-            flex: 0 0 25%;
-            max-width: 25%;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .col-md-4 {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-    }
 </style>
+@endsection
