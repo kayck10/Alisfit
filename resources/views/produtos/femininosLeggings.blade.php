@@ -1,7 +1,7 @@
 @extends('Layout.principal')
 
 @section('content')
-    <main class="col-md-9 offset-md-3">
+    <main class="col-md-9 offset-md-1">
         <div class="container">
             <h3 class="mb-4 text-center">Leggings Femininas</h3>
 
@@ -10,27 +10,27 @@
                     Nenhuma legging disponível no momento.
                 </div>
             @else
-                <div class="row">
-                    @foreach ($produtos as $produto)
-                        <div class="col-md-3 col-sm-6 mb-4">
-                            <div class="product-card">
-                                <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">
-                                    @if ($produto->imagens->isNotEmpty())
-                                    <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
-                                        alt="{{ $produto->nome }}" class="img-custom">
-                                @else
-                                    <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
-                                @endif
-                                </a>
-                                <p class="product-name">{{ $produto->nome }}</p>
-                                <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
+            <div class="row">
+                @foreach ($produtos as $produto)
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
+                        <div class="product-card">
+                            <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">
+                                @if ($produto->imagens->isNotEmpty())
+                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                    alt="{{ $produto->nome }}" class="img-custom">
+                            @else
+                                <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
+                            @endif
+                            </a>
+                            <p class="product-name">{{ $produto->nome }}</p>
+                            <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
 
-                                <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-dark">Ver Detalhes</a>
 
-                            </div>
+                                <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary">Ver Detalhes</a>
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
+            </div>
             @endif
         </div>
     </main>

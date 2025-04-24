@@ -1,7 +1,7 @@
 @extends('Layout.principal')
 
 @section('content')
-<main class="col-md-9 offset-md-3">
+<main class="col-md-9 offset-md-1">
     <div class="container">
         <h3 class="mb-4">Camisetas Masculinas</h3>
 

@@ -56,6 +56,8 @@ class ProdutosController extends Controller
             'destaque' => $request->boolean('destaque'),
             'lancamento' => $request->boolean('lancamento'),
             'oferta' => $request->boolean('oferta'),
+            'genero_id' => $request->genero_id,
+            'tipo_produto_id' => $request->tipo_produto_id
         ]);
 
         if ($request->has('relacionados')) {
@@ -213,7 +215,7 @@ class ProdutosController extends Controller
     public function masculinasCamisetas()
     {
         $masculino = Generos::where('desc', 'Masculino')->first();
-        $camiseta = TiposProdutos::where('desc', 'Camisa', 'Camiseta')->first();
+        $camiseta = TiposProdutos::where('desc', 'Camisa')->first();
         $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
 

@@ -1,7 +1,7 @@
 @extends('Layout.principal')
 
 @section('content')
-    <main class="col-md-9 offset-md-3">
+    <main class="col-md-9 offset-md-1">
         <div class="container">
             <h3 class="mb-4">Shorts Masculinos</h3>
 
@@ -10,27 +10,27 @@
                     Nenhum short masculino disponível no momento.
                 </div>
             @else
-                <div class="row">
-                    @foreach ($produtos as $produto)
-                        <div class="col-md-3 col-sm-6 mb-4">
-                            <div class="product-card">
-                                <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">
-                                    @if ($produto->imagens->isNotEmpty())
-                                    <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
-                                        alt="{{ $produto->nome }}" class="img-custom">
-                                @else
-                                    <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
-                                @endif
-                                </a>
-                                <p class="product-name">{{ $produto->nome }}</p>
-                                <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
+            <div class="row">
+                @foreach ($produtos as $produto)
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-6 mb-4">
+                        <div class="product-card">
+                            <a href="{{ route('produto.detalhes', ['id' => $produto->id]) }}">
+                                @if ($produto->imagens->isNotEmpty())
+                                <img src="{{ \App\Helpers\ImageHelper::getProdutoImagemUrl($produto) }}"
+                                    alt="{{ $produto->nome }}" class="img-custom">
+                            @else
+                                <img src="{{ asset('images/banner/12.png') }}" alt="Imagem padrão">
+                            @endif
+                            </a>
+                            <p class="product-name">{{ $produto->nome }}</p>
+                            <p class="product-price">R$ {{ number_format($produto->preco, 2, ',', '.') }}</p>
 
-                                <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-dark">Ver Detalhes</a>
 
-                            </div>
+                                <a href="{{ route('produto.detalhes', $produto->id) }}" class="btn btn-primary">Ver Detalhes</a>
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
+            </div>
             @endif
         </div>
     </main>
@@ -43,11 +43,10 @@
         .btn-primary {
             background: black !important;
             border: none;
-            padding: 6px 12px;
-            font-size: 13px;
-            margin-top: 5px;
+            padding: 8px 14px;
+            font-size: 14px;
             color: white;
-            width: 75%;
+            width: 90%;
             transition: background 0.3s ease, transform 0.2s ease;
             border-radius: 4px;
         }
@@ -57,10 +56,6 @@
             transform: scale(1.05);
         }
 
-        .col-md-3 {
-            padding: 8px;
-        }
-
         .product-card {
             text-align: center;
             padding: 12px;
@@ -68,7 +63,6 @@
             transition: box-shadow 0.3s ease, transform 0.3s ease;
             width: 100%;
             max-width: 300px;
-            min-width: 260px;
             margin: auto;
         }
 
@@ -76,8 +70,8 @@
             width: 100%;
             height: 320px;
             object-fit: cover;
-            transition: transform 0.3s ease;
             border-radius: 6px;
+            transition: transform 0.3s ease;
         }
 
         @media (max-width: 768px) {
@@ -96,36 +90,14 @@
             transform: translateY(-5px);
         }
 
-        .product-name,
-        .product-price,
-        .btn-primary {
+        .product-name, .product-price, .btn-primary {
             margin-top: 6px;
         }
 
-        .btn-primary {
-            width: 90%;
-            padding: 10px 14px;
-            font-size: 15px;
-        }
-
-        @media (max-width: 992px) {
-            .col-md-4 {
+        @media (max-width: 576px) {
+            .col-6 {
                 flex: 0 0 50%;
                 max-width: 50%;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .col-md-3 {
-                flex: 0 0 25%;
-                max-width: 25%;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .col-md-4 {
-                flex: 0 0 100%;
-                max-width: 100%;
             }
         }
     </style>
