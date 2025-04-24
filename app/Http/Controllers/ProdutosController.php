@@ -135,6 +135,8 @@ class ProdutosController extends Controller
             'destaque' => $request->boolean('destaque'),
             'lancamento' => $request->boolean('lancamento'),
             'oferta' => $request->boolean('oferta'),
+            'genero_id' => $request->genero_id,
+            'tipo_produto_id' => $request->tipo_produto_id
         ]);
 
         if ($request->has('relacionados')) {
