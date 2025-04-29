@@ -15,9 +15,9 @@ use App\Http\Controllers\ProdutosController;
 use App\Http\Controllers\TabelaMedidasController;
 use App\Http\Controllers\TiposProdutosController;
 use App\Http\Controllers\UsersController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
-
 
 Route::get('/login/admin', [LoginController::class, 'login'])->name('login');
 
@@ -156,7 +156,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/failure', [CheckoutController::class, 'failure'])->name('checkout.failure');
         Route::get('/pending', [CheckoutController::class, 'pending'])->name('checkout.pending');
         Route::get('/{id}', [CheckoutController::class, 'checkout'])->name('checkout');
-
     });
 
 
@@ -164,14 +163,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/calcular-frete', [FreteController::class, 'calcular'])->name('frete.calcular');
 });
 
+Route::post('/frete/salvar', function (Request $request) {
+    session(['valorFrete' => $request->valorFrete]);
+    return response()->json(['success' => true]);
+})->name('frete.salvar');
 
 Route::get('/imagens/produtos/{caminho}/{filename}', [ImagensProdutoController::class, 'getImage'])
-     ->name('produtos.imagem')
-     ->where('filename', '.*');
+    ->name('produtos.imagem')
+    ->where('filename', '.*');
 
 Route::get('/imagens/colecoes/{caminho}/{filename}', [ImagensProdutoController::class, 'getImageC'])
-     ->name('colecoes.imagem')
-     ->where('filename', '.*');
+    ->name('colecoes.imagem')
+    ->where('filename', '.*');
 
 
 

@@ -699,7 +699,7 @@
     });
 
     function atualizarBarraFreteGratis(totalCarrinho) {
-        let valorFreteGratis = 200;
+        let valorFreteGratis = 250;
         let faltando = Math.max(0, valorFreteGratis - totalCarrinho);
         let percentual = Math.min(100, (totalCarrinho / valorFreteGratis) * 100);
 

@@ -397,13 +397,13 @@
         <div class="ticker-wrap">
             <div class="ticker">
                 <span>COMPRE AGORA E PARCELE EM ATÉ 10X</span>
-                <span>DEVOLUÇÃO GARANTIDA EM ATÉ 7 DIAS</span>
+                <span>FRETE GRÁTIS A PARTIR DE R$ 250</span>
                 <span>COMPRE AGORA E PARCELE EM ATÉ 10X</span>
-                <span>DEVOLUÇÃO GARANTIDA EM ATÉ 7 DIAS</span>
+                <span>FRETE GRÁTIS A PARTIR DE R$ 250</span>
                 <span>COMPRE AGORA E PARCELE EM ATÉ 10X</span>
-                <span>DEVOLUÇÃO GARANTIDA EM ATÉ 7 DIAS</span>
+                <span>FRETE GRÁTIS A PARTIR DE R$ 250</span>
                 <span>COMPRE AGORA E PARCELE EM ATÉ 10X</span>
-                <span>DEVOLUÇÃO GARANTIDA EM ATÉ 7 DIAS</span>
+                <span>FRETE GRÁTIS A PARTIR DE R$ 250</span>
             </div>
         </div>
     </section>

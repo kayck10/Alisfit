@@ -63,6 +63,7 @@ class FreteService
                 'grátis' => false
             ];
         } catch (\Exception $e) {
+            dd($e);
             return ["error" => "Erro inesperado: " . $e->getMessage()];
         }
     }

@@ -48,6 +48,8 @@ class LoginController extends Controller
             'nome' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'senha' => 'required|min:6|confirmed',
+            'telefone' => 'nullable|string|max:20',
+
         ]);
 
         $user = User::create([
@@ -55,6 +57,7 @@ class LoginController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->senha),
             'id_tipos_usuarios' => 4,
+            'telefone' => $request->telefone,
         ]);
 
         Auth::login($user);

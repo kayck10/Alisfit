@@ -20,8 +20,8 @@ class PrincipalController extends Controller
             ->where('destaque', true)
             ->take(6)
             ->get();
-        $colecoes = Colecoes::all();
-        $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
+            $colecoes = Colecoes::where('status', 'publicado')->get();
+            $carrinho = Carrinhos::with('produtos')->where('user_id', Auth::id())->first();
 
         $pedido = optional($carrinho)->pedido_id;
 

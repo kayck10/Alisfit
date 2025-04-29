@@ -244,8 +244,6 @@ class CarrinhosController extends Controller
         return view('carrinho.info', compact('carrinho', 'subtotal', 'desconto', 'total', 'cor_map', 'produtos'));
     }
 
-
-
     public function finalizar()
     {
         $carrinho = Carrinhos::with('produtos', 'cupons')->where('user_id', Auth::id())->first();

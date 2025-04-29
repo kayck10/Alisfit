@@ -3,15 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Mail\StatusUpdatedMail;
-use App\Models\Carrinhos;
 use App\Models\Cupons;
 use App\Models\Log as ModelsLog;
 use App\Models\Pedidos;
 use App\Models\StatusPedidos;
 use Exception;
-use Faker\Provider\pt_BR\Payment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use MercadoPago\SDK;
